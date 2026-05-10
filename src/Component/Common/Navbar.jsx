@@ -1,16 +1,29 @@
 import React, { useState } from "react";
-import { ChevronDown, Phone, Globe } from "lucide-react";
+import { ChevronDown, Phone } from "lucide-react";
 import { Link } from "react-router-dom";
 
 const Navbar = () => {
   const [location, setLocation] = useState({ name: "Nepal", flag: "🇳🇵" });
-  const [isOpen, setIsOpen] = useState(false);
+  const [isLocOpen, setIsLocOpen] = useState(false);
+  const [isCompanyOpen, setIsCompanyOpen] = useState(false);
 
   const locations = [
     { name: "Nepal", flag: "🇳🇵" },
     { name: "America", flag: "🇺🇸" },
     { name: "Australia", flag: "🇦🇺" },
     { name: "UK", flag: "🇬🇧" },
+  ];
+
+  const companyLinks = [
+    [
+      "About-us",
+      "Meet Our Team",
+      "Why Ace?",
+      "CSI",
+      "Legal Documents",
+      "Terms and Conditions",
+    ],
+    ["Sign Up for Newsletter", "Contact Us"],
   ];
 
   return (
@@ -32,9 +45,39 @@ const Navbar = () => {
         <Link className="flex items-center hover:text-gray-300">
           TIBET <ChevronDown size={16} className="ml-1" />
         </Link>
-        <Link className="flex items-center hover:text-gray-300">
-          COMPANY <ChevronDown size={16} className="ml-1" />
-        </Link>
+
+        <div
+          className="relative group py-2"
+          onMouseEnter={() => setIsCompanyOpen(true)}
+          onMouseLeave={() => setIsCompanyOpen(false)}
+        >
+          <button className="flex items-center hover:text-gray-300 uppercase">
+            COMPANY{" "}
+            <ChevronDown
+              size={16}
+              className={`ml-1 transition-transform ${isCompanyOpen ? "rotate-180" : ""}`}
+            />
+          </button>
+
+          {isCompanyOpen && (
+            <div className="absolute left-1/2 -translate-x-1/2 mt-4 w-[600px] bg-white text-black shadow-2xl rounded-sm p-8 z-50 grid grid-cols-2 gap-x-12 border-t-4 border-green-600">
+              {companyLinks.map((column, idx) => (
+                <div key={idx} className="flex flex-col space-y-3">
+                  {column.map((link) => (
+                    <Link
+                      key={link}
+                      to={`/${link.toLowerCase().replace(/ /g, "-")}`}
+                      className="text-[15px] font-medium hover:text-green-700 transition-colors duration-200"
+                    >
+                      {link}
+                    </Link>
+                  ))}
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+
         <Link className="flex items-center hover:text-gray-300">
           NEPAL TREKS <ChevronDown size={16} className="ml-1" />
         </Link>
@@ -51,26 +94,26 @@ const Navbar = () => {
         <div className="flex flex-col items-end">
           <div className="relative">
             <button
-              onClick={() => setIsOpen(!isOpen)}
-              className="flex items-center text-[11px] mb-1 hover:text-gray-300 transition-colors"
+              onClick={() => setIsLocOpen(!isLocOpen)}
+              className="flex items-center text-[11px] mb-1 hover:text-gray-300"
             >
               <span className="uppercase tracking-wider">Change Location</span>
               <span className="ml-2">{location.flag}</span>
               <ChevronDown
                 size={12}
-                className={`ml-1 transition-transform ${isOpen ? "rotate-180" : ""}`}
+                className={`ml-1 ${isLocOpen ? "rotate-180" : ""}`}
               />
             </button>
 
-            {isOpen && (
-              <div className="absolute right-0 mt-1 w-32 bg-white text-black rounded shadow-lg z-50 py-1 overflow-hidden">
+            {isLocOpen && (
+              <div className="absolute right-0 mt-1 w-32 bg-white text-black rounded shadow-lg z-50 py-1">
                 {locations.map((loc) => (
                   <div
                     key={loc.name}
-                    className="px-3 py-2 text-xs hover:bg-gray-100 cursor-pointer flex justify-between items-center"
+                    className="px-3 py-2 text-xs hover:bg-gray-100 cursor-pointer flex justify-between"
                     onClick={() => {
                       setLocation(loc);
-                      setIsOpen(false);
+                      setIsLocOpen(false);
                     }}
                   >
                     {loc.name} <span>{loc.flag}</span>

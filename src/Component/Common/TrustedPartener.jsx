@@ -52,7 +52,7 @@ const TrustedPartner = () => {
 
           <div className="pt-4">
             <Link
-              to="/about"
+              to="/About-us"
               className="inline-block bg-[#f1b400] hover:bg-[#d49f00] text-black font-bold py-3 px-8 rounded-sm transition-colors shadow-md"
             >
               Read more about us

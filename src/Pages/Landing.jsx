@@ -4,11 +4,13 @@ import TrustedPartner from '../Component/Common/TrustedPartener'
 import Aced from '../Component/Common/Aced'
 import WhyAce from '../Component/Common/WhyAce'
 import FAQ from '../Component/Common/Frequent'
+import Everest from '../Component/Feature/Everest'
 
 const Landing=()=> {
   return (
     <div>
       <Hero/>
+      <Everest/>
       <TrustedPartner/>
       <Aced/>
       <WhyAce/>

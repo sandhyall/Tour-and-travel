@@ -1,10 +1,8 @@
 import Booking from "../models/Booking.js";
 import Trip from "../models/Trip.js";
 
-export const createBooking = async (
-  req,
-  res
-) => {
+// CREATE BOOKING
+export const createBooking = async (req, res) => {
   try {
     const {
       tripId,
@@ -14,8 +12,7 @@ export const createBooking = async (
       travelDate,
     } = req.body;
 
-    const trip =
-      await Trip.findById(tripId);
+    const trip = await Trip.findById(tripId);
 
     if (!trip) {
       return res.status(404).json({
@@ -23,89 +20,79 @@ export const createBooking = async (
       });
     }
 
-    // FIND SELECTED DATE
-    const selectedDate =
-      trip.availableDates.find(
-        (d) =>
-          new Date(d.date)
-            .toISOString()
-            .split("T")[0] ===
-          travelDate
-      );
+    const selectedDate = trip.availableDates.find(
+      (d) =>
+        new Date(d.date).toISOString().split("T")[0] === travelDate
+    );
 
     if (!selectedDate) {
       return res.status(400).json({
-        message:
-          "Date unavailable",
+        message: "Date unavailable",
       });
     }
 
     const remainingSeats =
-      selectedDate.totalSeats -
-      selectedDate.bookedSeats;
+      selectedDate.totalSeats - selectedDate.bookedSeats;
 
-    // PREVENT OVERBOOKING
-    if (
-      numberOfPeople >
-      remainingSeats
-    ) {
+    if (numberOfPeople > remainingSeats) {
       return res.status(400).json({
-        message:
-          "Not enough seats",
+        message: "Not enough seats",
       });
     }
 
-    const totalAmount =
-      trip.price *
-      numberOfPeople;
+    const totalAmount = trip.price * numberOfPeople;
 
-    const booking =
-      await Booking.create({
-        trip: tripId,
-        buyer,
-        participants,
-        numberOfPeople,
-        travelDate,
-        totalAmount,
+    const booking = await Booking.create({
+      trip: tripId,
+      buyer,
+      participants,
+      numberOfPeople,
+      travelDate,
+      totalAmount,
+      paymentStatus: "pending",
+      bookingStatus: "pending",
+    });
 
-        paymentStatus:
-          "pending",
-
-        bookingStatus:
-          "pending",
-      });
-
-    res.status(201).json(
-      booking
-    );
+    res.status(201).json(booking);
   } catch (err) {
     res.status(500).json({
       message: err.message,
     });
   }
 };
-export const getBookedDates =
-  async (req, res) => {
-    try {
-      const trip =
-        await Trip.findById(
-          req.params.tripId
-        );
 
-      if (!trip) {
-        return res.status(404)
-          .json({
-            message:
-              "Trip not found",
-          });
-      }
+// GET BOOKED DATES
+export const getBookedDates = async (req, res) => {
+  try {
+    const trip = await Trip.findById(req.params.tripId);
 
-      res.json(
-        trip.availableDates
-      );
-    } catch (err) {
-      res.status(500).json({
-        message: err.message,
+    if (!trip) {
+      return res.status(404).json({
+        message: "Trip not found",
       });
     }
-  };
+
+    res.json(trip.availableDates);
+  } catch (err) {
+    res.status(500).json({
+      message: err.message,
+    });
+  }
+};
+
+// ADMIN FUNCTIONS (placeholders if not built yet)
+export const getAllBookings = async (req, res) => {
+  res.json({ message: "getAllBookings not implemented yet" });
+};
+
+export const uploadSlip = async (req, res) => {
+  res.json({ message: "uploadSlip not implemented yet" });
+};
+
+export const verifyBooking = async (req, res) => {
+  res.json({ message: "verifyBooking not implemented yet" });
+};
+
+export const updateBookingStatus = async (req, res) => {
+  res.json({ message: "updateBookingStatus not implemented yet" });
+};

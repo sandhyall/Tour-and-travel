@@ -3,7 +3,9 @@ import slugify from "slugify";
 import cloudinary from "../config/cloudinary.js";
 import streamifier from "streamifier";
 
-// upload buffer helper
+/* =========================
+   Cloudinary Upload Helper
+========================= */
 const uploadBuffer = (buffer) => {
   return new Promise((resolve, reject) => {
     const stream = cloudinary.uploader.upload_stream(
@@ -11,14 +13,16 @@ const uploadBuffer = (buffer) => {
       (err, result) => {
         if (err) return reject(err);
         resolve(result);
-      }
+      },
     );
 
     streamifier.createReadStream(buffer).pipe(stream);
   });
 };
 
-// safe JSON parse
+/* =========================
+   Safe JSON Parse
+========================= */
 const safeParse = (val) => {
   try {
     return typeof val === "string" ? JSON.parse(val) : val || [];
@@ -32,25 +36,32 @@ const safeParse = (val) => {
 ========================= */
 export const createTrip = async (req, res) => {
   try {
-    console.log("BODY RECEIVED:", req.body);
-
     const data = req.body;
 
-    const slug = slugify(data.title || "trip", { lower: true });
+    const slug = slugify(data.title || "trip", {
+      lower: true,
+      strict: true,
+    });
 
-    let heroImage = {};
-    if (req.files?.heroImage?.[0]) {
-      const result = await uploadBuffer(req.files.heroImage[0].buffer);
+    // HERO IMAGE
+    let heroImage = null;
+
+    if (req.files?.featuredImage?.[0]) {
+      const result = await uploadBuffer(req.files.featuredImage[0].buffer);
+
       heroImage = {
         url: result.secure_url,
         public_id: result.public_id,
       };
     }
 
+    // GALLERY IMAGES
     let galleryImages = [];
-    if (req.files?.galleryImages?.length) {
-      for (let file of req.files.galleryImages) {
+
+    if (req.files?.gallery?.length) {
+      for (let file of req.files.gallery) {
         const result = await uploadBuffer(file.buffer);
+
         galleryImages.push({
           url: result.secure_url,
           public_id: result.public_id,
@@ -61,9 +72,9 @@ export const createTrip = async (req, res) => {
     const trip = await Trip.create({
       title: data.title,
       country: data.country,
-      duration: Number(data.duration),
-      price: Number(data.price),
-      oldPrice: Number(data.oldPrice),
+      duration: Number(data.duration) || 0,
+      price: Number(data.price) || 0,
+      oldPrice: Number(data.oldPrice) || 0,
 
       overview: data.overview,
       difficulty: data.difficulty,
@@ -76,27 +87,24 @@ export const createTrip = async (req, res) => {
       accommodation: data.accommodation,
 
       slug,
-      heroImage,
-      galleryImages,
 
-      packages: safeParse(data.packages),
-      itinerary: safeParse(data.itinerary),
+      heroImage, // ✅ MATCHED WITH SCHEMA
+      galleryImages, // ✅ MATCHED WITH SCHEMA
+
       includes: safeParse(data.includes),
       excludes: safeParse(data.excludes),
       highlights: safeParse(data.highlights),
+      itinerary: safeParse(data.itinerary),
       faqs: safeParse(data.faqs),
       packingList: safeParse(data.packingList),
     });
 
-    console.log("✅ TRIP CREATED:", trip._id);
-
     return res.status(201).json(trip);
-
   } catch (err) {
-    console.error("❌ CREATE TRIP ERROR:", err);
+    console.error(err);
     return res.status(500).json({
       message: "Trip creation failed",
-      error: err.message
+      error: err.message,
     });
   }
 };
@@ -105,20 +113,16 @@ export const createTrip = async (req, res) => {
    GET ALL TRIPS
 ========================= */
 export const getTrips = async (req, res) => {
-  const trips = await Trip.find();
-  res.json(trips);
+  try {
+    const trips = await Trip.find().sort({ createdAt: -1 });
+    return res.status(200).json(trips);
+  } catch (err) {
+    return res.status(500).json({ message: err.message });
+  }
 };
 
 /* =========================
-   GET TRIP BY SLUG
-========================= */
-export const getTrip = async (req, res) => {
-  const trip = await Trip.findOne({ slug: req.params.slug });
-  res.json(trip);
-};
-
-/* =========================
-   GET TRIP BY ID (ONLY ONCE)
+   GET BY ID
 ========================= */
 export const getTripById = async (req, res) => {
   try {
@@ -128,14 +132,14 @@ export const getTripById = async (req, res) => {
       return res.status(404).json({ message: "Trip not found" });
     }
 
-    res.json(trip);
+    return res.status(200).json(trip);
   } catch (err) {
-    res.status(500).json({ message: err.message });
+    return res.status(500).json({ message: err.message });
   }
 };
 
 /* =========================
-   UPDATE TRIP
+   UPDATE TRIP (FIXED)
 ========================= */
 export const updateTrip = async (req, res) => {
   try {
@@ -145,19 +149,30 @@ export const updateTrip = async (req, res) => {
       return res.status(404).json({ message: "Trip not found" });
     }
 
-    Object.assign(trip, req.body);
+    // SAFE FIELD UPDATE
+    if (req.body.title) trip.title = req.body.title;
+    if (req.body.country) trip.country = req.body.country;
+    if (req.body.duration) trip.duration = req.body.duration;
+    if (req.body.price) trip.price = req.body.price;
+    if (req.body.overview) trip.overview = req.body.overview;
 
-    if (req.body.itinerary) trip.itinerary = safeParse(req.body.itinerary);
-    if (req.body.packages) trip.packages = safeParse(req.body.packages);
     if (req.body.includes) trip.includes = safeParse(req.body.includes);
     if (req.body.excludes) trip.excludes = safeParse(req.body.excludes);
     if (req.body.highlights) trip.highlights = safeParse(req.body.highlights);
+    if (req.body.itinerary) trip.itinerary = safeParse(req.body.itinerary);
     if (req.body.faqs) trip.faqs = safeParse(req.body.faqs);
-    if (req.body.packingList) trip.packingList = safeParse(req.body.packingList);
+
+    // SLUG UPDATE
+    if (req.body.title) {
+      trip.slug = slugify(req.body.title, {
+        lower: true,
+        strict: true,
+      });
+    }
 
     // HERO IMAGE UPDATE
-    if (req.files?.heroImage?.[0]) {
-      const result = await uploadBuffer(req.files.heroImage[0].buffer);
+    if (req.files?.featuredImage?.[0]) {
+      const result = await uploadBuffer(req.files.featuredImage[0].buffer);
 
       trip.heroImage = {
         url: result.secure_url,
@@ -166,27 +181,29 @@ export const updateTrip = async (req, res) => {
     }
 
     // GALLERY UPDATE
-    if (req.files?.galleryImages?.length) {
-      const gallery = [];
+    if (req.files?.gallery?.length) {
+      const updatedGallery = [];
 
-      for (let file of req.files.galleryImages) {
+      for (let file of req.files.gallery) {
         const result = await uploadBuffer(file.buffer);
 
-        gallery.push({
+        updatedGallery.push({
           url: result.secure_url,
           public_id: result.public_id,
         });
       }
 
-      trip.galleryImages = gallery;
+      trip.galleryImages = updatedGallery;
     }
 
     await trip.save();
 
-    res.json(trip);
+    return res.status(200).json(trip);
   } catch (err) {
-    console.log("UPDATE TRIP ERROR:", err);
-    res.status(500).json({ message: err.message });
+    return res.status(500).json({
+      message: "Update failed",
+      error: err.message,
+    });
   }
 };
 
@@ -195,53 +212,64 @@ export const updateTrip = async (req, res) => {
 ========================= */
 export const deleteTrip = async (req, res) => {
   try {
-    await Trip.findByIdAndDelete(req.params.id);
-    res.json({ message: "Deleted" });
+    const trip = await Trip.findById(req.params.id);
+
+    if (!trip) {
+      return res.status(404).json({ message: "Trip not found" });
+    }
+
+    await trip.deleteOne();
+
+    return res.status(200).json({
+      success: true,
+      message: "Trip deleted successfully",
+    });
   } catch (err) {
-    res.status(500).json({ message: err.message });
+    return res.status(500).json({ message: err.message });
+  }
+};
+/* ==========================================================================
+   7. ADD TRIP DATE LOGISTICS
+   ========================================================================== */
+export const addTripDate = async (req, res) => {
+  try {
+    const { tripId, date, totalSeats } = req.body;
+
+    const trip = await Trip.findById(tripId);
+    if (!trip) {
+      return res.status(404).json({ message: "Target trip not found" });
+    }
+
+    // Push new date object to the array inside schema
+    trip.availableDates.push({
+      date,
+      totalSeats: Number(totalSeats || 0),
+    });
+
+    await trip.save();
+    return res.status(200).json({
+      success: true,
+      message: "Logistics date variant added successfully",
+      trip,
+    });
+  } catch (err) {
+    console.error("❌ ADD TRIP DATE ERROR:", err);
+    return res
+      .status(500)
+      .json({ message: "Failed to allocate date matrix", error: err.message });
   }
 };
 
-export const addTripDate =
-  async (req, res) => {
-    try {
-      const {
-        tripId,
-        date,
-        totalSeats,
-      } = req.body;
+export const getTrip = async (req, res) => {
+  try {
+    const trip = await Trip.findOne({ slug: req.params.slug });
 
-      const trip =
-        await Trip.findById(
-          tripId
-        );
-
-      if (!trip) {
-        return res.status(404)
-          .json({
-            message:
-              "Trip not found",
-          });
-      }
-
-      trip.availableDates.push({
-        date,
-        totalSeats,
-      });
-      
-      availableDates: JSON.parse(
-  req.body.availableDates || "[]"
-),
-
-      await trip.save();
-
-      res.json({
-        message:
-          "Date added successfully",
-      });
-    } catch (err) {
-      res.status(500).json({
-        message: err.message,
-      });
+    if (!trip) {
+      return res.status(404).json({ message: "Trip not found" });
     }
-  };
+
+    return res.status(200).json(trip);
+  } catch (err) {
+    return res.status(500).json({ message: err.message });
+  }
+};

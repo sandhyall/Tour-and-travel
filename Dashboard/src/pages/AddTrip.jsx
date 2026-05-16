@@ -24,7 +24,8 @@ export default function AddTrip() {
     startPoint: "",
     endPoint: "",
     meals: "",
-    accommodation: ""
+    accommodation: "",
+    category:"all"
   });
 
   const [heroImage, setHeroImage] = useState(null);
@@ -35,8 +36,9 @@ export default function AddTrip() {
   const [includes, setIncludes] = useState([]);
   const [excludes, setExcludes] = useState([]);
   const [highlights, setHighlights] = useState([]);
+  const [equipments, setEquipments] = useState([]);
 
-  // ✅ NEW: FAQs STATE
+
   const [faqs, setFaqs] = useState([]);
   const [availableDates, setAvailableDates] =
   useState([]);
@@ -60,8 +62,8 @@ export default function AddTrip() {
       fd.append("includes", JSON.stringify(includes || []));
       fd.append("excludes", JSON.stringify(excludes || []));
       fd.append("highlights", JSON.stringify(highlights || []));
-      fd.append("faqs", JSON.stringify(faqs || []));
-      fd.append(
+fd.append("equipmentRequired", JSON.stringify(equipments || []));
+fd.append("faqs", JSON.stringify(faqs || [])); fd.append(
   "availableDates",
   JSON.stringify(
     availableDates || []
@@ -117,6 +119,24 @@ export default function AddTrip() {
               <option>Bhutan</option>
               <option>Tibet</option>
             </select>
+
+            <select
+  style={styles.input}
+  value={form.category}
+  onChange={(e) =>
+    setForm({
+      ...form,
+      category: e.target.value,
+    })
+  }
+>
+  <option value="all">All</option>
+  <option value="popular">Popular</option>
+  <option value="featured">Featured</option>
+  <option value="trekking">Trekking</option>
+  <option value="hiking">Hiking</option>
+  <option value="expedition">Expedition</option>
+</select>
 
             {/* NEW FIELDS ROW 1 */}
             <div style={styles.gridContainer}>
@@ -356,7 +376,17 @@ export default function AddTrip() {
             <ListBuilder data={excludes} setData={setExcludes} />
           </div>
 
-          {/* ✅ NEW FAQ SECTION */}
+<div style={styles.section}>
+  <h2 style={styles.sectionTitle}>
+    🎒 Equipment Required
+  </h2>
+
+  <ListBuilder
+    data={equipments}
+    setData={setEquipments}
+  />
+</div>
+          
           <div style={styles.section}>
             <h2 style={styles.sectionTitle}>❓ FAQs</h2>
 

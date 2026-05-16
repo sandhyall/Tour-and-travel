@@ -29,7 +29,6 @@ const bookingSchema = new mongoose.Schema(
 
     numberOfPeople: Number,
 
-    // selected calendar date
     travelDate: Date,
 
     totalAmount: Number,
@@ -45,31 +44,46 @@ const bookingSchema = new mongoose.Schema(
       default: "pending",
     },
 
-    // ✅ NEW
     bookingStatus: {
       type: String,
       enum: [
         "pending",
         "confirmed",
         "cancelled",
-        "completed",
       ],
       default: "pending",
     },
 
-    // ✅ STRIPE
+    paymentMethod: {
+      type: String,
+      enum: [
+        "card",
+        "swift_bank_transfer",
+      ],
+      default: "card",
+    },
+
+    transactionId: String,
+
     stripeSessionId: String,
 
     stripePaymentIntentId: String,
 
-    // BANK SLIP
+    swiftReferenceNumber: String,
+
     bankSlip: {
       url: String,
       public_id: String,
     },
 
-    // PDF ticket
     ticketPdf: String,
+
+    invoiceNumber: String,
+
+    confirmationEmailSent: {
+      type: Boolean,
+      default: false,
+    },
   },
   { timestamps: true }
 );

@@ -23,6 +23,8 @@ export default function EditTrip() {
   const [includes, setIncludes] = useState([]);
   const [excludes, setExcludes] = useState([]);
   const [highlights, setHighlights] = useState([]);
+ 
+const [equipments, setEquipments] = useState([]);
   const [faqs, setFaqs] = useState([]);
 
   useEffect(() => {
@@ -46,7 +48,8 @@ export default function EditTrip() {
           startPoint: data.startPoint || "",
           endPoint: data.endPoint || "",
           meals: data.meals || "",
-          accommodation: data.accommodation || ""
+          accommodation: data.accommodation || "",
+          category: data.category || "all",
         });
 
         setItinerary(data.itinerary || []);
@@ -54,6 +57,7 @@ export default function EditTrip() {
         setIncludes(data.includes || []);
         setExcludes(data.excludes || []);
         setHighlights(data.highlights || []);
+        setEquipments(data.equipmentRequired || []);
         setFaqs(data.faqs || []);
 
       } catch (err) {
@@ -139,6 +143,23 @@ export default function EditTrip() {
               <option>Bhutan</option>
               <option>Tibet</option>
             </select>
+<select
+  value={form.category || "all"}
+  style={styles.input}
+  onChange={(e) =>
+    setForm({
+      ...form,
+      category: e.target.value,
+    })
+  }
+>
+  <option value="all">All</option>
+  <option value="popular">Popular</option>
+  <option value="featured">Featured</option>
+  <option value="trekking">Trekking</option>
+  <option value="hiking">Hiking</option>
+  <option value="expedition">Expedition</option>
+</select>
 
             <div style={styles.gridContainer}>
               <input
@@ -261,6 +282,18 @@ export default function EditTrip() {
             <h2 style={styles.sectionTitle}>❌ Excludes</h2>
             <ListBuilder title="Excludes" data={excludes} setData={setExcludes} />
           </div>
+
+          <div style={styles.section}>
+  <h2 style={styles.sectionTitle}>
+    🎒 Equipment Required
+  </h2>
+
+  <ListBuilder
+    title="Equipment"
+    data={equipments}
+    setData={setEquipments}
+  />
+</div>
 
           <div style={styles.section}>
   <h2 style={styles.sectionTitle}>❓ FAQs</h2>

@@ -1,9 +1,5 @@
-import stripe from "../config/stripe.js";
-
 import Booking from "../models/Booking.js";
-
 import Payment from "../models/Payment.js";
-
 import Trip from "../models/Trip.js";
 
 import {
@@ -14,41 +10,13 @@ import {
   generateTicketPdf,
 } from "../utils/generateTicketPdf.js";
 
-export const stripeWebhook =
+export const confirmCardPayment =
   async (req, res) => {
-    const sig =
-      req.headers[
-        "stripe-signature"
-      ];
-
-    let event;
-
     try {
-      event =
-        stripe.webhooks.constructEvent(
-          req.body,
-          sig,
-          process.env
-            .STRIPE_WEBHOOK_SECRET
-        );
-    } catch (err) {
-      return res
-        .status(400)
-        .send(
-          `Webhook Error: ${err.message}`
-        );
-    }
-
-    // PAYMENT SUCCESS
-    if (
-      event.type ===
-      "checkout.session.completed"
-    ) {
-      const session =
-        event.data.object;
-
-      const bookingId =
-        session.metadata.bookingId;
+      const {
+        bookingId,
+        transactionId,
+      } = req.body;
 
       const booking =
         await Booking.findById(
@@ -56,32 +24,31 @@ export const stripeWebhook =
         ).populate("trip");
 
       if (!booking) {
-        return res.status(404)
-          .json({
-            message:
-              "Booking not found",
-          });
+        return res.status(404).json({
+          message: "Booking not found",
+        });
       }
 
       if (
-  booking.paymentStatus ===
-  "paid"
-) {
+        booking.paymentStatus ===
+        "paid"
+      ) {
+        return res.json({
+          message:
+            "Already confirmed",
+        });
+      }
 
-  return res.json({
-    alreadyProcessed: true
-  });
-}
-
-      // UPDATE BOOKING
       booking.paymentStatus =
         "paid";
 
       booking.bookingStatus =
         "confirmed";
 
-      booking.stripePaymentIntentId =
-        session.payment_intent;
+      booking.transactionId =
+        transactionId;
+
+      await booking.save();
 
       // UPDATE SEATS
       const trip =
@@ -121,14 +88,11 @@ export const stripeWebhook =
       // UPDATE PAYMENT
       await Payment.findOneAndUpdate(
         {
-          bookingId:
-            booking._id,
+          bookingId: booking._id,
         },
         {
           status: "success",
-
-          stripePaymentIntentId:
-            session.payment_intent,
+          transactionId,
         }
       );
 
@@ -148,9 +112,13 @@ export const stripeWebhook =
         booking,
         pdfPath
       );
-    }
 
-    res.json({
-      received: true,
-    });
+      res.json({
+        success: true,
+      });
+    } catch (err) {
+      res.status(500).json({
+        message: err.message,
+      });
+    }
   };

@@ -1,19 +1,11 @@
-import stripe from "../config/stripe.js";
-
 import Booking from "../models/Booking.js";
-
 import Payment from "../models/Payment.js";
+import { v4 as uuidv4 } from "uuid";
 
-import { sendBookingEmail }
-from "../utils/sendBookingEmail.js";
-
-
-
-export const createStripeCheckout =
+export const createCheckout =
   async (req, res) => {
     try {
-      const { bookingId } =
-        req.body;
+      const { bookingId } = req.body;
 
       const booking =
         await Booking.findById(
@@ -21,79 +13,33 @@ export const createStripeCheckout =
         ).populate("trip");
 
       if (!booking) {
-        return res.status(404)
-          .json({
-            message:
-              "Booking not found",
-          });
+        return res.status(404).json({
+          message: "Booking not found",
+        });
       }
 
-      const session =
-        await stripe.checkout.sessions.create(
-          {
-            payment_method_types:
-              ["card"],
-
-            mode: "payment",
-
-            customer_email:
-              booking.buyer.email,
-
-            line_items: [
-              {
-                price_data: {
-                  currency: "usd",
-
-                  product_data: {
-                    name:
-                      booking.trip
-                        .title,
-                  },
-
-                  unit_amount:
-                    booking.totalAmount *
-                    100,
-                },
-
-                quantity: 1,
-              },
-            ],
-
-            success_url:
-              `${process.env.CLIENT_URL}/payment-success?session_id={CHECKOUT_SESSION_ID}`,
-
-            cancel_url:
-              `${process.env.CLIENT_URL}/payment-failed`,
-
-            metadata: {
-              bookingId:
-                booking._id.toString(),
-            },
-          }
-        );
-
-      booking.stripeSessionId =
-        session.id;
-
-      await booking.save();
+      const transactionId =
+        uuidv4();
 
       await Payment.create({
-        bookingId:
-          booking._id,
-
-        amount:
-          booking.totalAmount,
-
-        method: "stripe",
-
-        stripeSessionId:
-          session.id,
-
+        bookingId: booking._id,
+        amount: booking.totalAmount,
+        method: "card",
+        transactionId,
         status: "pending",
       });
 
+      /*
+        Normally here you redirect
+        to Himalayan Bank / Nabil /
+        Nepal Payment Gateway
+      */
+
+      const fakeGatewayUrl =
+        `${process.env.CLIENT_URL}/payment-success?bookingId=${booking._id}&transactionId=${transactionId}`;
+
       res.json({
-        url: session.url,
+        paymentUrl: fakeGatewayUrl,
       });
     } catch (err) {
       res.status(500).json({
@@ -101,5 +47,3 @@ export const createStripeCheckout =
       });
     }
   };
-
-

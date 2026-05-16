@@ -19,7 +19,6 @@ import {
 
 const router = express.Router();
 
-// PUBLIC
 router.post("/", createBooking);
 
 router.post(
@@ -28,13 +27,11 @@ router.post(
   uploadSlip
 );
 
-// CALENDAR
 router.get(
   "/trip/:tripId",
   getBookedDates
 );
 
-// ADMIN
 router.get(
   "/",
   protect,

@@ -58,35 +58,66 @@ export const createTrip = async (req, res) => {
       }
     }
 
-    const trip = await Trip.create({
-      title: data.title,
-      country: data.country,
-      duration: Number(data.duration),
-      price: Number(data.price),
-      oldPrice: Number(data.oldPrice),
+  const trip = await Trip.create({
+  title: data.title,
 
-      overview: data.overview,
-      difficulty: data.difficulty,
-      activity: data.activity,
-      maxAltitude: data.maxAltitude,
-      bestSeason: data.bestSeason,
-      startPoint: data.startPoint,
-      endPoint: data.endPoint,
-      meals: data.meals,
-      accommodation: data.accommodation,
+  country: data.country,
 
-      slug,
-      heroImage,
-      galleryImages,
+  duration: Number(data.duration),
 
-      packages: safeParse(data.packages),
-      itinerary: safeParse(data.itinerary),
-      includes: safeParse(data.includes),
-      excludes: safeParse(data.excludes),
-      highlights: safeParse(data.highlights),
-      faqs: safeParse(data.faqs),
-      packingList: safeParse(data.packingList),
-    });
+  price: Number(data.price),
+
+  oldPrice: Number(data.oldPrice),
+
+  overview: data.overview,
+
+  difficulty: data.difficulty,
+
+  activity: data.activity,
+
+  maxAltitude: data.maxAltitude,
+
+  bestSeason: data.bestSeason,
+
+  startPoint: data.startPoint,
+
+  endPoint: data.endPoint,
+
+  meals: data.meals,
+
+  accommodation: data.accommodation,
+
+  /* NEW */
+  category: data.category,
+
+  equipmentRequired: safeParse(
+    data.equipmentRequired
+  ),
+
+  slug,
+
+  heroImage,
+
+  galleryImages,
+
+  packages: safeParse(data.packages),
+
+  itinerary: safeParse(data.itinerary),
+
+  includes: safeParse(data.includes),
+
+  excludes: safeParse(data.excludes),
+
+  highlights: safeParse(data.highlights),
+
+  faqs: safeParse(data.faqs),
+
+  packingList: safeParse(data.packingList),
+
+  availableDates: safeParse(
+    data.availableDates
+  ),
+});
 
     console.log("✅ TRIP CREATED:", trip._id);
 
@@ -147,14 +178,47 @@ export const updateTrip = async (req, res) => {
 
     Object.assign(trip, req.body);
 
-    if (req.body.itinerary) trip.itinerary = safeParse(req.body.itinerary);
-    if (req.body.packages) trip.packages = safeParse(req.body.packages);
-    if (req.body.includes) trip.includes = safeParse(req.body.includes);
-    if (req.body.excludes) trip.excludes = safeParse(req.body.excludes);
-    if (req.body.highlights) trip.highlights = safeParse(req.body.highlights);
-    if (req.body.faqs) trip.faqs = safeParse(req.body.faqs);
-    if (req.body.packingList) trip.packingList = safeParse(req.body.packingList);
+   if (req.body.itinerary)
+  trip.itinerary =
+    safeParse(req.body.itinerary);
 
+if (req.body.packages)
+  trip.packages =
+    safeParse(req.body.packages);
+
+if (req.body.includes)
+  trip.includes =
+    safeParse(req.body.includes);
+
+if (req.body.excludes)
+  trip.excludes =
+    safeParse(req.body.excludes);
+
+if (req.body.highlights)
+  trip.highlights =
+    safeParse(req.body.highlights);
+
+if (req.body.faqs)
+  trip.faqs =
+    safeParse(req.body.faqs);
+
+if (req.body.packingList)
+  trip.packingList =
+    safeParse(req.body.packingList);
+
+/* NEW */
+if (req.body.equipmentRequired) {
+  trip.equipmentRequired =
+    safeParse(
+      req.body.equipmentRequired
+    );
+}
+
+/* NEW */
+if (req.body.category) {
+  trip.category =
+    req.body.category;
+}
     // HERO IMAGE UPDATE
     if (req.files?.heroImage?.[0]) {
       const result = await uploadBuffer(req.files.heroImage[0].buffer);

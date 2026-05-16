@@ -35,6 +35,7 @@ function App() {
    <Route path="/edit/:id" element={<EditTrip/>} />
    <Route path="/admin-bookings" element={<AdminBooking/>} />
    <Route path="/admin-calendar" element={<AdminCalendar/>} />
+   <Route path="/login" element={<Login/>}/>
   
   <Route path="/test" element={<Test/>}/>
         </Routes>

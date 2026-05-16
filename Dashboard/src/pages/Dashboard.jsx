@@ -2,8 +2,6 @@ import { useEffect, useState } from "react";
 import axios from "../api/axios";
 import { useNavigate } from "react-router-dom";
 import Sidebar from "../components/Sidebar";
-import "../styles/dashboard.css";
-import "../styles/buttons.css";
 import {
   LineChart,
   Line,
@@ -14,28 +12,38 @@ import {
   CartesianGrid,
   Tooltip,
   Legend,
-  ResponsiveContainer
+  ResponsiveContainer,
 } from "recharts";
 
 export default function Dashboard() {
-
   const [stats, setStats] = useState({});
   const [bookings, setBookings] = useState([]);
   const [revenueData, setRevenueData] = useState([]);
   const [showGraphs, setShowGraphs] = useState(false);
   const [loading, setLoading] = useState(true);
+
   const navigate = useNavigate();
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const statsRes = await axios.get("/dashboard/stats");
-        setStats(statsRes.data);
+        const [statsRes, bookingsRes, revenueRes] = await Promise.all([
+          axios.get("/dashboard/stats"),
+          axios.get("/bookings"),
+          axios.get("/dashboard/revenue"),
+        ]);
 
-        const bookingsRes = await axios.get("/bookings");
-        setBookings(bookingsRes.data || []);
+        // Stats
+        setStats(statsRes.data || {});
 
-        const revenueRes = await axios.get("/dashboard/revenue");
+        // Bookings Fix
+        const bookingsData = Array.isArray(bookingsRes.data)
+          ? bookingsRes.data
+          : bookingsRes.data.bookings || [];
+
+        setBookings(bookingsData);
+
+        // Revenue Data Formatting
         const monthNames = [
           "Jan",
           "Feb",
@@ -48,12 +56,16 @@ export default function Dashboard() {
           "Sep",
           "Oct",
           "Nov",
-          "Dec"
+          "Dec",
         ];
-        const formattedData = revenueRes.data.map((item) => ({
-          month: monthNames[item._id - 1] || `M${item._id}`,
-          revenue: item.revenue
-        }));
+
+        const formattedData = Array.isArray(revenueRes.data)
+          ? revenueRes.data.map((item) => ({
+              month: monthNames[item._id - 1] || `M${item._id}`,
+              revenue: item.revenue || 0,
+            }))
+          : [];
+
         setRevenueData(formattedData);
       } catch (error) {
         console.error("Error fetching dashboard data:", error);
@@ -61,393 +73,257 @@ export default function Dashboard() {
         setLoading(false);
       }
     };
+
     fetchData();
   }, []);
 
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center min-h-screen text-xl font-bold">
+        Loading Dashboard...
+      </div>
+    );
+  }
+
   return (
-    <>
+    <div className="flex min-h-screen bg-slate-50">
       <Sidebar />
-      <div className="dashboard-container" style={styles.container}>
+
+      <main className="flex-1 ml-64 p-8 transition-all duration-300">
         {/* Header */}
-        <div style={styles.header}>
+        <header className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-10 pb-6 border-b-2 border-blue-600">
           <div>
-            <h1 style={styles.title} className="dashboard-title">
+            <h1 className="text-3xl font-bold text-slate-900">
               📊 Dashboard
             </h1>
-            <p style={styles.subtitle}>
-              Welcome to Travel Wales Admin Panel
+
+            <p className="text-slate-500 mt-1">
+              Welcome to Wales Trek & Travel Admin Panel
             </p>
           </div>
-          <div style={styles.quickActions} className="quick-actions">
+
+          <div className="flex gap-3">
             <button
-              style={styles.addButton}
               onClick={() => navigate("/add-trip")}
+              className="bg-blue-600 hover:bg-blue-700 text-white px-5 py-2.5 rounded-lg font-semibold"
             >
               ➕ Add New Trip
             </button>
+
             <button
-              style={{
-                ...styles.addButton,
-                backgroundColor: showGraphs ? "#28a745" : "#666"
-              }}
               onClick={() => setShowGraphs(!showGraphs)}
+              className={`px-5 py-2.5 rounded-lg font-semibold text-white ${
+                showGraphs
+                  ? "bg-emerald-600 hover:bg-emerald-700"
+                  : "bg-slate-600 hover:bg-slate-700"
+              }`}
             >
-              📈 {showGraphs ? "Hide" : "Show"} Graphs
+              📈 {showGraphs ? "Hide" : "Show"} Analytics
             </button>
           </div>
-        </div>
+        </header>
 
-        {/* Stats Grid */}
-        <div style={styles.statsGrid}>
-          <Card
+        {/* Stats */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-10">
+          <StatCard
             title="Total Trips"
-            value={stats.totalTrips || 0}
+            value={stats.totalTrips}
             icon="✈️"
-            color="#007bff"
+            color="blue"
           />
-          <Card
+
+          <StatCard
             title="Total Bookings"
-            value={stats.totalBookings || 0}
+            value={stats.totalBookings}
             icon="📅"
-            color="#28a745"
+            color="emerald"
           />
-          <Card
+
+          <StatCard
             title="Total Revenue"
-            value={"₹" + (stats.totalRevenue || 0)}
+            value={`₹${stats.totalRevenue?.toLocaleString() || 0}`}
             icon="💰"
-            color="#ffc107"
+            color="amber"
           />
-          <Card
-            title="Pending Bookings"
-            value={stats.pendingBookings || 0}
+
+          <StatCard
+            title="Pending"
+            value={stats.pendingBookings}
             icon="⏳"
-            color="#dc3545"
+            color="red"
           />
         </div>
 
-        {/* Graphs Section */}
+        {/* Graphs */}
         {showGraphs && (
-          <div className="charts-grid" style={styles.chartsContainer}>
-            {/* Monthly Revenue Chart */}
-            {revenueData.length > 0 && (
-              <div className="chart-section" style={styles.chartSection}>
-                <h2 style={styles.chartTitle}>💰 Monthly Revenue</h2>
-                <ResponsiveContainer width="100%" height={300}>
-                  <LineChart data={revenueData}>
-                    <CartesianGrid strokeDasharray="3 3" stroke="#e9ecef" />
-                    <XAxis dataKey="month" stroke="#999" />
-                    <YAxis stroke="#999" />
-                    <Tooltip
-                      contentStyle={{
-                        backgroundColor: "#fff",
-                        border: "1px solid #ddd",
-                        borderRadius: "8px"
-                      }}
-                    />
-                    <Legend />
-                    <Line
-                      type="monotone"
-                      dataKey="revenue"
-                      stroke="#007bff"
-                      strokeWidth={2}
-                      dot={{ fill: "#007bff", r: 5 }}
-                      activeDot={{ r: 7 }}
-                    />
-                  </LineChart>
-                </ResponsiveContainer>
-              </div>
-            )}
+          <div className="grid grid-cols-1 xl:grid-cols-2 gap-8 mb-10">
+            {/* Revenue Chart */}
+            <ChartWrapper title="💰 Monthly Revenue">
+              <ResponsiveContainer width="100%" height={300}>
+                <LineChart data={revenueData}>
+                  <CartesianGrid strokeDasharray="3 3" />
 
-            {/* Stats Overview Chart */}
-            <div className="chart-section" style={styles.chartSection}>
-              <h2 style={styles.chartTitle}>📊 Booking Statistics</h2>
+                  <XAxis dataKey="month" />
+
+                  <YAxis />
+
+                  <Tooltip />
+
+                  <Legend />
+
+                  <Line
+                    type="monotone"
+                    dataKey="revenue"
+                    stroke="#2563eb"
+                    strokeWidth={3}
+                  />
+                </LineChart>
+              </ResponsiveContainer>
+            </ChartWrapper>
+
+            {/* Booking Chart */}
+            <ChartWrapper title="📊 Booking Overview">
               <ResponsiveContainer width="100%" height={300}>
                 <BarChart
                   data={[
                     {
-                      name: "Bookings",
-                      total: stats.totalBookings,
-                      pending: stats.pendingBookings,
-                      verified: stats.verifiedPayments
-                    }
+                      name: "Stats",
+                      total: stats.totalBookings || 0,
+                      pending: stats.pendingBookings || 0,
+                      verified: stats.verifiedPayments || 0,
+                    },
                   ]}
                 >
-                  <CartesianGrid strokeDasharray="3 3" stroke="#e9ecef" />
-                  <XAxis dataKey="name" stroke="#999" />
-                  <YAxis stroke="#999" />
-                  <Tooltip
-                    contentStyle={{
-                      backgroundColor: "#fff",
-                      border: "1px solid #ddd",
-                      borderRadius: "8px"
-                    }}
-                  />
+                  <CartesianGrid strokeDasharray="3 3" />
+
+                  <XAxis dataKey="name" />
+
+                  <YAxis />
+
+                  <Tooltip />
+
                   <Legend />
-                  <Bar dataKey="total" fill="#007bff" name="Total Bookings" />
-                  <Bar dataKey="pending" fill="#ffc107" name="Pending" />
-                  <Bar dataKey="verified" fill="#28a745" name="Verified" />
+
+                  <Bar dataKey="total" fill="#3b82f6" name="Total" />
+
+                  <Bar dataKey="pending" fill="#f59e0b" name="Pending" />
+
+                  <Bar dataKey="verified" fill="#10b981" name="Verified" />
                 </BarChart>
               </ResponsiveContainer>
-            </div>
+            </ChartWrapper>
           </div>
         )}
 
-        {/* Analytics Section */}
-        <div style={styles.analyticsSection}>
-          <h2 style={styles.sectionTitle}>📈 Recent Bookings</h2>
+        {/* Recent Bookings */}
+        <section className="bg-white rounded-2xl p-6 shadow-sm border border-slate-200 mb-8">
+          <h2 className="text-xl font-bold text-slate-800 mb-6">
+            📈 Recent Bookings
+          </h2>
 
-          {bookings.length === 0 ? (
-            <div style={styles.emptyState}>
-              <p>No bookings yet</p>
-            </div>
-          ) : (
-            <div style={styles.bookingsList}>
-              {bookings.slice(0, 5).map((booking, idx) => (
-                <div key={idx} style={styles.bookingItem} className="booking-item">
-                  <div style={styles.bookingInfo}>
-                    <h4 style={styles.bookingTitle}>
-                      {booking.tripTitle || booking.trip?.title || "Trip"}
+          <div className="space-y-4">
+            {!Array.isArray(bookings) || bookings.length === 0 ? (
+              <div className="text-center py-12 text-slate-400 font-medium">
+                No bookings yet
+              </div>
+            ) : (
+              bookings.slice(0, 5).map((booking, idx) => (
+                <div
+                  key={booking._id || idx}
+                  className="flex items-center justify-between p-4 bg-slate-50 rounded-xl border"
+                >
+                  <div>
+                    <h4 className="font-bold text-slate-800 text-lg">
+                      {booking.tripTitle ||
+                        booking.trip?.title ||
+                        "Unknown Trip"}
                     </h4>
-                    <p style={styles.bookingDetails}>
-                      👤 {booking.userName || booking.user?.name || "User"}
-                    </p>
-                    <p style={styles.bookingDetails}>
-                      📅 {new Date(booking.createdAt).toLocaleDateString()}
-                    </p>
+
+                    <div className="text-sm text-slate-500 mt-1">
+                      👤{" "}
+                      {booking.userName ||
+                        booking.user?.name ||
+                        "Unknown User"}
+                    </div>
+
+                    <div className="text-sm text-slate-500">
+                      📅{" "}
+                      {booking.createdAt
+                        ? new Date(
+                            booking.createdAt
+                          ).toLocaleDateString()
+                        : "No Date"}
+                    </div>
                   </div>
-                  <div style={styles.bookingAmount}>
-                    <p style={styles.amount}>
+
+                  <div className="text-right">
+                    <p className="text-xl font-bold text-blue-600">
                       ₹{booking.totalPrice || booking.amount || 0}
                     </p>
+
                     <span
-                      style={{
-                        ...styles.status,
-                        backgroundColor:
-                          booking.status === "confirmed"
-                            ? "#28a745"
-                            : booking.status === "pending"
-                              ? "#ffc107"
-                              : "#dc3545"
-                      }}
+                      className={`px-3 py-1 rounded-full text-xs font-bold ${
+                        booking.status === "confirmed"
+                          ? "bg-emerald-100 text-emerald-700"
+                          : booking.status === "pending"
+                            ? "bg-amber-100 text-amber-700"
+                            : "bg-red-100 text-red-700"
+                      }`}
                     >
                       {booking.status || "pending"}
                     </span>
                   </div>
                 </div>
-              ))}
-            </div>
-          )}
-        </div>
+              ))
+            )}
+          </div>
+        </section>
 
-        {/* Quick Info */}
-        <div style={styles.quickInfo}>
-          <p style={styles.infoText}>
-            💡 Manage Nepal, Bhutan, and Tibet trips easily from this
-            dashboard.
-          </p>
+        {/* Info Box */}
+        <div className="bg-blue-600 rounded-xl p-4 text-white shadow-lg">
+          💡 Pro Tip: You can manage Nepal, Bhutan, and Tibet itineraries from
+          the Trips section.
         </div>
-      </div>
-    </>
+      </main>
+    </div>
   );
 }
 
-function Card({ title, value, icon, color }) {
+function StatCard({ title, value, icon, color }) {
+  const colorMap = {
+    blue: "border-blue-500",
+    emerald: "border-emerald-500",
+    amber: "border-amber-500",
+    red: "border-red-500",
+  };
+
   return (
-    <div style={{ ...styles.card, borderLeftColor: color }}>
-      <div style={styles.cardIcon}>{icon}</div>
-      <div style={styles.cardContent}>
-        <p style={styles.cardTitle}>{title}</p>
-        <h2 style={styles.cardValue}>{value}</h2>
+    <div
+      className={`bg-white p-6 rounded-2xl border-l-4 shadow-sm ${colorMap[color]}`}
+    >
+      <div className="flex items-center gap-4">
+        <div className="text-4xl">{icon}</div>
+
+        <div>
+          <p className="text-xs font-bold text-slate-400 uppercase">
+            {title}
+          </p>
+
+          <h2 className="text-2xl font-extrabold text-slate-800">
+            {value || 0}
+          </h2>
+        </div>
       </div>
     </div>
   );
 }
 
-const styles = {
-  container: {
-    padding: "20px",
-    backgroundColor: "#f8f9fa",
-    minHeight: "100vh",
-    marginLeft: "260px"
-  },
-  header: {
-    display: "flex",
-    justifyContent: "space-between",
-    alignItems: "center",
-    marginBottom: "40px",
-    paddingBottom: "20px",
-    borderBottom: "3px solid #007bff",
-    flexWrap: "wrap",
-    gap: "20px"
-  },
-  title: {
-    fontSize: "clamp(1.8rem, 4vw, 2.5rem)",
-    color: "#1a1a2e",
-    margin: "0 0 8px 0",
-    fontWeight: "600"
-  },
-  subtitle: {
-    color: "#666",
-    fontSize: "0.95rem",
-    margin: "0"
-  },
-  quickActions: {
-    display: "flex",
-    gap: "10px",
-    flexWrap: "wrap"
-  },
-  addButton: {
-    padding: "12px 24px",
-    backgroundColor: "#007bff",
-    color: "#fff",
-    border: "none",
-    borderRadius: "8px",
-    fontSize: "0.95rem",
-    fontWeight: "600",
-    cursor: "pointer",
-    transition: "all 0.3s ease",
-    boxShadow: "0 4px 12px rgba(0, 123, 255, 0.3)",
-    whiteSpace: "nowrap"
-  },
-  statsGrid: {
-    display: "grid",
-    gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))",
-    gap: "20px",
-    marginBottom: "40px"
-  },
-  chartsContainer: {
-    display: "grid",
-    gridTemplateColumns: "repeat(auto-fit, minmax(500px, 1fr))",
-    gap: "20px",
-    marginBottom: "40px"
-  },
-  chartSection: {
-    backgroundColor: "#fff",
-    borderRadius: "12px",
-    padding: "25px",
-    boxShadow: "0 4px 12px rgba(0, 0, 0, 0.08)",
-    border: "1px solid #e9ecef"
-  },
-  chartTitle: {
-    fontSize: "1.2rem",
-    color: "#1a1a2e",
-    margin: "0 0 20px 0",
-    fontWeight: "600"
-  },
-  card: {
-    background: "#fff",
-    padding: "20px",
-    borderRadius: "12px",
-    boxShadow: "0 4px 12px rgba(0, 0, 0, 0.08)",
-    border: "1px solid #e9ecef",
-    borderLeft: "4px solid #007bff",
-    display: "flex",
-    alignItems: "center",
-    gap: "15px",
-    transition: "all 0.3s ease",
-    cursor: "pointer"
-  },
-  cardIcon: {
-    fontSize: "2.5rem",
-    minWidth: "50px",
-    textAlign: "center"
-  },
-  cardContent: {
-    flex: 1
-  },
-  cardTitle: {
-    color: "#999",
-    fontSize: "0.9rem",
-    margin: "0 0 5px 0",
-    fontWeight: "500",
-    textTransform: "uppercase",
-    letterSpacing: "0.5px"
-  },
-  cardValue: {
-    color: "#1a1a2e",
-    fontSize: "clamp(1.5rem, 3vw, 2rem)",
-    margin: "0",
-    fontWeight: "700"
-  },
-  analyticsSection: {
-    backgroundColor: "#fff",
-    borderRadius: "12px",
-    padding: "25px",
-    boxShadow: "0 4px 12px rgba(0, 0, 0, 0.08)",
-    border: "1px solid #e9ecef",
-    marginBottom: "30px"
-  },
-  sectionTitle: {
-    fontSize: "1.3rem",
-    color: "#1a1a2e",
-    margin: "0 0 20px 0",
-    fontWeight: "600"
-  },
-  bookingsList: {
-    display: "flex",
-    flexDirection: "column",
-    gap: "15px"
-  },
-  bookingItem: {
-    display: "flex",
-    justifyContent: "space-between",
-    alignItems: "center",
-    padding: "15px",
-    backgroundColor: "#f8f9fa",
-    borderRadius: "8px",
-    border: "1px solid #e9ecef",
-    transition: "all 0.3s ease",
-    flexWrap: "wrap",
-    gap: "15px"
-  },
-  bookingInfo: {
-    flex: 1
-  },
-  bookingTitle: {
-    color: "#1a1a2e",
-    fontSize: "1rem",
-    margin: "0 0 5px 0",
-    fontWeight: "600"
-  },
-  bookingDetails: {
-    color: "#999",
-    fontSize: "0.85rem",
-    margin: "3px 0"
-  },
-  bookingAmount: {
-    display: "flex",
-    alignItems: "center",
-    gap: "12px",
-    flexWrap: "wrap"
-  },
-  amount: {
-    color: "#007bff",
-    fontSize: "1.2rem",
-    fontWeight: "700",
-    margin: "0"
-  },
-  status: {
-    padding: "6px 12px",
-    borderRadius: "20px",
-    color: "#fff",
-    fontSize: "0.8rem",
-    fontWeight: "600",
-    textTransform: "capitalize"
-  },
-  emptyState: {
-    textAlign: "center",
-    padding: "40px 20px",
-    color: "#999"
-  },
-  quickInfo: {
-    backgroundColor: "#e7f3ff",
-    border: "1px solid #b3d9ff",
-    padding: "15px 20px",
-    borderRadius: "8px"
-  },
-  infoText: {
-    color: "#0056b3",
-    margin: "0",
-    fontSize: "0.95rem"
-  }
-};
+function ChartWrapper({ title, children }) {
+  return (
+    <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
+      <h3 className="text-lg font-bold text-slate-800 mb-6">{title}</h3>
+
+      {children}
+    </div>
+  );
+}

@@ -1,7 +1,7 @@
 import Booking from "../models/Booking.js";
 import Trip from "../models/Trip.js";
 import Payment from "../models/Payment.js";
-import Payment from "../models/Payment.js";
+
 
 import {
   sendBookingEmail,

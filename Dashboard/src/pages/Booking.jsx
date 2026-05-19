@@ -22,13 +22,13 @@ export default function Bookings() {
       setLoading(true);
       const { data } = await axios.get("/bookings");
       
-      // ✅ सुरक्षा: यदि ब्याकइन्डले अब्जेक्ट (जस्तै { bookings: [...] }) पठायो भने पनि सुरक्षित राख्ने
+      
       if (Array.isArray(data)) {
         setBookings(data);
       } else if (data && Array.isArray(data.bookings)) {
         setBookings(data.bookings);
       } else {
-        setBookings([]); // गल्ती डेटा आए खाली एरे सेट गर्ने
+        setBookings([]); /
       }
     } catch (err) {
       console.error(err);

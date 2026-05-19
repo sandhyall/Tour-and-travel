@@ -12,6 +12,7 @@ import {
   Compass,
   CheckCircle2,
   Layers,
+  X,
   Image as ImageIcon,
 } from "lucide-react";
 import Sidebar from "../components/Sidebar";
@@ -20,6 +21,10 @@ export default function Trips() {
   const [trips, setTrips] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const navigate = useNavigate();
+
+  // Quick Modal view states for dates management without switching pages
+  const [selectedTripForDates, setSelectedTripForDates] = useState(null);
+  const [isUpdatingDates, setIsUpdatingDates] = useState(false);
 
   const fetchTrips = async () => {
     setIsLoading(true);
@@ -52,6 +57,24 @@ export default function Trips() {
     }
   };
 
+  // Inline Quick-save helper for available dates modal
+  const handleSaveDates = async () => {
+    setIsUpdatingDates(true);
+    try {
+      await axios.put(`/trips/${selectedTripForDates._id}`, {
+        availableDates: selectedTripForDates.availableDates,
+      });
+      alert("Departure roster updated successfully! 🎉");
+      setSelectedTripForDates(null);
+      fetchTrips();
+    } catch (err) {
+      console.error("Error updating departure dates:", err);
+      alert("Failed to update schedule metrics.");
+    } finally {
+      setIsUpdatingDates(false);
+    }
+  };
+
   const getCountryBadgeStyle = (country) => {
     switch (country?.toLowerCase()) {
       case "nepal":
@@ -65,7 +88,6 @@ export default function Trips() {
     }
   };
 
-  // ग्यालरीबाट इमेज एरे सुरक्षित रूपमा निकाल्न सहयोगी फङ्सन
   const getGalleryArray = (trip) => {
     const gallery = trip.gallery || trip.galleryImages || [];
     return Array.isArray(gallery) ? gallery : [];
@@ -129,6 +151,9 @@ export default function Trips() {
           <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-8">
             {trips.map((trip) => {
               const galleryImages = getGalleryArray(trip);
+              const upcomingDatesCount = Array.isArray(trip.availableDates)
+                ? trip.availableDates.length
+                : 0;
 
               return (
                 <div
@@ -142,7 +167,8 @@ export default function Trips() {
                         trip.heroImage?.url ||
                         trip.featuredImage?.url ||
                         trip.featuredImage ||
-                        (galleryImages[0]?.url || galleryImages[0]) ||
+                        galleryImages[0]?.url ||
+                        galleryImages[0] ||
                         "https://placehold.co/500x300?text=No+Hero+Image"
                       }
                       alt={trip.title}
@@ -153,12 +179,19 @@ export default function Trips() {
                       className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                     />
 
-                    <div
-                      className={`absolute top-4 right-4 px-3 py-1 rounded-lg text-[10px] font-extrabold uppercase tracking-widest shadow-sm border ${getCountryBadgeStyle(
-                        trip.country,
-                      )}`}
-                    >
-                      {trip.country}
+                    <div className="absolute top-4 left-4 flex gap-1.5">
+                      <div
+                        className={`px-3 py-1 rounded-lg text-[10px] font-extrabold uppercase tracking-widest shadow-sm border ${getCountryBadgeStyle(
+                          trip.country,
+                        )}`}
+                      >
+                        {trip.country}
+                      </div>
+                      {upcomingDatesCount > 0 && (
+                        <div className="bg-teal-500 text-white border border-teal-400 px-2.5 py-1 rounded-lg text-[10px] font-extrabold uppercase tracking-widest shadow-sm">
+                          {upcomingDatesCount} Batches Scheduled
+                        </div>
+                      )}
                     </div>
                   </div>
 
@@ -168,20 +201,20 @@ export default function Trips() {
                       {trip.title}
                     </h3>
 
-                    {/* NEW: DYNAMIC GALLERY PREVIEW SECTION */}
+                    {/* DYNAMIC GALLERY PREVIEW */}
                     <div className="mb-4">
                       <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block mb-1.5 flex items-center gap-1">
                         <ImageIcon size={11} className="text-slate-400" />
                         Gallery Collection ({galleryImages.length})
                       </span>
-                      
+
                       {galleryImages.length > 0 ? (
                         <div className="grid grid-cols-4 gap-2">
                           {galleryImages.slice(0, 4).map((img, index) => {
-                            const imgUrl = img?.url || img; // अब्जेक्ट वा स्ट्रिङ दुवैलाई व्यवस्थापन गर्न
+                            const imgUrl = img?.url || img;
                             return (
-                              <div 
-                                key={index} 
+                              <div
+                                key={index}
                                 className="relative h-12 rounded-lg overflow-hidden border border-slate-100 bg-slate-50"
                               >
                                 <img
@@ -189,10 +222,10 @@ export default function Trips() {
                                   alt={`Gallery ${index + 1}`}
                                   className="w-full h-full object-cover hover:opacity-80 transition-opacity"
                                   onError={(e) => {
-                                    e.target.src = "https://placehold.co/100x100?text=Error";
+                                    e.target.src =
+                                      "https://placehold.co/100x100?text=Error";
                                   }}
                                 />
-                                {/* यदि ४ वटा भन्दा धेरै इमेज छन् भने अन्तिममा +Count देखाउने */}
                                 {index === 3 && galleryImages.length > 4 && (
                                   <div className="absolute inset-0 bg-slate-900/60 flex items-center justify-center backdrop-blur-[1px]">
                                     <span className="text-white text-[10px] font-black">
@@ -223,7 +256,10 @@ export default function Trips() {
                         </span>
                       </div>
                       <div className="flex flex-col items-center text-center border-x border-slate-200/60">
-                        <BarChart3 size={14} className="text-emerald-500 mb-1" />
+                        <BarChart3
+                          size={14}
+                          className="text-emerald-500 mb-1"
+                        />
                         <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">
                           Grade
                         </span>
@@ -266,7 +302,10 @@ export default function Trips() {
                     <div className="flex flex-wrap gap-2 mb-6 pt-4 border-t border-slate-100">
                       {trip.includes?.length > 0 && (
                         <span className="inline-flex items-center gap-1 bg-slate-50 border border-slate-100 text-slate-600 px-2 py-1 rounded-md text-[10px] font-bold uppercase tracking-tight">
-                          <CheckCircle2 size={10} className="text-emerald-500" />{" "}
+                          <CheckCircle2
+                            size={10}
+                            className="text-emerald-500"
+                          />{" "}
                           {trip.includes.length} Services
                         </span>
                       )}
@@ -294,14 +333,22 @@ export default function Trips() {
                         </span>
                       </button>
 
+                      {/* ✅ OPEN MODAL INSTEAD OF CHANGING ROUTES */}
                       <button
                         type="button"
-                        onClick={() => navigate(`/trip-dates/${trip._id}`)}
-                        className="flex flex-col items-center justify-center p-2 rounded-xl bg-slate-50 text-slate-600 hover:bg-emerald-50 hover:text-emerald-600 border border-slate-100 hover:border-emerald-100 transition-all active:scale-95 group/btn"
+                        onClick={() =>
+                          setSelectedTripForDates({
+                            ...trip,
+                            availableDates: Array.isArray(trip.availableDates)
+                              ? [...trip.availableDates]
+                              : [],
+                          })
+                        }
+                        className="flex flex-col items-center justify-center p-2 rounded-xl bg-slate-50 text-slate-600 hover:bg-teal-50 hover:text-teal-600 border border-slate-100 hover:border-teal-100 transition-all active:scale-95 group/btn"
                       >
                         <Calendar
                           size={14}
-                          className="text-slate-400 group-hover/btn:text-emerald-600 transition-colors"
+                          className="text-slate-400 group-hover/btn:text-teal-600 transition-colors"
                         />
                         <span className="text-[9px] font-bold uppercase tracking-wider mt-1.5">
                           Dates
@@ -326,6 +373,198 @@ export default function Trips() {
                 </div>
               );
             })}
+          </div>
+        )}
+
+        {/* ==========================================================================
+            ⚡ MODAL: INLINE COMFORT DEPARTURE DATE SCHEDULER
+           ========================================================================== */}
+        {selectedTripForDates && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/40 backdrop-blur-sm p-4">
+            <div className="bg-white rounded-3xl w-full max-w-2xl shadow-2xl border border-slate-100 flex flex-col max-h-[85vh] overflow-hidden animate-in fade-in zoom-in-95 duration-200">
+              {/* Modal Header */}
+              <div className="p-6 border-b border-slate-100 flex items-center justify-between bg-slate-50/50">
+                <div>
+                  <h3 className="font-black text-lg text-slate-900 tracking-tight">
+                    Manage Logistics Departure Matrix
+                  </h3>
+                  <p className="text-xs text-slate-400 font-medium mt-0.5 line-clamp-1">
+                    Modifying schedules for: {selectedTripForDates.title}
+                  </p>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setSelectedTripForDates(null)}
+                  className="p-2 text-slate-400 hover:text-slate-600 rounded-xl hover:bg-slate-100 transition-colors"
+                >
+                  <X size={18} />
+                </button>
+              </div>
+
+              {/* Modal Body (Scrollable Dates Area) */}
+              <div className="p-6 overflow-y-auto space-y-4 flex-1 bg-[#fcfdfe]">
+                {selectedTripForDates.availableDates.length === 0 ? (
+                  <div className="text-center py-8 border border-dashed border-slate-200 bg-white rounded-2xl">
+                    <p className="text-sm font-medium text-slate-400">
+                      No active departures listed for this trip.
+                    </p>
+                  </div>
+                ) : (
+                  selectedTripForDates.availableDates.map((item, idx) => (
+                    <div
+                      key={idx}
+                      className="grid grid-cols-1 sm:grid-cols-12 gap-3 items-center bg-white p-4 rounded-xl border border-slate-100 shadow-sm relative group"
+                    >
+                      <div className="sm:col-span-4">
+                        <label className="block text-[9px] font-extrabold uppercase tracking-wider text-slate-400 mb-1">
+                          Date
+                        </label>
+                        <input
+                          type="date"
+                          value={item.date ? item.date.substring(0, 10) : ""}
+                          onChange={(e) => {
+                            const updated = [
+                              ...selectedTripForDates.availableDates,
+                            ];
+                            updated[idx].date = e.target.value;
+                            setSelectedTripForDates({
+                              ...selectedTripForDates,
+                              availableDates: updated,
+                            });
+                          }}
+                          className="w-full px-3 py-2 text-xs font-semibold bg-slate-50 border border-slate-200 rounded-lg outline-none focus:border-teal-500"
+                        />
+                      </div>
+                      <div className="sm:col-span-3">
+                        <label className="block text-[9px] font-extrabold uppercase tracking-wider text-slate-400 mb-1">
+                          Seats Available
+                        </label>
+                        <input
+                          type="number"
+                          placeholder="e.g. 12"
+                          value={item.totalSeats || ""}
+                          onChange={(e) => {
+                            const updated = [
+                              ...selectedTripForDates.availableDates,
+                            ];
+                            updated[idx].totalSeats = e.target.value;
+                            setSelectedTripForDates({
+                              ...selectedTripForDates,
+                              availableDates: updated,
+                            });
+                          }}
+                          className="w-full px-3 py-2 text-xs font-semibold bg-slate-50 border border-slate-200 rounded-lg outline-none focus:border-teal-500"
+                        />
+                      </div>
+                      <div className="sm:col-span-2">
+                        <label className="block text-[9px] font-extrabold uppercase tracking-wider text-slate-400 mb-1">
+                          Price ($)
+                        </label>
+                        <input
+                          type="number"
+                          placeholder="Optional"
+                          value={item.price || ""}
+                          onChange={(e) => {
+                            const updated = [
+                              ...selectedTripForDates.availableDates,
+                            ];
+                            updated[idx].price = e.target.value;
+                            setSelectedTripForDates({
+                              ...selectedTripForDates,
+                              availableDates: updated,
+                            });
+                          }}
+                          className="w-full px-3 py-2 text-xs font-semibold bg-slate-50 border border-slate-200 rounded-lg outline-none focus:border-teal-500"
+                        />
+                      </div>
+                      <div className="sm:col-span-2">
+                        <label className="block text-[9px] font-extrabold uppercase tracking-wider text-slate-400 mb-1">
+                          Status
+                        </label>
+                        <select
+                          value={item.status || "available"}
+                          onChange={(e) => {
+                            const updated = [
+                              ...selectedTripForDates.availableDates,
+                            ];
+                            updated[idx].status = e.target.value;
+                            setSelectedTripForDates({
+                              ...selectedTripForDates,
+                              availableDates: updated,
+                            });
+                          }}
+                          className="w-full px-3 py-2 text-xs font-semibold bg-slate-50 border border-slate-200 rounded-lg outline-none focus:border-teal-500"
+                        >
+                          <option value="available">Available</option>
+                          <option value="full">Full</option>
+                          <option value="closed">Closed</option>
+                        </select>
+                      </div>
+                      <div className="sm:col-span-1 text-center pt-4">
+                        <button
+                          type="button"
+                          onClick={() => {
+                            const updated =
+                              selectedTripForDates.availableDates.filter(
+                                (_, i) => i !== idx,
+                              );
+                            setSelectedTripForDates({
+                              ...selectedTripForDates,
+                              availableDates: updated,
+                            });
+                          }}
+                          className="p-2 text-slate-300 hover:text-red-500 rounded-lg transition-colors"
+                        >
+                          <Trash2 size={14} />
+                        </button>
+                      </div>
+                    </div>
+                  ))
+                )}
+
+                <button
+                  type="button"
+                  onClick={() => {
+                    const updated = [
+                      ...selectedTripForDates.availableDates,
+                      {
+                        date: "",
+                        totalSeats: "",
+                        price: "",
+                        status: "available",
+                      },
+                    ];
+                    setSelectedTripForDates({
+                      ...selectedTripForDates,
+                      availableDates: updated,
+                    });
+                  }}
+                  className="w-full py-2.5 border-2 border-dashed border-slate-200 hover:border-teal-500 text-slate-500 hover:text-teal-600 bg-white rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-2"
+                >
+                  <Plus size={12} /> Add New Departure Batch
+                </button>
+              </div>
+
+              {/* Modal Footer actions */}
+              <div className="p-4 border-t border-slate-100 bg-slate-50 flex items-center justify-end gap-2">
+                <button
+                  type="button"
+                  disabled={isUpdatingDates}
+                  onClick={() => setSelectedTripForDates(null)}
+                  className="px-4 py-2 text-xs font-bold text-slate-500 hover:text-slate-700 disabled:opacity-50"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="button"
+                  disabled={isUpdatingDates}
+                  onClick={handleSaveDates}
+                  className="px-5 py-2.5 bg-teal-600 hover:bg-teal-700 disabled:bg-slate-300 text-white font-bold rounded-xl text-xs shadow-sm transition-all"
+                >
+                  {isUpdatingDates ? "Saving Schedule..." : "Save Changes"}
+                </button>
+              </div>
+            </div>
           </div>
         )}
       </main>

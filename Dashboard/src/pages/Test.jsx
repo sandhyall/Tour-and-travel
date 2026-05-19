@@ -19,7 +19,7 @@ export default function ApiTester() {
     }
   };
 
-  // Reusable Tailwind classes for consistency
+
   const sectionCard =
     "bg-white p-6 rounded-2xl border border-slate-200 shadow-sm transition-all hover:shadow-md";
   const btnPrimary =

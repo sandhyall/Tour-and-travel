@@ -36,13 +36,13 @@ const Navbar = () => {
       </div>
 
       <div className="hidden lg:flex items-center space-x-8 text-sm font-bold">
-        <Link className="flex items-center hover:text-gray-300">
+        <Link to="/nepal" className="flex items-center hover:text-gray-300">
           NEPAL <ChevronDown size={16} className="ml-1" />
         </Link>
-        <Link className="flex items-center hover:text-gray-300">
+        <Link to="/butan" className="flex items-center hover:text-gray-300">
           BHUTAN <ChevronDown size={16} className="ml-1" />
         </Link>
-        <Link className="flex items-center hover:text-gray-300">
+        <Link to="/tibet" className="flex items-center hover:text-gray-300">
           TIBET <ChevronDown size={16} className="ml-1" />
         </Link>
 

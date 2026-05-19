@@ -1,4 +1,258 @@
-import React, { useState, useRef } from "react";
+// import React, { useState, useRef, useEffect } from "react";
+// import axios from "../../api/axios";
+// import {
+//   Calendar,
+//   ChevronRight,
+//   Flame,
+//   Gem,
+//   Mountain,
+//   Map,
+//   MapPin,
+//   Loader2,
+// } from "lucide-react";
+
+// const Everest = () => {
+//   const [allTrips, setAllTrips] = useState([]);
+//   const [activeTab, setActiveTab] = useState("best-sellers");
+//   const [loading, setLoading] = useState(true);
+//   const [error, setError] = useState(null);
+
+//   const scrollRef = useRef(null);
+
+//   const tabs = [
+//     {
+//       id: "best-sellers",
+//       label: "Best Sellers 2026",
+//       icon: <Flame className="w-4 h-4 text-orange-500 fill-orange-500" />,
+//     },
+//     {
+//       id: "luxury",
+//       label: "Luxury VIP Tours",
+//       icon: <Gem className="w-4 h-4 text-blue-500" />,
+//     },
+//     {
+//       id: "peak-climbing",
+//       label: "Peak Climbing",
+//       icon: <Mountain className="w-4 h-4 text-gray-600" />,
+//     },
+//     {
+//       id: "short-treks",
+//       label: "Short Treks",
+//       icon: <Map className="w-4 h-4 text-green-600" />,
+//     },
+//     {
+//       id: "bhutan-tours",
+//       label: "Bhutan Tours",
+//       icon: <MapPin className="w-4 h-4 text-red-500" />,
+//     },
+//   ];
+
+//   useEffect(() => {
+//     const fetchData = async () => {
+//       try {
+//         setLoading(true);
+//         setError(null);
+
+//         const response = await axios.get("/trips");
+
+//         const tripsArray = Array.isArray(response.data)
+//           ? response.data
+//           : response.data.trips || [];
+
+//         console.log(" Trips Array:", tripsArray);
+//         setAllTrips(tripsArray);
+//       } catch (err) {
+//         console.error("Error fetching trips:", err);
+//         setError(err.response?.data?.message || "Data Loading ....");
+//       } finally {
+//         setLoading(false);
+//       }
+//     };
+
+//     fetchData();
+//   }, []);
+
+//   const getActivePackages = () => {
+//     if (!Array.isArray(allTrips) || allTrips.length === 0) return [];
+
+//     return allTrips.filter((pkg) => {
+//       switch (activeTab) {
+//         case "best-sellers":
+//           return pkg.isBestSeller2026 === true;
+//         case "luxury":
+//           return pkg.isLuxuryVIP === true;
+//         case "peak-climbing":
+//           return pkg.isPeakClimbing === true;
+//         case "short-treks":
+//           return pkg.isShortTrek === true;
+//         case "bhutan-tours":
+//           return pkg.isBhutanTour === true;
+//         default:
+//           return false;
+//       }
+//     });
+//   };
+
+//   const scrollRight = () => {
+//     if (scrollRef.current) {
+//       scrollRef.current.scrollBy({ left: 310, behavior: "smooth" });
+//     }
+//   };
+
+//   if (loading) {
+//     return (
+//       <div className="min-h-[400px] flex items-center justify-center bg-white">
+//         <Loader2 className="w-8 h-8 animate-spin text-gray-400" />
+//       </div>
+//     );
+//   }
+
+//   if (error) {
+//     return (
+//       <div className="p-12 text-red-500 text-center font-medium">{error}</div>
+//     );
+//   }
+
+//   const activePackages = getActivePackages();
+
+//   return (
+//     <div className="w-full bg-white px-4 md:px-16 py-8 font-sans">
+//       <div className="max-w-[1400px] mx-auto">
+//         <div className="flex border-b border-gray-100 overflow-x-auto no-scrollbar mb-8 gap-x-8 whitespace-nowrap">
+//           {tabs.map((tab) => (
+//             <button
+//               key={tab.id}
+//               onClick={() => setActiveTab(tab.id)}
+//               className={`flex items-center gap-2 pb-3 px-1 transition-all relative ${
+//                 activeTab === tab.id
+//                   ? "text-black font-bold border-b-2 border-black"
+//                   : "text-gray-400 hover:text-gray-700"
+//               }`}
+//             >
+//               {tab.icon}
+//               <span className="text-[14px] tracking-wide">{tab.label}</span>
+//             </button>
+//           ))}
+//         </div>
+
+//         <div className="relative group">
+//           {activePackages.length === 0 ? (
+//             <div className="text-center py-12 text-gray-400 text-sm border border-dashed border-gray-100 rounded-2xl bg-gray-50/50">
+//               <br />
+//               <span className="text-[11px] text-gray-300">
+//                 Total Trips in DB: {allTrips.length}
+//               </span>
+//             </div>
+//           ) : (
+//             <div
+//               ref={scrollRef}
+//               className="flex gap-5 overflow-x-auto no-scrollbar scroll-smooth pb-6"
+//             >
+//               {activePackages.map((pkg) => {
+//                 const imgUrl =
+//                   pkg.featuredImage?.url ||
+//                   pkg.featuredImage ||
+//                   (Array.isArray(pkg.gallery) && pkg.gallery[0]?.url) ||
+//                   (Array.isArray(pkg.gallery) && pkg.gallery[0]) ||
+//                   "https://images.unsplash.com/photo-1544735716-392fe2489ffa?q=80&w=600";
+
+//                 return (
+//                   <div
+//                     key={pkg._id || pkg.id}
+//                     className="min-w-[290px] max-w-[290px] bg-white rounded-2xl border border-gray-100 overflow-hidden flex flex-col hover:shadow-md transition-shadow duration-300"
+//                   >
+//                     <Link
+//                     to={`/feature/${tripId}`}
+//                     key={tripId}
+//                     className="min-w-[290px] max-w-[290px] bg-white rounded-2xl border border-gray-100 overflow-hidden flex flex-col hover:shadow-lg transition-all duration-300 transform hover:-translate-y-0.5"
+//                   >
+//                     <div className="h-[180px] w-full relative bg-gray-50">
+//                       <img
+//                         src={imgUrl}
+//                         alt={pkg.title}
+//                         className="w-full h-full object-cover"
+//                         onError={(e) => {
+//                           e.target.src =
+//                             "https://images.unsplash.com/photo-1544735716-392fe2489ffa?q=80&w=600";
+//                         }}
+//                       />
+
+//                       {activeTab === "best-sellers" &&
+//                         pkg.oldPrice > pkg.price && (
+//                           <div className="absolute bottom-3 left-3 bg-white/95 backdrop-blur-sm px-2.5 py-1 rounded-md text-[10px] font-bold flex items-center gap-1.5 shadow-sm border border-gray-100/50">
+//                             <div className="bg-orange-500 p-0.5 rounded text-[8px]">
+//                               <Flame className="w-2.5 h-2.5 text-white fill-white" />
+//                             </div>
+//                             <div className="flex flex-col leading-tight">
+//                               <span className="text-[7px] text-gray-400 uppercase tracking-tighter font-semibold">
+//                                 Special Offer
+//                               </span>
+//                               <span className="text-orange-600 text-[9px]">
+//                                 Best Deal
+//                               </span>
+//                             </div>
+//                           </div>
+//                         )}
+//                     </div>
+
+//                     <div className="p-5 flex-grow flex flex-col justify-between min-h-[190px]">
+//                       <div>
+//                         <div className="flex items-center gap-1.5 text-gray-400 text-[12px] mb-2">
+//                           <Calendar className="w-3.5 h-3.5 text-gray-400" />
+//                           <span>
+//                             {pkg.duration ? `${pkg.duration} Days` : "N/A"}
+//                           </span>
+//                         </div>
+
+//                         <h3 className="font-bold text-[15px] text-gray-900 leading-snug line-clamp-2">
+//                           {pkg.title}
+//                         </h3>
+//                       </div>
+
+//                       <div className="mt-4">
+//                         {pkg.oldPrice > 0 && (
+//                           <span className="text-gray-400 text-[11px] line-through block -mb-1">
+//                             USD {pkg.oldPrice}
+//                           </span>
+//                         )}
+//                         <span className="text-gray-400 text-[11px] font-medium inline-block mr-1">
+//                           from
+//                         </span>
+//                         <div className="text-[18px] font-black text-gray-950 tracking-tight inline-block">
+//                           USD {pkg.price}
+//                         </div>
+//                       </div>
+//                     </div>
+//                   </div>
+//                 );
+//               })}
+//             </div>
+//           )}
+
+//           {activePackages.length > 0 && (
+//             <button
+//               onClick={scrollRight}
+//               className="absolute right-[-18px] top-[45%] -translate-y-1/2 bg-white rounded-full p-2.5 shadow-lg border border-gray-100 z-10 hover:bg-gray-50 transition-all active:scale-95 flex items-center justify-center"
+//             >
+//               <ChevronRight className="w-5 h-5 text-black" strokeWidth={2.5} />
+//             </button>
+//           )}
+//         </div>
+//       </div>
+
+//       <style>{`
+//         .no-scrollbar::-webkit-scrollbar { display: none; }
+//         .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+//       `}</style>
+//     </div>
+//   );
+// };
+
+// export default Everest;
+
+import React, { useState, useRef, useEffect } from "react";
+import { Link } from "react-router-dom"; // 🎯 रूटिङका लागि थपियो
+import axios from "../../api/axios";
 import {
   Calendar,
   ChevronRight,
@@ -7,279 +261,237 @@ import {
   Mountain,
   Map,
   MapPin,
+  Loader2,
 } from "lucide-react";
 
 const Everest = () => {
+  const [allTrips, setAllTrips] = useState([]);
   const [activeTab, setActiveTab] = useState("best-sellers");
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
   const scrollRef = useRef(null);
 
   const tabs = [
     {
       id: "best-sellers",
-      label: "Best Sellers for 2026",
-      icon: <Flame className="w-5 h-5 text-orange-500" />,
+      label: "Best Sellers 2026",
+      icon: <Flame className="w-4 h-4 text-orange-500 fill-orange-500" />,
     },
-
     {
       id: "luxury",
-      label: "Luxury & VIP Adventures",
-      icon: <Gem className="w-5 h-5 text-blue-600" />,
+      label: "Luxury VIP Tours",
+      icon: <Gem className="w-4 h-4 text-blue-500" />,
     },
-
     {
       id: "peak-climbing",
       label: "Peak Climbing",
-      icon: <Mountain className="w-5 h-5 text-gray-700" />,
+      icon: <Mountain className="w-4 h-4 text-gray-600" />,
     },
-
     {
       id: "short-treks",
       label: "Short Treks",
-      icon: <Map className="w-5 h-5 text-green-600" />,
+      icon: <Map className="w-4 h-4 text-green-600" />,
     },
-
     {
       id: "bhutan-tours",
       label: "Bhutan Tours",
-      icon: <MapPin className="w-5 h-5 text-red-600" />,
+      icon: <MapPin className="w-4 h-4 text-red-500" />,
     },
   ];
 
-  const packages = {
-    "best-sellers": [
-      {
-        id: 1,
-        title: "Everest Base Camp Trek",
-        days: "14 Days",
-        price: "1,550",
-        image:
-          "https://images.unsplash.com/photo-1544735716-392fe2489ffa?auto=format&fit=crop&q=80&w=600",
-        badge: "Best of the Best",
-      },
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        setLoading(true);
+        setError(null);
 
-      {
-        id: 2,
-        title: "Everest Base Camp Trek with Helicopter Return",
-        days: "12 Days",
-        price: "2,350",
-        image:
-          "https://images.unsplash.com/photo-1533130061792-64b345e4a833?auto=format&fit=crop&q=80&w=600",
-      },
+        const response = await axios.get("/trips");
+        const tripsArray = Array.isArray(response.data)
+          ? response.data
+          : response.data.trips || [];
 
-      {
-        id: 3,
-        title: "Annapurna Base Camp Trek",
-        days: "13 Days",
-        price: "1,050",
-        image:
-          "https://images.unsplash.com/photo-1585016495481-91613a3ab1bc?auto=format&fit=crop&q=80&w=600",
-      },
+        setAllTrips(tripsArray);
+      } catch (err) {
+        console.error("Error fetching trips:", err);
+        setError(err.response?.data?.message || "Data Loading Error");
+      } finally {
+        setLoading(false);
+      }
+    };
 
-      {
-        id: 4,
-        title: "Annapurna Circuit Trek",
-        days: "16 Days",
-        price: "1,420",
-        image:
-          "https://images.unsplash.com/photo-1544735716-392fe2489ffa?auto=format&fit=crop&q=80&w=600",
-      },
-    ],
+    fetchData();
+  }, []);
 
-    luxury: [
-      {
-        id: 5,
-        title: "Luxury Everest Base Camp Heli Trek",
-        days: "11 Days",
-        price: "4,500",
-        image:
-          "https://images.unsplash.com/photo-1605640840605-14ac1855827b?auto=format&fit=crop&q=80&w=600",
-        badge: "Premium",
-      },
+  const getActivePackages = () => {
+    if (!Array.isArray(allTrips) || allTrips.length === 0) return [];
 
-      {
-        id: 6,
-        title: "Luxury Annapurna Heritage Trek",
-        days: "10 Days",
-        price: "3,200",
-        image:
-          "https://images.unsplash.com/photo-1521334885634-9552f105e991?auto=format&fit=crop&q=80&w=600",
-      },
-    ],
-
-    "peak-climbing": [
-      {
-        id: 7,
-        title: "Island Peak Climbing",
-        days: "18 Days",
-        price: "2,800",
-        image:
-          "https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?auto=format&fit=crop&q=80&w=600",
-      },
-
-      {
-        id: 8,
-        title: "Mera Peak Climbing",
-        days: "20 Days",
-        price: "3,100",
-        image:
-          "https://images.unsplash.com/photo-1501555088652-021faa106b9b?auto=format&fit=crop&q=80&w=600",
-      },
-    ],
-
-    "short-treks": [
-      {
-        id: 9,
-        title: "Ghorepani Poon Hill Trek",
-        days: "5 Days",
-        price: "550",
-        image:
-          "https://images.unsplash.com/photo-1585016495481-91613a3ab1bc?auto=format&fit=crop&q=80&w=600",
-      },
-
-      {
-        id: 10,
-        title: "Everest View Trek",
-        days: "7 Days",
-        price: "950",
-        image:
-          "https://images.unsplash.com/photo-1544735716-392fe2489ffa?auto=format&fit=crop&q=80&w=600",
-      },
-    ],
-
-    "bhutan-tours": [
-      {
-        id: 11,
-        title: "Glimpse of Bhutan",
-        days: "4 Days",
-        price: "1,200",
-        image:
-          "https://images.unsplash.com/photo-1578500484596-f04642131238?auto=format&fit=crop&q=80&w=600",
-      },
-    ],
+    return allTrips.filter((pkg) => {
+      switch (activeTab) {
+        case "best-sellers":
+          return pkg.isBestSeller2026 === true;
+        case "luxury":
+          return pkg.isLuxuryVIP === true;
+        case "peak-climbing":
+          return pkg.isPeakClimbing === true;
+        case "short-treks":
+          return pkg.isShortTrek === true;
+        case "bhutan-tours":
+          return pkg.isBhutanTour === true;
+        default:
+          return false;
+      }
+    });
   };
 
   const scrollRight = () => {
     if (scrollRef.current) {
-      scrollRef.current.scrollBy({
-        left: 350,
-        behavior: "smooth",
-      });
+      scrollRef.current.scrollBy({ left: 310, behavior: "smooth" });
     }
   };
 
+  if (loading) {
+    return (
+      <div className="min-h-[400px] flex items-center justify-center bg-white">
+        <Loader2 className="w-8 h-8 animate-spin text-gray-400" />
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="p-12 text-red-500 text-center font-medium">{error}</div>
+    );
+  }
+
+  const activePackages = getActivePackages();
+
   return (
-    <div className="min-h-screen bg-white p-4 md:p-12 font-sans text-gray-800">
-      <div className="max-w-7xl mx-auto">
-        <div className="flex border-b border-gray-200 overflow-x-auto no-scrollbar mb-10 gap-x-10 whitespace-nowrap">
+    <div className="w-full bg-white px-4 md:px-16 py-8 font-sans">
+      <div className="max-w-[1400px] mx-auto">
+        <div className="flex border-b border-gray-100 overflow-x-auto no-scrollbar mb-8 gap-x-8 whitespace-nowrap">
           {tabs.map((tab) => (
             <button
               key={tab.id}
               onClick={() => setActiveTab(tab.id)}
-              className={`flex items-center gap-2 pb-4 px-1 transition-all duration-300 relative
-              
-              ${
+              className={`flex items-center gap-2 pb-3 px-1 transition-all relative ${
                 activeTab === tab.id
-                  ? "text-black font-bold"
-                  : "text-gray-500 hover:text-black"
-              }
-              
-              `}
+                  ? "text-black font-bold border-b-2 border-black"
+                  : "text-gray-400 hover:text-gray-700"
+              }`}
             >
               {tab.icon}
-
-              <span className="text-[15px]">{tab.label}</span>
-
-              {activeTab === tab.id && (
-                <div className="absolute bottom-0 left-0 w-full h-[3px] bg-black rounded-full" />
-              )}
+              <span className="text-[14px] tracking-wide">{tab.label}</span>
             </button>
           ))}
         </div>
 
-        <div className="relative">
-          <div
-            ref={scrollRef}
-            className="flex gap-6 overflow-x-auto no-scrollbar scroll-smooth pb-10"
-          >
-            {packages[activeTab].map((pkg) => (
-              <div
-                key={pkg.id}
-                className="min-w-[300px] max-w-[300px] bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden flex flex-col hover:shadow-lg transition-shadow duration-300"
-              >
-                <div className="h-48 relative overflow-hidden group">
-                  <img
-                    src={pkg.image}
-                    alt={pkg.title}
-                    className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
-                  />
+        <div className="relative group">
+          {activePackages.length === 0 ? (
+            <div className="text-center py-12 text-gray-400 text-sm border border-dashed border-gray-100 rounded-2xl bg-gray-50/50">
+              <span className="text-[11px] text-gray-300">
+                Total Trips in DB: {allTrips.length}
+              </span>
+            </div>
+          ) : (
+            <div
+              ref={scrollRef}
+              className="flex gap-5 overflow-x-auto no-scrollbar scroll-smooth pb-6"
+            >
+              {activePackages.map((pkg) => {
+                const imgUrl =
+                  pkg.featuredImage?.url ||
+                  pkg.featuredImage ||
+                  (Array.isArray(pkg.gallery) && pkg.gallery[0]?.url) ||
+                  (Array.isArray(pkg.gallery) && pkg.gallery[0]) ||
+                  "https://images.unsplash.com/photo-1544735716-392fe2489ffa?q=80&w=600";
 
-                  {pkg.badge && (
-                    <div className="absolute bottom-3 left-3 bg-white px-2 py-1.5 rounded-lg text-[10px] font-bold flex items-center gap-1.5 shadow-md border border-gray-100">
-                      <div className="bg-orange-500 p-0.5 rounded text-[8px]">
-                        <Flame className="w-3 h-3 text-white" fill="white" />
+                const tripId = pkg._id || pkg.id;
+
+                return (
+                
+                  <Link
+                    to={`/feature/${tripId}`}
+                    key={tripId}
+                    className="min-w-[290px] max-w-[290px] bg-white rounded-2xl border border-gray-100 overflow-hidden flex flex-col hover:shadow-lg transition-all duration-300 transform hover:-translate-y-0.5"
+                  >
+                    <div className="h-[180px] w-full relative bg-gray-50">
+                      <img
+                        src={imgUrl}
+                        alt={pkg.title}
+                        className="w-full h-full object-cover"
+                        onError={(e) => {
+                          e.target.src =
+                            "https://images.unsplash.com/photo-1544735716-392fe2489ffa?q=80&w=600";
+                        }}
+                      />
+
+                      {activeTab === "best-sellers" &&
+                        pkg.oldPrice > pkg.price && (
+                          <div className="absolute bottom-3 left-3 bg-white/95 backdrop-blur-sm px-2.5 py-1 rounded-md text-[10px] font-bold flex items-center gap-1.5 shadow-sm border border-gray-100/50">
+                            <div className="bg-orange-500 p-0.5 rounded text-[8px]">
+                              <Flame className="w-2.5 h-2.5 text-white fill-white" />
+                            </div>
+                            <div className="flex flex-col leading-tight">
+                              <span className="text-[7px] text-gray-400 uppercase tracking-tighter font-semibold">
+                                Special Offer
+                              </span>
+                              <span className="text-orange-600 text-[9px]">
+                                Best Deal
+                              </span>
+                            </div>
+                          </div>
+                        )}
+                    </div>
+
+                    <div className="p-5 flex-grow flex flex-col justify-between min-h-[190px]">
+                      <div>
+                        <div className="flex items-center gap-1.5 text-gray-400 text-[12px] mb-2">
+                          <Calendar className="w-3.5 h-3.5 text-gray-400" />
+                          <span>
+                            {pkg.duration ? `${pkg.duration} Days` : "N/A"}
+                          </span>
+                        </div>
+
+                        <h3 className="font-bold text-[15px] text-gray-900 leading-snug line-clamp-2">
+                          {pkg.title}
+                        </h3>
                       </div>
 
-                      <div className="flex flex-col leading-none">
-                        <span className="text-[8px] text-gray-500 uppercase tracking-tighter">
-                          Travelers' Choice
+                      <div className="mt-4">
+                        {pkg.oldPrice > 0 && (
+                          <span className="text-gray-400 text-[11px] line-through block -mb-1">
+                            USD {pkg.oldPrice}
+                          </span>
+                        )}
+                        <span className="text-gray-400 text-[11px] font-medium inline-block mr-1">
+                          from
                         </span>
-
-                        <span>{pkg.badge}</span>
+                        <div className="text-[18px] font-black text-gray-950 tracking-tight inline-block">
+                          USD {pkg.price}
+                        </div>
                       </div>
                     </div>
-                  )}
-                </div>
+                  </Link>
+                );
+              })}
+            </div>
+          )}
 
-                <div className="p-6 flex-grow flex flex-col justify-between">
-                  <div>
-                    <div className="flex items-center gap-2 text-gray-500 text-[13px] mb-2 font-medium">
-                      <Calendar className="w-4 h-4" />
-
-                      <span>{pkg.days}</span>
-                    </div>
-
-                    <h3 className="font-bold text-[17px] text-gray-900 leading-snug mb-4">
-                      {pkg.title}
-                    </h3>
-                  </div>
-
-                  <div className="border-t border-gray-100 pt-4 mt-auto">
-                    <span className="text-gray-500 text-[12px] block mb-0.5 font-medium">
-                      from
-                    </span>
-
-                    <div className="flex items-baseline gap-1">
-                      <span className="text-xl font-extrabold text-gray-900">
-                        USD {pkg.price}
-                      </span>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
-
-          <button
-            onClick={scrollRight}
-            className="absolute right-[-15px] top-[40%] -translate-y-1/2 bg-white rounded-full p-3 shadow-xl border border-gray-100 z-10 hover:bg-gray-100 transition-all hover:scale-110 hidden md:flex items-center justify-center"
-          >
-            <ChevronRight className="w-6 h-6 text-black" strokeWidth={3} />
-          </button>
+          {activePackages.length > 0 && (
+            <button
+              onClick={scrollRight}
+              className="absolute right-[-18px] top-[45%] -translate-y-1/2 bg-white rounded-full p-2.5 shadow-lg border border-gray-100 z-10 hover:bg-gray-50 transition-all active:scale-95 flex items-center justify-center"
+            >
+              <ChevronRight className="w-5 h-5 text-black" strokeWidth={2.5} />
+            </button>
+          )}
         </div>
       </div>
 
       <style>{`
-
-        .no-scrollbar::-webkit-scrollbar {
-          display: none;
-        }
-
-        .no-scrollbar {
-          -ms-overflow-style: none;
-          scrollbar-width: none;
-        }
-
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
       `}</style>
     </div>
   );

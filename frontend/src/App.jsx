@@ -10,6 +10,10 @@ import LegalDocuments from "./Component/Feature/legaldoucment";
 import TermsAndCondition from "./Component/Feature/TermsAndCondition";
 import Newsletter from "./Component/Feature/Newsletter";
 import Contactus from "./Component/Feature/Contactus";
+import Everestfeature from "./Pages/Everestfeature";
+import Nepal from "./Pages/Nepal";
+import Bhutan from "./Pages/Bhutan";
+import Tibet from "./Pages/Tibet";
 
 
 const App = () => {
@@ -27,6 +31,10 @@ const App = () => {
             <Route path="/terms-and-conditions" element={<TermsAndCondition/>}/>
             <Route path="/sign-up-for-newsletter" element={<Newsletter/>}/>
             <Route path="/contact-us" element={<Contactus/>}/>
+            <Route path="feature/:id" element={<Everestfeature/>}/>
+            <Route path="/nepal" element={<Nepal/>}/>
+            <Route path="/butan" element={<Bhutan/>}/>
+            <Route path="/tibet" element={<Tibet/>}/>
             
           </Route>
         

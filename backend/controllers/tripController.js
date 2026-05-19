@@ -87,9 +87,20 @@ export const createTrip = async (req, res) => {
       accommodation: data.accommodation,
 
       slug,
+      heroImage,
+      galleryImages,
 
-      heroImage, // ✅ MATCHED WITH SCHEMA
-      galleryImages, // ✅ MATCHED WITH SCHEMA
+      categoryType: data.categoryType ? data.categoryType.toLowerCase() : "standard",
+      badge: data.badge === "true" || data.badge === true,
+
+      // ✅ FIXED: Strings "true"/"false" converted to actual booleans
+      isBestSeller2026: data.isBestSeller2026 === "true",
+      isLuxuryVIP: data.isLuxuryVIP === "true",
+      isPeakClimbing: data.isPeakClimbing === "true",
+      isShortTrek: data.isShortTrek === "true",
+      isBhutanTour: data.isBhutanTour === "true",
+
+      availableDates: safeParse(data.availableDates),
 
       includes: safeParse(data.includes),
       excludes: safeParse(data.excludes),
@@ -97,6 +108,7 @@ export const createTrip = async (req, res) => {
       itinerary: safeParse(data.itinerary),
       faqs: safeParse(data.faqs),
       packingList: safeParse(data.packingList),
+      packages: safeParse(data.packages),
     });
 
     return res.status(201).json(trip);
@@ -114,7 +126,40 @@ export const createTrip = async (req, res) => {
 ========================= */
 export const getTrips = async (req, res) => {
   try {
-    const trips = await Trip.find().sort({ createdAt: -1 });
+    const { category, format,type } = req.query;
+    let filterQuery = {};
+
+    if (type) {
+      if (type === "popular") {
+        filterQuery = {
+          $or: [{ isBestSeller2026: true }, { badge: true }]
+        };
+      } else if (["standard", "comfort", "luxury"].includes(type.toLowerCase())) {
+        filterQuery.categoryType = type.toLowerCase();
+      }
+    }
+
+    // Frontend category filter mapping
+    if (category === "best-sellers") filterQuery.isBestSeller2026 = true;
+    if (category === "luxury") filterQuery.isLuxuryVIP = true;
+    if (category === "peak-climbing") filterQuery.isPeakClimbing = true;
+    if (category === "short-treks") filterQuery.isShortTrek = true;
+    if (category === "bhutan-tours") filterQuery.isBhutanTour = true;
+
+    const trips = await Trip.find(filterQuery).sort({ createdAt: -1 });
+
+    // If frontend requests grouped format (for tab-based components)
+    if (format === "grouped") {
+      const groupedPackages = {
+        "best-sellers": trips.filter((t) => t.isBestSeller2026),
+        luxury: trips.filter((t) => t.isLuxuryVIP),
+        "peak-climbing": trips.filter((t) => t.isPeakClimbing),
+        "short-treks": trips.filter((t) => t.isShortTrek),
+        "bhutan-tours": trips.filter((t) => t.isBhutanTour),
+      };
+      return res.status(200).json(groupedPackages);
+    }
+
     return res.status(200).json(trips);
   } catch (err) {
     return res.status(500).json({ message: err.message });
@@ -139,7 +184,7 @@ export const getTripById = async (req, res) => {
 };
 
 /* =========================
-   UPDATE TRIP (FIXED)
+   UPDATE TRIP
 ========================= */
 export const updateTrip = async (req, res) => {
   try {
@@ -149,20 +194,81 @@ export const updateTrip = async (req, res) => {
       return res.status(404).json({ message: "Trip not found" });
     }
 
-    // SAFE FIELD UPDATE
-    if (req.body.title) trip.title = req.body.title;
-    if (req.body.country) trip.country = req.body.country;
-    if (req.body.duration) trip.duration = req.body.duration;
-    if (req.body.price) trip.price = req.body.price;
-    if (req.body.overview) trip.overview = req.body.overview;
+    /* ==========================================================================
+       1. TEXT FIELDS
+       ========================================================================== */
+    const textFields = [
+      "title",
+      "country",
+      "overview",
+      "difficulty",
+      "activity",
+      "maxAltitude",
+      "bestSeason",
+      "startPoint",
+      "endPoint",
+      "meals",
+      "accommodation",
+      "categoryType",
+    ];
 
-    if (req.body.includes) trip.includes = safeParse(req.body.includes);
-    if (req.body.excludes) trip.excludes = safeParse(req.body.excludes);
-    if (req.body.highlights) trip.highlights = safeParse(req.body.highlights);
-    if (req.body.itinerary) trip.itinerary = safeParse(req.body.itinerary);
-    if (req.body.faqs) trip.faqs = safeParse(req.body.faqs);
+    textFields.forEach((field) => {
+      if (req.body[field] !== undefined) {
+        trip[field] = req.body[field];
+      }
+    });
 
-    // SLUG UPDATE
+    /* ==========================================================================
+       2. NUMBER FIELDS
+       ========================================================================== */
+    const numberFields = ["duration", "price", "oldPrice"];
+    numberFields.forEach((field) => {
+      if (req.body[field] !== undefined) {
+        trip[field] = Number(req.body[field]) || 0;
+      }
+    });
+
+    /* ==========================================================================
+       3. BOOLEAN CATEGORY FLAGS
+       ========================================================================== */
+    const booleanCategoryFields = [
+      "isBestSeller2026",
+      "isLuxuryVIP",
+      "isPeakClimbing",
+      "isShortTrek",
+      "isBhutanTour",
+      "badge",
+    ];
+    booleanCategoryFields.forEach((field) => {
+      if (req.body[field] !== undefined) {
+        // ✅ Handle both string "true"/"false" from FormData and real booleans from JSON
+        trip[field] = req.body[field] === "true" || req.body[field] === true;
+      }
+    });
+
+    /* ==========================================================================
+       4. ARRAY / JSON FIELDS
+       ========================================================================== */
+    const arrayFields = [
+      "includes",
+      "excludes",
+      "highlights",
+      "itinerary",
+      "faqs",
+      "packages",
+      "packingList",
+      "availableDates",
+    ];
+
+    arrayFields.forEach((field) => {
+      if (req.body[field] !== undefined) {
+        trip[field] = safeParse(req.body[field]);
+      }
+    });
+
+    /* ==========================================================================
+       5. SLUG UPDATE
+       ========================================================================== */
     if (req.body.title) {
       trip.slug = slugify(req.body.title, {
         lower: true,
@@ -170,7 +276,9 @@ export const updateTrip = async (req, res) => {
       });
     }
 
-    // HERO IMAGE UPDATE
+    /* ==========================================================================
+       6. HERO IMAGE UPDATE
+       ========================================================================== */
     if (req.files?.featuredImage?.[0]) {
       const result = await uploadBuffer(req.files.featuredImage[0].buffer);
 
@@ -180,7 +288,9 @@ export const updateTrip = async (req, res) => {
       };
     }
 
-    // GALLERY UPDATE
+    /* ==========================================================================
+       7. GALLERY IMAGES UPDATE
+       ========================================================================== */
     if (req.files?.gallery?.length) {
       const updatedGallery = [];
 
@@ -196,6 +306,9 @@ export const updateTrip = async (req, res) => {
       trip.galleryImages = updatedGallery;
     }
 
+    /* ==========================================================================
+       8. SAVE & RESPOND
+       ========================================================================== */
     await trip.save();
 
     return res.status(200).json(trip);
@@ -228,38 +341,59 @@ export const deleteTrip = async (req, res) => {
     return res.status(500).json({ message: err.message });
   }
 };
-/* ==========================================================================
-   7. ADD TRIP DATE LOGISTICS
-   ========================================================================== */
+
+/* =========================
+   ADD TRIP DATE
+========================= */
 export const addTripDate = async (req, res) => {
   try {
-    const { tripId, date, totalSeats } = req.body;
+    const { tripId, date, totalSeats, price, status } = req.body;
+
+    if (!tripId || !date || !totalSeats) {
+      return res.status(400).json({
+        message: "tripId, date, and totalSeats fields are required",
+      });
+    }
 
     const trip = await Trip.findById(tripId);
     if (!trip) {
       return res.status(404).json({ message: "Target trip not found" });
     }
 
-    // Push new date object to the array inside schema
-    trip.availableDates.push({
-      date,
-      totalSeats: Number(totalSeats || 0),
-    });
+    const newDateVariant = {
+      date: new Date(date),
+      totalSeats: Number(totalSeats),
+      bookedSeats: 0,
+    };
 
+    if (price !== undefined) {
+      newDateVariant.price = Number(price);
+    }
+
+    if (status) {
+      newDateVariant.status = status;
+    }
+
+    trip.availableDates.push(newDateVariant);
     await trip.save();
+
     return res.status(200).json({
       success: true,
-      message: "Logistics date variant added successfully",
+      message: "Date variant added successfully",
       trip,
     });
   } catch (err) {
     console.error("❌ ADD TRIP DATE ERROR:", err);
-    return res
-      .status(500)
-      .json({ message: "Failed to allocate date matrix", error: err.message });
+    return res.status(500).json({
+      message: "Failed to add date",
+      error: err.message,
+    });
   }
 };
 
+/* =========================
+   GET BY SLUG
+========================= */
 export const getTrip = async (req, res) => {
   try {
     const trip = await Trip.findOne({ slug: req.params.slug });

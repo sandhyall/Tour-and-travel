@@ -20,7 +20,7 @@ const availableDateSchema = new mongoose.Schema({
 
   status: {
     type: String,
-    enum: ["available", "full", "closed"],
+    enum: ["available", "full", "closed", "limited", "sold-out"],
     default: "available",
   },
 });
@@ -63,17 +63,42 @@ const tripSchema = new mongoose.Schema(
     price: Number,
     oldPrice: Number,
 
-    // ✅ NEW FIELD
+    categoryType: {
+      type: String,
+      enum: ["standard", "comfort", "luxury"],
+      default: "standard",
+    },
+    badge: {
+      type: Boolean,
+      default: false,
+    },
+
+    // ✅ CATEGORY/TAB BOOLEAN FLAGS
+    isBestSeller2026: {
+      type: Boolean,
+      default: false,
+    },
+    isLuxuryVIP: {
+      type: Boolean,
+      default: false,
+    },
+    isPeakClimbing: {
+      type: Boolean,
+      default: false,
+    },
+    isShortTrek: {
+      type: Boolean,
+      default: false,
+    },
+    isBhutanTour: {
+      type: Boolean,
+      default: false,
+    },
+
     availableDates: [availableDateSchema],
 
-    packingList: {
-      general: [String],
-      upperBody: [String],
-      torso: [String],
-      lowerBody: [String],
-      hands: [String],
-      feet: [String],
-    },
+    // ✅ FIXED: flat [String] array to match safeParse() usage in controller
+    packingList: [String],
 
     highlights: [String],
     includes: [String],
@@ -113,7 +138,7 @@ const tripSchema = new mongoose.Schema(
       },
     ],
   },
-  { timestamps: true }
+  { timestamps: true },
 );
 
 export default mongoose.model("Trip", tripSchema);

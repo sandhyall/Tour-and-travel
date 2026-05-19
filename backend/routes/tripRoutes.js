@@ -25,7 +25,7 @@ router.post(
     { name: "featuredImage", maxCount: 1 },
     { name: "gallery", maxCount: 10 },
   ]),
-  createTrip
+  createTrip,
 );
 
 /* =========================
@@ -34,12 +34,14 @@ router.post(
 router.get("/", getTrips);
 
 /* =========================
-   ADD TRIP DATE (IMPORTANT)
+   ADD TRIP DATE
+   NOTE: Must be BEFORE /:id to avoid "dates" being treated as an ID
 ========================= */
 router.post("/dates", protect, adminOnly, addTripDate);
 
 /* =========================
    GET BY SLUG (PUBLIC PAGE)
+   NOTE: Must be BEFORE /:id to avoid "slug" being treated as an ID
 ========================= */
 router.get("/slug/:slug", getTrip);
 
@@ -59,7 +61,7 @@ router.put(
     { name: "featuredImage", maxCount: 1 },
     { name: "gallery", maxCount: 10 },
   ]),
-  updateTrip
+  updateTrip,
 );
 
 /* =========================

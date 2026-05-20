@@ -2,6 +2,7 @@ import React, { useEffect, useState, useRef } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import axios from "../../src/api/axios";
 import { Link } from "react-router-dom";
+import BookingModal from "../Component/BookingModal";
 import {
   MapPin,
   Clock,
@@ -167,6 +168,9 @@ const Everestfeature = () => {
   const [galleryOpen, setGalleryOpen] = useState(false);
   const [galleryIndex, setGalleryIndex] = useState(0);
   const sidebarRef = useRef(null);
+
+  const [bookingOpen, setBookingOpen] =
+  useState(false);
 
   useEffect(() => {
     const fetchTripDetail = async () => {
@@ -745,9 +749,14 @@ const Everestfeature = () => {
               </div>
 
               <div className="px-6 pb-5 space-y-2.5">
-                <button className="w-full bg-gray-950 hover:bg-gray-800 text-white font-semibold py-3.5 rounded-xl transition-colors text-sm tracking-wide">
-                  Book This Expedition
-                </button>
+                <button
+  onClick={() =>
+    setBookingOpen(true)
+  }
+  className="w-full bg-gray-950 hover:bg-gray-800 text-white font-semibold py-3.5 rounded-xl transition-colors text-sm tracking-wide"
+>
+  Book This Expedition
+</button>
                 <button className="w-full flex items-center justify-center gap-2 border border-amber-200 bg-amber-50 hover:bg-amber-100 text-amber-700 font-semibold py-3 rounded-xl transition-colors text-sm">
                   <Download size={14} />
                   Download Brochure
@@ -835,6 +844,14 @@ const Everestfeature = () => {
             </div>
           </div>
         </aside>
+
+        <BookingModal
+  trip={trip}
+  open={bookingOpen}
+  onClose={() =>
+    setBookingOpen(false)
+  }
+/>
       </div>
 
       {galleryOpen && lightboxImages.length > 0 && (

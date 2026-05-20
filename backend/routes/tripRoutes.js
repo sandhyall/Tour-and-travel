@@ -3,10 +3,8 @@ import {
   createTrip,
   getTrips,
   getTripById,
-  getTrip,
   updateTrip,
-  deleteTrip,
-  addTripDate,
+  deleteTrip
 } from "../controllers/tripController.js";
 
 import { protect, adminOnly } from "../middleware/authMiddleware.js";
@@ -14,59 +12,43 @@ import { upload } from "../middleware/uploadMiddleware.js";
 
 const router = express.Router();
 
-/* =========================
-   CREATE TRIP
-========================= */
+/**
+ * CREATE TRIP
+ */
 router.post(
   "/",
-  protect,
-  adminOnly,
   upload.fields([
-    { name: "featuredImage", maxCount: 1 },
-    { name: "gallery", maxCount: 10 },
+    { name: "heroImage", maxCount: 1 },
+    { name: "galleryImages", maxCount: 10 }
   ]),
-  createTrip,
+  createTrip
 );
 
-/* =========================
-   GET ALL TRIPS
-========================= */
+/**
+ * GET ALL TRIPS
+ */
 router.get("/", getTrips);
 
-/* =========================
-   ADD TRIP DATE
-   NOTE: Must be BEFORE /:id to avoid "dates" being treated as an ID
-========================= */
-router.post("/dates", protect, adminOnly, addTripDate);
-
-/* =========================
-   GET BY SLUG (PUBLIC PAGE)
-   NOTE: Must be BEFORE /:id to avoid "slug" being treated as an ID
-========================= */
-router.get("/slug/:slug", getTrip);
-
-/* =========================
-   GET BY ID (ADMIN EDIT PAGE)
-========================= */
+/**
+ * GET SINGLE TRIP BY ID (IMPORTANT: put before slug if you use slug route)
+ */
 router.get("/:id", getTripById);
 
-/* =========================
-   UPDATE TRIP
-========================= */
+/**
+ * UPDATE TRIP
+ */
 router.put(
   "/:id",
-  protect,
-  adminOnly,
   upload.fields([
-    { name: "featuredImage", maxCount: 1 },
-    { name: "gallery", maxCount: 10 },
+    { name: "heroImage", maxCount: 1 },
+    { name: "galleryImages", maxCount: 10 }
   ]),
-  updateTrip,
+  updateTrip
 );
 
-/* =========================
-   DELETE TRIP
-========================= */
-router.delete("/:id", protect, adminOnly, deleteTrip);
+/**
+ * DELETE TRIP
+ */
+router.delete("/:id", deleteTrip);
 
 export default router;

@@ -1,64 +1,153 @@
-import stripe from "../config/stripe.js";
 import Booking from "../models/Booking.js";
 import Payment from "../models/Payment.js";
-import { sendBookingEmail } from "../utils/sendBookingEmail.js";
 
-export const createStripeCheckout = async (req, res) => {
-  try {
-    const { bookingId } = req.body;
+import axios from "axios";
 
-    const booking = await Booking.findById(bookingId).populate("trip");
+import { v4 as uuidv4 } from "uuid";
 
-    if (!booking) {
-      return res.status(404).json({
-        message: "Booking not found",
+/* =========================
+   CARD CHECKOUT
+========================= */
+
+export const createCheckout =
+  async (req, res) => {
+    try {
+      const { bookingId } =
+        req.body;
+
+      const booking =
+        await Booking.findById(
+          bookingId
+        ).populate("trip");
+
+      if (!booking) {
+        return res.status(404).json({
+          message:
+            "Booking not found",
+        });
+      }
+
+      const transactionId =
+        uuidv4();
+
+      await Payment.create({
+        bookingId:
+          booking._id,
+
+        amount:
+          booking.totalAmount,
+
+        method: "card",
+
+        transactionId,
+
+        status: "pending",
+      });
+
+      const fakeGatewayUrl =
+        `${process.env.CLIENT_URL}/payment-success?bookingId=${booking._id}&transactionId=${transactionId}`;
+
+      res.json({
+        paymentUrl:
+          fakeGatewayUrl,
+      });
+    } catch (err) {
+      res.status(500).json({
+        message: err.message,
       });
     }
+  };
 
-    const session = await stripe.checkout.sessions.create({
-      payment_method_types: ["card"],
-      mode: "payment",
+/* =========================
+   KHALTI PAYMENT
+========================= */
 
-      customer_email: booking.buyer.email,
+export const createKhaltiPayment =
+  async (req, res) => {
+    try {
+      const { bookingId } =
+        req.body;
 
-      line_items: [
-        {
-          price_data: {
-            currency: "usd",
-            product_data: {
-              name: booking.trip.title,
+      const booking =
+        await Booking.findById(
+          bookingId
+        ).populate("trip");
+
+      if (!booking) {
+        return res.status(404).json({
+          message:
+            "Booking not found",
+        });
+      }
+
+      const response =
+        await axios.post(
+          "https://a.khalti.com/api/v2/epayment/initiate/",
+          {
+            return_url:
+              `${process.env.CLIENT_URL}/payment-success`,
+
+            website_url:
+              process.env.CLIENT_URL,
+
+            amount:
+              booking.totalAmount *
+              100,
+
+            purchase_order_id:
+              booking._id.toString(),
+
+            purchase_order_name:
+              booking.trip.title,
+
+            customer_info: {
+              name: `${booking.buyer.firstName} ${booking.buyer.lastName}`,
+
+              email:
+                booking.buyer.email,
             },
-            unit_amount: booking.totalAmount * 100,
           },
-          quantity: 1,
-        },
-      ],
+          {
+            headers: {
+              Authorization:
+                `Key ${process.env.KHALTI_SECRET_KEY}`,
 
-      success_url: `${process.env.CLIENT_URL}/payment-success?session_id={CHECKOUT_SESSION_ID}`,
-      cancel_url: `${process.env.CLIENT_URL}/payment-failed`,
+              "Content-Type":
+                "application/json",
+            },
+          }
+        );
 
-      metadata: {
-        bookingId: booking._id.toString(),
-      },
-    });
+      await Payment.create({
+        bookingId:
+          booking._id,
 
-    booking.stripeSessionId = session.id;
-    await booking.save();
+        amount:
+          booking.totalAmount,
 
-    await Payment.create({
-      bookingId: booking._id,
-      amount: booking.totalAmount,
-      method: "stripe",
-      stripeSessionId: session.id,
-      status: "pending",
-    });
+        method: "khalti",
 
-    res.json({
-      url: session.url,
-    });
-  } catch (err) {
-    res.status(500).json({
-      message: err.message,
-    });
-  }
-};
+        transactionId:
+          uuidv4(),
+
+        status: "pending",
+      });
+
+      res.json({
+        paymentUrl:
+          response.data
+            .payment_url,
+      });
+    } catch (err) {
+      console.log(
+        "KHALTI ERROR:",
+        err.response?.data ||
+          err.message
+      );
+
+      res.status(500).json({
+        message:
+          "Khalti payment failed",
+      });
+    }
+  };

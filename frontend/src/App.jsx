@@ -14,7 +14,7 @@ import Everestfeature from "./Pages/Everestfeature";
 import Nepal from "./Pages/Nepal";
 import Bhutan from "./Pages/Bhutan";
 import Tibet from "./Pages/Tibet";
-
+import PaymentSuccess from "./pages/PaymentSuccess";
 
 const App = () => {
   return (
@@ -35,7 +35,7 @@ const App = () => {
             <Route path="/nepal" element={<Nepal/>}/>
             <Route path="/butan" element={<Bhutan/>}/>
             <Route path="/tibet" element={<Tibet/>}/>
-            
+            <Route path="/payment-success" element={<PaymentSuccess />}/>
           </Route>
         
         </Routes>

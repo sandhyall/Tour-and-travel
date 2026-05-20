@@ -24,16 +24,36 @@ export default function AdminCalendar() {
     }
   };
 
-  const getDayData = (date) => {
-    const d = date.toLocaleDateString('en-CA'); 
-    return data.find((x) => x.date === d);
-  };
+ const getDayData = (date) => {
+  const d = date.toLocaleDateString('en-CA'); 
+  return data.find((x) => x.date === d);
+};
 
-  const handleClickDay = (date) => {
-    setSelectedDate(date);
-    const found = getDayData(date);
-    setSelectedBookings(found?.bookings || []);
-  };
+const groupedData = data.reduce((acc, item) => {
+  if (!acc[item.date]) {
+    acc[item.date] = {
+      date: item.date,
+      bookings: [],
+      count: 0,
+      remainingSeats: 999
+    };
+  }
+
+  acc[item.date].bookings.push(item);
+  acc[item.date].count += 1;
+
+  return acc;
+}, {});
+
+const handleClickDay = (date) => {
+  setSelectedDate(date);
+
+  const d = date.toLocaleDateString("en-CA");
+
+  const found = data.filter((x) => x.date === d);
+
+  setSelectedBookings(found);
+};
 
   return (
     <div className="flex bg-slate-50 min-h-screen">
@@ -63,23 +83,33 @@ export default function AdminCalendar() {
                 onClickDay={handleClickDay}
                 className="border-none w-full admin-custom-calendar"
                 tileContent={({ date }) => {
-                  const dayData = getDayData(date);
-                  if (!dayData) return null;
-                  const isFull = dayData.remainingSeats <= 0;
+  const dayData = getDayData(date);
 
-                  return (
-                    <div className="flex flex-col items-center mt-1">
-                      <div className={`text-[10px] font-bold px-1.5 rounded-full ${isFull ? 'bg-rose-100 text-rose-600' : 'bg-emerald-100 text-emerald-600'}`}>
-                        {dayData.count}
-                      </div>
-                      <div className="flex gap-0.5 mt-0.5">
-                        {dayData.bookings.slice(0, 3).map((_, i) => (
-                           <span key={i} className={`w-1 h-1 rounded-full ${isFull ? 'bg-rose-400' : 'bg-indigo-400'}`}></span>
-                        ))}
-                      </div>
-                    </div>
-                  );
-                }}
+  if (!dayData) return null;
+
+  const isFull = dayData.remainingSeats <= 0;
+
+  return (
+    <div className="flex flex-col items-center mt-1">
+      <div className={`text-[10px] font-bold px-1.5 rounded-full ${
+        isFull ? 'bg-rose-100 text-rose-600' : 'bg-emerald-100 text-emerald-600'
+      }`}>
+        {dayData.count}
+      </div>
+
+      <div className="flex gap-0.5 mt-0.5">
+        {(dayData?.bookings || []).slice(0, 3).map((_, i) => (
+          <span
+            key={i}
+            className={`w-1 h-1 rounded-full ${
+              isFull ? 'bg-rose-400' : 'bg-indigo-400'
+            }`}
+          />
+        ))}
+      </div>
+    </div>
+  );
+}}
                 tileClassName={({ date }) => {
                   const dayData = getDayData(date);
                   if (!dayData) return "text-slate-400";
@@ -116,23 +146,32 @@ export default function AdminCalendar() {
                     </div>
                   ) : (
                     selectedBookings.map((b) => (
-                      <div key={b._id} className="p-4 rounded-xl bg-slate-50 border border-slate-100 hover:border-indigo-200 transition-colors">
-                        <div className="flex justify-between items-start mb-2">
-                           <span className="text-xs font-bold text-indigo-600 uppercase tracking-tighter">Trip ID: {b._id.slice(-5)}</span>
-                           {b.paymentStatus === 'paid' ? 
-                             <CheckCircle2 size={14} className="text-emerald-500" /> : 
-                             <AlertCircle size={14} className="text-amber-500" />
-                           }
-                        </div>
-                        <h4 className="text-sm font-semibold text-slate-800 leading-snug mb-1">{b.trip?.title}</h4>
-                        <div className="flex items-center gap-3 mt-3 text-[11px] font-medium text-slate-500 uppercase">
-                          <span className="flex items-center gap-1"><Users size={12} /> {b.numberOfPeople}</span>
-                          <span className="flex items-center gap-1 border-l pl-3">
-                             {b.buyer?.firstName} {b.buyer?.lastName}
-                          </span>
-                        </div>
-                      </div>
-                    ))
+  <div key={b.id} className="p-4 rounded-xl bg-slate-50 border border-slate-100 hover:border-indigo-200 transition-colors">
+    
+    <div className="flex justify-between items-start mb-2">
+      <span className="text-xs font-bold text-indigo-600 uppercase tracking-tighter">
+        Trip ID: {(b.id || "").slice(-5)}
+      </span>
+
+      {b.payment === "paid" ? (
+        <CheckCircle2 size={14} className="text-emerald-500" />
+      ) : (
+        <AlertCircle size={14} className="text-amber-500" />
+      )}
+    </div>
+
+    <h4 className="text-sm font-semibold text-slate-800 leading-snug mb-1">
+      {b.title || "Trip"}
+    </h4>
+
+    <div className="flex items-center gap-3 mt-3 text-[11px] font-medium text-slate-500 uppercase">
+      <span className="flex items-center gap-1">
+        <Users size={12} /> {b.people || 0}
+      </span>
+    </div>
+
+  </div>
+))
                   )}
                 </div>
               </div>

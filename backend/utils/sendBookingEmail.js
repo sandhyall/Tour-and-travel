@@ -8,7 +8,7 @@ export const sendBookingEmail =
 
     const transporter =
       nodemailer.createTransport({
-        service: "gmail",
+        service: "smtp.gmail.com",
 
         auth: {
           user:

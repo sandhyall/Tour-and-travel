@@ -165,3 +165,28 @@ export const getBookingsByDate = async (req, res) => {
   }
 };
 
+export const getCalendar = async (req, res) => {
+  try {
+    const bookings = await Booking.find()
+      .populate("trip")
+      .lean();
+
+    const calendar = bookings
+      .filter(b => b.travelDate && b.trip)
+      .map(b => ({
+        id: b._id,
+        title: b.trip?.title || "Trip",
+        date: new Date(b.travelDate).toISOString().split("T")[0],
+        status: b.bookingStatus || "pending",
+        payment: b.paymentStatus || "pending",
+        people: b.numberOfPeople || 0,
+        buyer: b.buyer || {},
+      }));
+
+    return res.json(calendar);
+
+  } catch (err) {
+    console.error("CALENDAR ERROR:", err);
+    return res.status(500).json({ message: err.message });
+  }
+};

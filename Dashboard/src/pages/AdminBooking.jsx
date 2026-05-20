@@ -380,16 +380,20 @@ export default function AdminBookings() {
                           <DollarSign size={14} />
                           {b.totalAmount}
                         </div>
-                        {b.bankSlip?.url && (
-                          <a 
-                            href={b.bankSlip.url} 
-                            target="_blank" 
-                            rel="noreferrer"
-                            className="text-[10px] font-bold text-indigo-600 hover:underline flex items-center gap-1 mt-1 uppercase"
-                          >
-                            View Slip <ExternalLink size={10} />
-                          </a>
-                        )}
+                       {b.bankSlip?.url ? (
+  <a 
+    href={b.bankSlip.url} 
+    target="_blank" 
+    rel="noreferrer"
+    className="text-[10px] font-bold text-indigo-600 hover:underline flex items-center gap-1 mt-1 uppercase"
+  >
+    View Slip <ExternalLink size={10} />
+  </a>
+) : (
+  <span className="text-[10px] text-slate-400 mt-1 block">
+    No slip uploaded
+  </span>
+)}
                       </td>
 
                       {/* Status Badges */}

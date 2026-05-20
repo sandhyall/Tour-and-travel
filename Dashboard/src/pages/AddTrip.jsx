@@ -226,13 +226,12 @@ export default function AddTrip() {
 
     // 3. Append Single Featured Image File Binary
     if (featuredImage) {
-      formData.append("featuredImage", featuredImage);
-    }
+  formData.append("heroImage", featuredImage);
+}
 
-    // 4. Append Multiple Gallery Images File Arrays Binaries
-    gallery.forEach((file) => {
-      formData.append("gallery", file);
-    });
+gallery.forEach((file) => {
+  formData.append("galleryImages", file);
+});
 
     try {
       const response = await axios.post("/trips", formData, {

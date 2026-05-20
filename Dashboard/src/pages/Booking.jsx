@@ -17,40 +17,70 @@ export default function Bookings() {
   const [search, setSearch] = useState("");
   const [loading, setLoading] = useState(true);
 
-  const fetchData = async () => {
-    try {
-      setLoading(true);
-      const { data } = await axios.get("/bookings");
+  // const fetchData = async () => {
+  //   try {
+  //     setLoading(true);
+  //     const { data } = await axios.get("/bookings");
       
       
-      if (Array.isArray(data)) {
-        setBookings(data);
-      } else if (data && Array.isArray(data.bookings)) {
-        setBookings(data.bookings);
-      } else {
-        setBookings([]); /
-      }
-    } catch (err) {
-      console.error(err);
-      setBookings([]);
-    } finally {
-      setLoading(false);
-    }
-  };
+  //     if (Array.isArray(data)) {
+  //       setBookings(data);
+  //     } else if (data && Array.isArray(data.bookings)) {
+  //       setBookings(data.bookings);
+  //     } else {
+  //       setBookings([]); /
+  //     }
+  //   } catch (err) {
+  //     console.error(err);
+  //     setBookings([]);
+  //   } finally {
+  //     setLoading(false);
+  //   }
+  // };
 
+const fetchData = async () => {
+  try {
+    setLoading(true);
+
+    const token = localStorage.getItem("token");
+
+    const { data } = await axios.get("/bookings", {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+
+    const bookingsArray = Array.isArray(data)
+      ? data
+      : data?.bookings || [];
+
+    setBookings(bookingsArray);
+  } catch (err) {
+    console.error("Fetch bookings error:", err);
+    setBookings([]);
+  } finally {
+    setLoading(false);
+  }
+};
   useEffect(() => {
     fetchData();
   }, []);
 
-  const updateStatus = async (id, status) => {
-    try {
-      await axios.put(`/bookings/${id}/status`, { status });
-      fetchData();
-    } catch (err) {
-      alert("Failed to update status");
-    }
-  };
+const updateStatus = async (id, status) => {
+  try {
+    await axios.put(`/bookings/${id}/status`, { status });
 
+    setBookings((prev) =>
+      prev.map((b) =>
+        b._id === id
+          ? { ...b, bookingStatus: status } // 🔥 instant UI update
+          : b
+      )
+    );
+  } catch (err) {
+    alert("Failed to update status");
+  }
+};
   // ✅ सुरक्षा: bookings एरे हो कि होइन चेक गरेर मात्र फिल्टर गर्ने
   const safeBookings = Array.isArray(bookings) ? bookings : [];
 
@@ -256,5 +286,6 @@ export default function Bookings() {
         </div>
       </main>
     </div>
+   
   );
 }

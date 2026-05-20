@@ -12,9 +12,8 @@ const paymentSchema = new mongoose.Schema(
     method: {
       type: String,
       enum: [
-        "bank",
-        "stripe",
-        "khalti",
+        "card",
+        "swift_bank_transfer",
       ],
     },
 
@@ -23,6 +22,8 @@ const paymentSchema = new mongoose.Schema(
     stripeSessionId: String,
 
     stripePaymentIntentId: String,
+
+    swiftReferenceNumber: String,
 
     currency: {
       type: String,

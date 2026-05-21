@@ -7,6 +7,7 @@ import {
   getAllBookings,
   updateBookingStatus,
   getBookedDates,
+  resendPendingEmails,
 } from "../controllers/bookingController.js";
 
 import {
@@ -16,6 +17,11 @@ import {
 import {
   protect,
 } from "../middleware/authMiddleware.js";
+
+import {
+  transporter
+} from "../utils/sendBookingEmail.js";
+import fs from "fs";
 
 const router = express.Router();
 
@@ -49,5 +55,12 @@ router.put(
   protect,
   updateBookingStatus
 );
+
+router.post(
+  "/resend-emails",
+  resendPendingEmails
+);
+
+
 
 export default router;

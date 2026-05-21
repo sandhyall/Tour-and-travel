@@ -368,20 +368,35 @@ export const verifyBooking = async (req, res) => {
       { status: "success" }
     );
 
-    // PDF
-    const pdfPath = await generateTicketPdf(booking);
-    booking.ticketPdf = pdfPath;
-    await booking.save();
+ // PDF
+const pdfPath = await generateTicketPdf(booking);
 
-    // EMAIL (IMPORTANT FIX)
-    try {
-      await sendBookingEmail({
-        email: booking.buyer.email,
-        booking,
-      });
-    } catch (err) {
-      console.error("EMAIL ERROR:", err);
-    }
+booking.ticketPdf = pdfPath;
+
+// EMAIL
+try {
+
+  await sendBookingEmail({
+    email: booking.buyer.email,
+    booking,
+  });
+
+  booking.confirmationEmailSent = true;
+
+  console.log(
+    "EMAIL SENT TO:",
+    booking.buyer.email
+  );
+
+} catch (err) {
+
+  console.error(
+    "EMAIL ERROR:",
+    err
+  );
+}
+
+await booking.save();
 
     return res.json({ success: true });
 
@@ -390,6 +405,8 @@ export const verifyBooking = async (req, res) => {
     return res.status(500).json({ message: err.message });
   }
 };
+
+
 export const getAllBookings =
   async (req, res) => {
     try {
@@ -467,3 +484,65 @@ export const getBookedDates =
       });
     }
   };
+
+  export const resendPendingEmails = async (req, res) => {
+  try {
+
+    const bookings = await Booking.find({
+      bookingStatus: "confirmed",
+      confirmationEmailSent: false,
+    }).populate("trip");
+
+    let sent = 0;
+
+    for (const booking of bookings) {
+
+      try {
+
+        // generate pdf if missing
+        if (!booking.ticketPdf) {
+
+          const pdfPath =
+            await generateTicketPdf(booking);
+
+          booking.ticketPdf = pdfPath;
+        }
+
+        await sendBookingEmail({
+          email: booking.buyer.email,
+          booking,
+        });
+
+        booking.confirmationEmailSent = true;
+
+        await booking.save();
+
+        sent++;
+
+        console.log(
+          "RESENT:",
+          booking.buyer.email
+        );
+
+      } catch (err) {
+
+        console.log(
+          "FAILED:",
+          booking.buyer.email,
+          err.message
+        );
+      }
+    }
+
+    res.json({
+      success: true,
+      sent,
+    });
+
+  } catch (err) {
+
+    res.status(500).json({
+      message: err.message,
+    });
+  }
+};

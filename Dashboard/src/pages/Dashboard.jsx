@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import axios from "../api/axios";
 import { useNavigate } from "react-router-dom";
 import Sidebar from "../components/Sidebar";
+
 import {
   LineChart,
   Line,
@@ -43,20 +44,10 @@ export default function Dashboard() {
 
         setBookings(bookingsData);
 
-        // Revenue Data Formatting
+        // Revenue Formatting
         const monthNames = [
-          "Jan",
-          "Feb",
-          "Mar",
-          "Apr",
-          "May",
-          "Jun",
-          "Jul",
-          "Aug",
-          "Sep",
-          "Oct",
-          "Nov",
-          "Dec",
+          "Jan","Feb","Mar","Apr","May","Jun",
+          "Jul","Aug","Sep","Oct","Nov","Dec",
         ];
 
         const formattedData = Array.isArray(revenueRes.data)
@@ -90,7 +81,8 @@ export default function Dashboard() {
       <Sidebar />
 
       <main className="flex-1 ml-64 p-8 transition-all duration-300">
-        {/* Header */}
+
+        {/* HEADER */}
         <header className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-10 pb-6 border-b-2 border-blue-600">
           <div>
             <h1 className="text-3xl font-bold text-slate-900">
@@ -123,8 +115,9 @@ export default function Dashboard() {
           </div>
         </header>
 
-        {/* Stats */}
+        {/* STATS */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-10">
+
           <StatCard
             title="Total Trips"
             value={stats.totalTrips}
@@ -141,7 +134,7 @@ export default function Dashboard() {
 
           <StatCard
             title="Total Revenue"
-            value={`₹${stats.totalRevenue?.toLocaleString() || 0}`}
+            value={`$${stats.totalRevenue?.toLocaleString() || 0}`}
             icon="💰"
             color="amber"
           />
@@ -152,25 +145,22 @@ export default function Dashboard() {
             icon="⏳"
             color="red"
           />
+
         </div>
 
-        {/* Graphs */}
+        {/* GRAPHS */}
         {showGraphs && (
           <div className="grid grid-cols-1 xl:grid-cols-2 gap-8 mb-10">
+
             {/* Revenue Chart */}
             <ChartWrapper title="💰 Monthly Revenue">
               <ResponsiveContainer width="100%" height={300}>
                 <LineChart data={revenueData}>
                   <CartesianGrid strokeDasharray="3 3" />
-
                   <XAxis dataKey="month" />
-
                   <YAxis />
-
                   <Tooltip />
-
                   <Legend />
-
                   <Line
                     type="monotone"
                     dataKey="revenue"
@@ -195,100 +185,114 @@ export default function Dashboard() {
                   ]}
                 >
                   <CartesianGrid strokeDasharray="3 3" />
-
                   <XAxis dataKey="name" />
-
                   <YAxis />
-
                   <Tooltip />
-
                   <Legend />
 
                   <Bar dataKey="total" fill="#3b82f6" name="Total" />
-
                   <Bar dataKey="pending" fill="#f59e0b" name="Pending" />
-
                   <Bar dataKey="verified" fill="#10b981" name="Verified" />
                 </BarChart>
               </ResponsiveContainer>
             </ChartWrapper>
+
           </div>
         )}
 
-        {/* Recent Bookings */}
-        <section className="bg-white rounded-2xl p-6 shadow-sm border border-slate-200 mb-8">
-          <h2 className="text-xl font-bold text-slate-800 mb-6">
-            📈 Recent Bookings
-          </h2>
+        {/* BOOKINGS */}
+     {/* BOOKINGS */}
+<section className="bg-white rounded-2xl p-6 shadow-sm border border-slate-200 mb-8">
 
-          <div className="space-y-4">
-            {!Array.isArray(bookings) || bookings.length === 0 ? (
-              <div className="text-center py-12 text-slate-400 font-medium">
-                No bookings yet
-              </div>
-            ) : (
-              bookings.slice(0, 5).map((booking, idx) => (
-                <div
-                  key={booking._id || idx}
-                  className="flex items-center justify-between p-4 bg-slate-50 rounded-xl border"
-                >
-                  <div>
-                    <h4 className="font-bold text-slate-800 text-lg">
-                      {booking.tripTitle ||
-                        booking.trip?.title ||
-                        "Unknown Trip"}
-                    </h4>
+  <h2 className="text-xl font-bold text-slate-800 mb-6">
+    📈 Recent Bookings
+  </h2>
 
-                    <div className="text-sm text-slate-500 mt-1">
-                      👤{" "}
-                      {booking.userName ||
-                        booking.user?.name ||
-                        "Unknown User"}
-                    </div>
+  <div className="space-y-4">
 
-                    <div className="text-sm text-slate-500">
-                      📅{" "}
-                      {booking.createdAt
-                        ? new Date(
-                            booking.createdAt
-                          ).toLocaleDateString()
-                        : "No Date"}
-                    </div>
-                  </div>
+    {!Array.isArray(bookings) || bookings.length === 0 ? (
+      <div className="text-center py-12 text-slate-400 font-medium">
+        No bookings yet
+      </div>
+    ) : (
+      bookings.slice(0, 5).map((booking, idx) => (
+        <div
+          key={booking._id || idx}
+          className="flex items-center justify-between p-4 bg-slate-50 rounded-xl border hover:shadow-sm transition"
+        >
 
-                  <div className="text-right">
-                    <p className="text-xl font-bold text-blue-600">
-                      ₹{booking.totalPrice || booking.amount || 0}
-                    </p>
+          {/* LEFT SIDE */}
+          <div className="space-y-1">
 
-                    <span
-                      className={`px-3 py-1 rounded-full text-xs font-bold ${
-                        booking.status === "confirmed"
-                          ? "bg-emerald-100 text-emerald-700"
-                          : booking.status === "pending"
-                            ? "bg-amber-100 text-amber-700"
-                            : "bg-red-100 text-red-700"
-                      }`}
-                    >
-                      {booking.status || "pending"}
-                    </span>
-                  </div>
-                </div>
-              ))
-            )}
+            {/* Trip Title */}
+            <h4 className="font-bold text-slate-800 text-lg">
+              {booking.tripTitle || booking.trip?.title || "Unknown Trip"}
+            </h4>
+
+            {/* Booking ID */}
+            <p className="text-xs text-slate-500">
+              🆔 Booking ID:{" "}
+              <span className="font-mono text-slate-700">
+                {booking._id?.slice(-6).toUpperCase() || "N/A"}
+              </span>
+            </p>
+
+            {/* User */}
+            <p className="text-sm text-slate-500">
+              👤 {booking.buyer?.firstName} {booking.buyer?.lastName} 
+            </p>
+
+            {/* Date */}
+            <p className="text-sm text-slate-500">
+              📅{" "}
+              {booking.createdAt
+                ? new Date(booking.createdAt).toLocaleDateString()
+                : "No Date"}
+            </p>
+
           </div>
-        </section>
 
-        {/* Info Box */}
-        <div className="bg-blue-600 rounded-xl p-4 text-white shadow-lg">
-          💡 Pro Tip: You can manage Nepal, Bhutan, and Tibet itineraries from
-          the Trips section.
+          {/* RIGHT SIDE */}
+          <div className="text-right">
+
+            {/* Amount */}
+            <p className="text-xl font-bold text-blue-600">
+              ${booking.totalAmount || booking.amount || 0}
+            </p>
+
+            {/* Status */}
+            <span
+              className={`px-3 py-1 rounded-full text-xs font-bold ${
+                booking.bookingStatus === "confirmed"
+                  ? "bg-emerald-100 text-emerald-700"
+                  : booking.bookingStatus === "pending"
+                  ? "bg-amber-100 text-amber-700"
+                  : "bg-red-100 text-red-700"
+              }`}
+            >
+              {booking.bookingStatus || "pending"}
+            </span>
+
+          </div>
+
         </div>
+      ))
+    )}
+
+  </div>
+</section>
+
+        {/* INFO */}
+        <div className="bg-blue-600 rounded-xl p-4 text-white shadow-lg">
+          💡 Pro Tip: You can manage Nepal, Bhutan, and Tibet itineraries from the Trips section.
+        </div>
+
       </main>
     </div>
   );
 }
 
+/* ================= STAT CARD ================= */
 function StatCard({ title, value, icon, color }) {
   const colorMap = {
     blue: "border-blue-500",
@@ -318,11 +322,13 @@ function StatCard({ title, value, icon, color }) {
   );
 }
 
+/* ================= CHART WRAPPER ================= */
 function ChartWrapper({ title, children }) {
   return (
     <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
-      <h3 className="text-lg font-bold text-slate-800 mb-6">{title}</h3>
-
+      <h3 className="text-lg font-bold text-slate-800 mb-6">
+        {title}
+      </h3>
       {children}
     </div>
   );

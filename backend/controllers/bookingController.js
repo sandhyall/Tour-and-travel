@@ -13,6 +13,77 @@ import {
   generateTicketPdf,
 } from "../utils/generateTicketPdf.js";
 
+const uploadBuffer = (buffer) => {
+  return new Promise((resolve, reject) => {
+    const stream = cloudinary.uploader.upload_stream(
+      {
+        folder: "bank-slips",
+      },
+      (err, result) => {
+        if (err) {
+          return reject(err);
+        }
+
+        resolve(result);
+      }
+    );
+
+    streamifier
+      .createReadStream(buffer)
+      .pipe(stream);
+  });
+};
+
+export const uploadSlip = async (req, res) => {
+  try {
+    const booking = await Booking.findById(req.params.id);
+
+    if (!booking) {
+      return res.status(404).json({
+        message: "Booking not found",
+      });
+    }
+
+    // CHECK FILE
+    if (!req.file) {
+      return res.status(400).json({
+        message: "No file uploaded",
+      });
+    }
+
+    // UPLOAD BUFFER TO CLOUDINARY
+    const result = await uploadBuffer(req.file.buffer);
+
+    // SAVE URL
+    booking.bankSlip = {
+      url: result.secure_url,
+      public_id: result.public_id,
+    };
+
+    await booking.save();
+
+    // PAYMENT RECORD
+    await Payment.create({
+      bookingId: booking._id,
+      amount: booking.totalAmount,
+      method: "swift_bank_transfer",
+      status: "pending",
+    });
+
+    res.json({
+      success: true,
+      message: "Slip uploaded successfully",
+      slip: booking.bankSlip,
+    });
+
+  } catch (err) {
+    console.error("SLIP ERROR:", err);
+
+    res.status(500).json({
+      message: err.message,
+    });
+  }
+};
 
 export const createBooking = async (
   req,
@@ -117,65 +188,74 @@ if (!matchedDate) {
   }
 };
 
-export const uploadSlip =
-  async (req, res) => {
-    try {
-      const booking =
-        await Booking.findById(
-          req.params.id
-        );
+// export const uploadSlip = async (req, res) => {
+//   try {
+//     const booking = await Booking.findById(req.params.id);
 
-      if (!booking) {
-        return res.status(404).json({
-          message: "Booking not found",
-        });
-      }
+//     if (!booking) {
+//       return res.status(404).json({
+//         message: "Booking not found",
+//       });
+//     }
 
-const result = await cloudinary.uploader.upload(req.file.path);
+//     // CHECK FILE
+//     if (!req.file) {
+//       return res.status(400).json({
+//         message: "No file uploaded",
+//       });
+//     }
 
-booking.bankSlip = {
-  url: result.secure_url,
-  public_id: result.public_id,
-};
+//     // UPLOAD BUFFER TO CLOUDINARY
+//     const result = await uploadBuffer(req.file.buffer);
 
-      await booking.save();
+//     // SAVE URL
+//     booking.bankSlip = {
+//       url: result.secure_url,
+//       public_id: result.public_id,
+//     };
 
-      await Payment.create({
-        bookingId: booking._id,
-        amount: booking.totalAmount,
-        method: "swift_bank_transfer",
-        status: "pending",
-      });
+//     await booking.save();
 
-      res.json({
-        success: true,
-        message:
-          "Slip uploaded successfully",
-      });
-    } catch (err) {
-      res.status(500).json({
-        message: err.message,
-      });
-    }
-  };
+//     // PAYMENT RECORD
+//     await Payment.create({
+//       bookingId: booking._id,
+//       amount: booking.totalAmount,
+//       method: "swift_bank_transfer",
+//       status: "pending",
+//     });
 
-  const uploadBuffer = (buffer) => {
-  return new Promise((resolve, reject) => {
-    const stream =
-      cloudinary.uploader.upload_stream(
-        { folder: "bank-slips" },
-        (err, result) => {
-          if (err) return reject(err);
+//     res.json({
+//       success: true,
+//       message: "Slip uploaded successfully",
+//       slip: booking.bankSlip,
+//     });
 
-          resolve(result);
-        }
-      );
+//   } catch (err) {
+//     console.error("SLIP ERROR:", err);
 
-    streamifier
-      .createReadStream(buffer)
-      .pipe(stream);
-  });
-};
+//     res.status(500).json({
+//       message: err.message,
+//     });
+//   }
+// };
+
+//   const uploadBuffer = (buffer) => {
+//   return new Promise((resolve, reject) => {
+//     const stream =
+//       cloudinary.uploader.upload_stream(
+//         { folder: "bank-slips" },
+//         (err, result) => {
+//           if (err) return reject(err);
+
+//           resolve(result);
+//         }
+//       );
+
+//     streamifier
+//       .createReadStream(buffer)
+//       .pipe(stream);
+//   });
+// };
 
 // export const verifyBooking = async (req, res) => {
 //   try {

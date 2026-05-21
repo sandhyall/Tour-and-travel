@@ -165,7 +165,7 @@ export default function BookingModal({
       window.location.href = data.paymentUrl;
     } else {
       const fd = new FormData();
-     fd.append("slip", bankSlip);
+     fd.append("file", bankSlip);
 
       await axios.post(
         `/bookings/${bookingId}/slip`,

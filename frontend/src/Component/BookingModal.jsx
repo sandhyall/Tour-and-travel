@@ -23,6 +23,17 @@ const INITIAL_FORM_TEMPLATE = {
   travelDate: "",
 };
 
+// FIX 4: Format ISO date string to a readable label for display
+const formatDate = (isoString) => {
+  if (!isoString) return "";
+  return new Date(isoString).toLocaleDateString("en-US", {
+    weekday: "short",
+    year: "numeric",
+    month: "long",
+    day: "numeric",
+  });
+};
+
 export default function BookingModal({ trip, open, onClose }) {
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
@@ -31,7 +42,7 @@ export default function BookingModal({ trip, open, onClose }) {
   const [bankSlip, setBankSlip] = useState(null);
   const [error, setError] = useState("");
   const [form, setForm] = useState(() =>
-    JSON.parse(JSON.stringify(INITIAL_FORM_TEMPLATE)),
+    JSON.parse(JSON.stringify(INITIAL_FORM_TEMPLATE))
   );
 
   const getAuthHeader = (additionalHeaders = {}) => {
@@ -44,15 +55,17 @@ export default function BookingModal({ trip, open, onClose }) {
     };
   };
 
-  useEffect(() => {
-    if (open) {
-      setForm(JSON.parse(JSON.stringify(INITIAL_FORM_TEMPLATE)));
-      setSelectedPackage(null);
-      setPaymentMethod("card");
-      setBankSlip(null);
-      setError("");
-    }
-  }, [open]);
+// In BookingModal.jsx, update your useEffect dependency array:
+useEffect(() => {
+  if (open) {
+    setForm(JSON.parse(JSON.stringify(INITIAL_FORM_TEMPLATE)));
+    setSelectedPackage(trip.packages?.[0] || null);
+    setPaymentMethod("card");
+    setBankSlip(null);
+    setError("");
+  }
+// Use the ID instead of the whole object
+}, [open, trip?._id]);
 
   if (!open) return null;
 
@@ -66,7 +79,7 @@ export default function BookingModal({ trip, open, onClose }) {
 
   const updateParticipant = (index, field, value) => {
     const updated = form.participants.map((p, i) =>
-      i === index ? { ...p, [field]: value } : p,
+      i === index ? { ...p, [field]: value } : p
     );
     setForm((prev) => ({ ...prev, participants: updated }));
   };
@@ -98,96 +111,42 @@ export default function BookingModal({ trip, open, onClose }) {
   };
 
   // ==================== SUBMIT LOGIC ====================
-  const createBooking = async () => {
+ const createBooking = async () => {
+    setError("");
+    const validationError = validateBookingForm(form, selectedPackage, paymentMethod, bankSlip);
+    if (validationError) {
+      setError(validationError);
+      toast.error(validationError);
+      return;
+    }
+
+    setLoading(true);
     try {
-      setError("");
-      const validationError = validateBookingForm(
-        form,
-        selectedPackage,
-        paymentMethod,
-        bankSlip,
-      );
-      if (validationError) {
-        setError(validationError);
-        toast.error(validationError);
-        return;
-      }
-
-      setLoading(true);
-      const processingToast = toast.loading(
-        "Processing your expedition registration...",
-      );
-
-      // बुकिङ पेलोड
       const payload = {
         tripId: trip._id,
-        packageName: selectedPackage?.name,
-        packagePrice: selectedPackage?.price,
         buyer: form.buyer,
         participants: form.participants,
         numberOfPeople: form.participants.length,
-        travelDate: new Date(form.travelDate).toISOString(),
-        paymentMethod,
+        travelDate: form.travelDate,
+        packageName: selectedPackage.name,
+        packagePrice: selectedPackage.price,
       };
 
-      // १. पहिले मेन बुकिङ डेटा सेभ गर्ने
       const { data } = await axios.post("/bookings", payload, getAuthHeader());
-      const bookingId = data?._id || data?.booking?._id;
+      const bookingId = data._id;
 
-      if (!bookingId) {
-        throw new Error("Booking registration tracking references missing.");
-      }
-
-      // २. पेमेन्ट कन्डिसन चेक गर्ने
       if (paymentMethod === "card") {
-        // अनलाइन गेटवे (eSewa/Khalti) को लागि रिक्वेस्ट हिट गर्ने
-        const res = await axios.post(
-          "/payments/card/checkout",
-          { bookingId },
-          getAuthHeader(),
-        );
-        toast.dismiss(processingToast);
-
-        if (res.data?.paymentUrl) {
-          window.location.href = res.data.paymentUrl; // गेटवेको पेजमा रिडाइरेक्ट गर्ने
-        } else {
-          navigate(`/booking-success?bookingId=${bookingId}`);
-          onClose();
-        }
+        const { data: payData } = await axios.post("/payments/card/checkout", { bookingId });
+        window.location.href = payData.paymentUrl;
       } else {
-        // बैंक ट्रान्सफर हो भने स्लिप फाइल अपलोड गर्ने
-        if (!bankSlip) {
-          toast.dismiss(processingToast);
-          setLoading(false);
-          return toast.error("Please upload bank transfer slip!");
-        }
-
         const fd = new FormData();
-        fd.append("file", bankSlip);
-
-        await axios.post(
-          `/bookings/${bookingId}/slip`,
-          fd,
-          getAuthHeader({
-            "Content-Type": "multipart/form-data",
-          }),
-        );
-
-        toast.dismiss(processingToast);
-        toast.success("Booking submitted! Receipt awaiting operator audit.", {
-          duration: 5000,
-        });
+        fd.append("slip", bankSlip);
+        await axios.post(`/bookings/${bookingId}/slip`, fd, getAuthHeader());
+        toast.success("Booking submitted!");
         navigate(`/booking-success?bookingId=${bookingId}`);
-        onClose();
       }
     } catch (err) {
-      console.error(err);
-      const errMsg =
-        err.response?.data?.message ||
-        err.message ||
-        "Booking creation failure.";
-      setError(errMsg);
-      toast.error(errMsg);
+      setError(err.response?.data?.message || "Booking failed");
     } finally {
       setLoading(false);
     }
@@ -270,9 +229,7 @@ export default function BookingModal({ trip, open, onClose }) {
               {/* Participants */}
               <div className="space-y-6">
                 <div className="flex justify-between items-center border-b border-gray-100 pb-3">
-                  <h3 className="text-xl font-bold">
-                    Travelers / Participants
-                  </h3>
+                  <h3 className="text-xl font-bold">Travelers / Participants</h3>
                   <button
                     type="button"
                     onClick={addParticipant}
@@ -363,11 +320,7 @@ export default function BookingModal({ trip, open, onClose }) {
                         placeholder="Nationality"
                         value={participant.nationality}
                         onChange={(e) =>
-                          updateParticipant(
-                            index,
-                            "nationality",
-                            e.target.value,
-                          )
+                          updateParticipant(index, "nationality", e.target.value)
                         }
                         className="border border-gray-200 bg-white rounded-xl px-4 py-2.5 outline-none focus:border-amber-500 transition-colors"
                       />
@@ -376,11 +329,7 @@ export default function BookingModal({ trip, open, onClose }) {
                       placeholder="Passport / ID Number"
                       value={participant.passportNumber}
                       onChange={(e) =>
-                        updateParticipant(
-                          index,
-                          "passportNumber",
-                          e.target.value,
-                        )
+                        updateParticipant(index, "passportNumber", e.target.value)
                       }
                       className="border border-gray-200 bg-white rounded-xl px-4 py-2.5 w-full outline-none focus:border-amber-500 transition-colors"
                     />
@@ -392,25 +341,48 @@ export default function BookingModal({ trip, open, onClose }) {
               <div>
                 <h3 className="text-xl font-bold mb-4">Select Date</h3>
                 <div className="grid md:grid-cols-2 gap-4">
-                  {trip.availableDates?.map((d, i) => (
-                    <button
-                      key={i}
-                      type="button"
-                      onClick={() =>
-                        setForm((prev) => ({ ...prev, travelDate: d.date }))
-                      }
-                      className={`border rounded-2xl p-4 text-left transition-all ${
-                        form.travelDate === d.date
-                          ? "border-amber-500 bg-amber-50 shadow-sm"
-                          : "hover:bg-gray-50 border-gray-200"
-                      }`}
-                    >
-                      <p className="font-bold text-slate-800">{d.date}</p>
-                      <p className="text-xs text-gray-400 mt-1">
-                        {d.totalSeats} seats left
-                      </p>
-                    </button>
-                  ))}
+                  {trip.availableDates?.map((d, i) => {
+                    // FIX 6: Show remaining seats, not total seats
+                    const seatsLeft = d.totalSeats - (d.bookedSeats || 0);
+                    const isFull = seatsLeft <= 0 || d.status === "full";
+                    const isSelected = form.travelDate === d.date;
+
+                    return (
+                      <button
+                        key={i}
+                        type="button"
+                        disabled={isFull}
+                        onClick={() =>
+                          setForm((prev) => ({ ...prev, travelDate: d.date }))
+                        }
+                        className={`border rounded-2xl p-4 text-left transition-all ${
+                          isFull
+                            ? "opacity-40 cursor-not-allowed border-gray-100 bg-gray-50"
+                            : isSelected
+                            ? "border-amber-500 bg-amber-50 shadow-sm"
+                            : "hover:bg-gray-50 border-gray-200"
+                        }`}
+                      >
+                        {/* FIX 4: Render a human-readable date, not raw ISO string */}
+                        <p className="font-bold text-slate-800">
+                          {formatDate(d.date)}
+                        </p>
+                        <p
+                          className={`text-xs mt-1 ${
+                            isFull
+                              ? "text-red-400 font-semibold"
+                              : seatsLeft <= 5
+                              ? "text-amber-500 font-semibold"
+                              : "text-gray-400"
+                          }`}
+                        >
+                          {isFull
+                            ? "Fully booked"
+                            : `${seatsLeft} seat${seatsLeft !== 1 ? "s" : ""} remaining`}
+                        </p>
+                      </button>
+                    );
+                  })}
                 </div>
               </div>
 
@@ -421,21 +393,19 @@ export default function BookingModal({ trip, open, onClose }) {
                   paymentMethod={paymentMethod}
                   setPaymentMethod={setPaymentMethod}
                 />
-                {/* 1. Show this message ONLY when Online Payment ("card") is active */}
+
                 {paymentMethod === "card" && (
                   <div className="mt-4 border border-amber-200 bg-amber-50/40 rounded-xl p-5 text-sm text-amber-900 flex flex-col gap-1.5">
-                    <p className="font-semibold">
-                      ✓ Online Gateway Checkout Selected
-                    </p>
+                    <p className="font-semibold">✓ Online Gateway Checkout Selected</p>
                     <p className="text-xs text-gray-600 leading-relaxed">
-                      Clicking the <strong>"Proceed to Gateway"</strong> button
-                      below will open a secure merchant terminal to finalize
-                      your transaction via Khalti, eSewa, or Card.
+                      Clicking <strong>"Confirm & Book Now"</strong> will open a
+                      secure merchant terminal to finalize your transaction via
+                      Khalti, eSewa, or Card.
                     </p>
                   </div>
                 )}
 
-                {/* 2. Your existing Bank Transfer snippet */}
+                {/* FIX 1: Single bank slip block (was duplicated) */}
                 {paymentMethod === "swift_bank_transfer" && (
                   <div className="mt-4 border border-dashed border-gray-300 rounded-xl p-5 bg-gray-50/50">
                     <label className="block text-sm font-semibold text-gray-700 mb-2">
@@ -447,23 +417,13 @@ export default function BookingModal({ trip, open, onClose }) {
                       onChange={(e) => setBankSlip(e.target.files?.[0] || null)}
                       className="w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-bold file:bg-amber-100 file:text-amber-800 hover:file:bg-amber-200 cursor-pointer"
                     />
-                  </div>
-                )}
-
-                {paymentMethod === "swift_bank_transfer" && (
-                  <div className="mt-4 border border-dashed border-gray-300 rounded-xl p-5 bg-gray-50/50">
-                    <label className="block text-sm font-semibold text-gray-700 mb-2">
-                      Upload Bank Transfer Slip / Receipt
-                    </label>
-                    <input
-                      type="file"
-                      accept="image/*,application/pdf"
-                      onChange={(e) => setBankSlip(e.target.files?.[0] || null)}
-                      className="w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-bold file:bg-amber-100 file:text-amber-800 hover:file:bg-amber-200 cursor-pointer"
-                    />
-                    {bankSlip && (
+                    {bankSlip ? (
                       <p className="text-xs text-emerald-600 mt-2 font-medium">
-                        ✓ Selected File: {bankSlip.name}
+                        ✓ Selected: {bankSlip.name}
+                      </p>
+                    ) : (
+                      <p className="text-xs text-gray-400 mt-2">
+                        Accepted formats: JPG, PNG, PDF
                       </p>
                     )}
                   </div>
@@ -491,7 +451,8 @@ export default function BookingModal({ trip, open, onClose }) {
                   <div className="flex justify-between">
                     <span>Departure:</span>
                     <span className="font-bold text-slate-900">
-                      {form.travelDate || "-"}
+                      {/* FIX 4: Human-readable date in summary too */}
+                      {formatDate(form.travelDate) || "-"}
                     </span>
                   </div>
                 </div>

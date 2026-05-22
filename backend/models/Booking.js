@@ -28,6 +28,15 @@ const bookingSchema = new mongoose.Schema(
 
     participants: [participantSchema],
 
+    packageName: { 
+      type: String, 
+      required: [true, "Package name is required"] 
+    },
+    packagePrice: { 
+      type: Number, 
+      required: [true, "Package price is required"] 
+    },
+
     numberOfPeople: { 
       type: Number, 
       required: true, 
@@ -74,6 +83,8 @@ const bookingSchema = new mongoose.Schema(
 
     ticketPdf: { type: String },
   },
+
+  
   { timestamps: true }
 );
 

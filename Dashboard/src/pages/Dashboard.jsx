@@ -190,10 +190,10 @@ export default function Dashboard() {
           />
         </div>
 
-       
+        {/* ── Booking Breakdown Visual ── */}
         <div style={{ display: "grid", gridTemplateColumns: "1fr 2fr", gap: 20, marginBottom: 36 }}>
 
-         
+          {/* Donut-style ratio card */}
           <div style={{ background: "#fff", borderRadius: 14, border: "1px solid #E2E8F0", padding: "24px" }}>
             <p style={{ margin: "0 0 4px", fontSize: 15, fontWeight: 700, color: "#0F172A" }}>Booking Mix</p>
             <p style={{ margin: "0 0 20px", fontSize: 12, color: "#94A3B8" }}>Status distribution</p>
@@ -292,7 +292,7 @@ export default function Dashboard() {
           </div>
         </div>
 
-      
+        {/* ── Analytics ── */}
         {showGraphs && (
           <>
             <SectionLabel>Analytics</SectionLabel>

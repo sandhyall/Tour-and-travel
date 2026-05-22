@@ -15,11 +15,17 @@ import Nepal from "./Pages/Nepal";
 import Bhutan from "./Pages/Bhutan";
 import Tibet from "./Pages/Tibet";
 import PaymentSuccess from "./pages/PaymentSuccess";
+import { BookingCancel, BookingSuccess } from "./Pages/BookingStatus.jsx";
+import { Toaster } from 'react-hot-toast';
 
 const App = () => {
   return (
     <div>
       <BrowserRouter>
+      <Toaster
+        position="top-center"
+        reverseOrder={false}
+      />
         <Routes>
           <Route path="/" element={<Layout />} >
             <Route index element={<Landing />} />
@@ -36,6 +42,9 @@ const App = () => {
             <Route path="/butan" element={<Bhutan/>}/>
             <Route path="/tibet" element={<Tibet/>}/>
             <Route path="/payment-success" element={<PaymentSuccess />}/>
+            <Route path="/booking-success" element={<BookingSuccess />} />
+            <Route path="/booking-cancel" element={<BookingCancel />} />
+           
           </Route>
         
         </Routes>

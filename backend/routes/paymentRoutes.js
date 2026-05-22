@@ -1,5 +1,4 @@
 import express from "express";
-
 import {
   createCheckout,
   createKhaltiPayment,
@@ -7,23 +6,17 @@ import {
 
 import {
   confirmCardPayment,
+  verifyKhaltiPayment, // Added our new verification function
 } from "../controllers/paymentWebhookController.js";
 
 const router = express.Router();
 
-router.post(
-  "/create-checkout",
-  createCheckout
-);
+// --- CARD ROUTES ---
+router.post("/card/checkout", createCheckout);
+router.post("/card/confirm", confirmCardPayment);
 
-router.post(
-  "/confirm-payment",
-  confirmCardPayment
-);
-
-router.post(
-  "/create-khalti",
-  createKhaltiPayment
-);
+// --- KHALTI ROUTES ---
+router.post("/khalti/initiate", createKhaltiPayment);
+router.post("/khalti/verify", verifyKhaltiPayment); // Added verification endpoint
 
 export default router;

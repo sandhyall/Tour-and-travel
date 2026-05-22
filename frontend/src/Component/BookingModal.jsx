@@ -1,86 +1,81 @@
-import { useState } from "react";
-
+import { useEffect, useState } from "react";
 import axios from "../api/axios";
-
-import {
-  X,
-  Calendar,
-  Upload,
-} from "lucide-react";
-
+import { X, Plus, Trash2 } from "lucide-react";
 import PaymentMethodCard from "./PaymentMethodCard";
+import { validateBookingForm } from "../utils/validator";
+import toast from "react-hot-toast";
+import { useNavigate } from "react-router-dom";
 
-import {
-  validateBookingForm,
-} from "../utils/validator";
-
-export default function BookingModal({
-  trip,
-  open,
-  onClose,
-}) {
-  const [loading, setLoading] =
-    useState(false);
-
-  const [selectedPackage, setSelectedPackage] =
-    useState("");
-
-  const [paymentMethod, setPaymentMethod] =
-    useState("card");
-
-  const [bankSlip, setBankSlip] =
-    useState(null);
-
-  const [error, setError] =
-    useState("");
-
-  const [form, setForm] = useState({
-    buyer: {
+const INITIAL_FORM_TEMPLATE = {
+  buyer: { firstName: "", lastName: "", email: "" },
+  participants: [
+    {
       firstName: "",
       lastName: "",
       email: "",
+      gender: "",
+      dob: "",
+      phone: "",
+      nationality: "",
+      passportNumber: "",
     },
+  ],
+  travelDate: "",
+};
 
-    participants: [
-      {
-        firstName: "",
-        lastName: "",
-        email: "",
-        gender: "",
-        dob: "",
-        phone: "",
-        nationality: "",
-        passportNumber: "",
+export default function BookingModal({ trip, open, onClose }) {
+  const [loading, setLoading] = useState(false);
+  const navigate = useNavigate();
+  const [selectedPackage, setSelectedPackage] = useState(null);
+  const [paymentMethod, setPaymentMethod] = useState("card");
+  const [bankSlip, setBankSlip] = useState(null);
+  const [error, setError] = useState("");
+  const [form, setForm] = useState(() =>
+    JSON.parse(JSON.stringify(INITIAL_FORM_TEMPLATE)),
+  );
+
+  const getAuthHeader = (additionalHeaders = {}) => {
+    const token = localStorage.getItem("token");
+    return {
+      headers: {
+        ...(token ? { Authorization: `Bearer ${token}` } : {}),
+        ...additionalHeaders,
       },
-    ],
+    };
+  };
 
-    travelDate: "",
-  });
+  useEffect(() => {
+    if (open) {
+      setForm(JSON.parse(JSON.stringify(INITIAL_FORM_TEMPLATE)));
+      setSelectedPackage(null);
+      setPaymentMethod("card");
+      setBankSlip(null);
+      setError("");
+    }
+  }, [open]);
 
   if (!open) return null;
 
-  const updateParticipant = (
-    index,
-    field,
-    value
-  ) => {
-    const updated = [
-      ...form.participants,
-    ];
+  const totalPrice =
+    (Number(selectedPackage?.price) || Number(trip.price) || 0) *
+    form.participants.length;
 
-    updated[index][field] = value;
+  const updateBuyer = (field, value) => {
+    setForm((prev) => ({ ...prev, buyer: { ...prev.buyer, [field]: value } }));
+  };
 
-    setForm({
-      ...form,
-      participants: updated,
-    });
+  const updateParticipant = (index, field, value) => {
+    const updated = form.participants.map((p, i) =>
+      i === index ? { ...p, [field]: value } : p,
+    );
+    setForm((prev) => ({ ...prev, participants: updated }));
   };
 
   const addParticipant = () => {
-    setForm({
-      ...form,
+    setForm((prev) => ({
+      ...prev,
       participants: [
-        ...form.participants,
+        ...prev.participants,
         {
           firstName: "",
           lastName: "",
@@ -92,602 +87,442 @@ export default function BookingModal({
           passportNumber: "",
         },
       ],
-    });
+    }));
   };
 
-  const removeParticipant = (
-    index
-  ) => {
-    const updated =
-      form.participants.filter(
-        (_, i) => i !== index
-      );
-
-    setForm({
-      ...form,
-      participants: updated,
-    });
+  const removeParticipant = (index) => {
+    setForm((prev) => ({
+      ...prev,
+      participants: prev.participants.filter((_, i) => i !== index),
+    }));
   };
 
-  const selectedPkg =
-    trip.packages?.find(
-      (p) =>
-        p.name === selectedPackage
-    );
+  // ==================== SUBMIT LOGIC ====================
+  const createBooking = async () => {
+    try {
+      setError("");
+      const validationError = validateBookingForm(
+        form,
+        selectedPackage,
+        paymentMethod,
+        bankSlip,
+      );
+      if (validationError) {
+        setError(validationError);
+        toast.error(validationError);
+        return;
+      }
 
-  const totalPrice =
-    (selectedPkg?.price ||
-      trip.price ||
-      0) *
-    form.participants.length;
+      setLoading(true);
+      const processingToast = toast.loading(
+        "Processing your expedition registration...",
+      );
 
- const createBooking = async () => {
-  try {
-    setError("");
+      // बुकिङ पेलोड
+      const payload = {
+        tripId: trip._id,
+        packageName: selectedPackage?.name,
+        packagePrice: selectedPackage?.price,
+        buyer: form.buyer,
+        participants: form.participants,
+        numberOfPeople: form.participants.length,
+        travelDate: new Date(form.travelDate).toISOString(),
+        paymentMethod,
+      };
 
-    const validationError = validateBookingForm(
-      form,
-      selectedPackage,
-      paymentMethod,
-      bankSlip
-    );
+      // १. पहिले मेन बुकिङ डेटा सेभ गर्ने
+      const { data } = await axios.post("/bookings", payload, getAuthHeader());
+      const bookingId = data?._id || data?.booking?._id;
 
-    if (validationError) {
-      return setError(validationError);
+      if (!bookingId) {
+        throw new Error("Booking registration tracking references missing.");
+      }
+
+      // २. पेमेन्ट कन्डिसन चेक गर्ने
+      if (paymentMethod === "card") {
+        // अनलाइन गेटवे (eSewa/Khalti) को लागि रिक्वेस्ट हिट गर्ने
+        const res = await axios.post(
+          "/payments/card/checkout",
+          { bookingId },
+          getAuthHeader(),
+        );
+        toast.dismiss(processingToast);
+
+        if (res.data?.paymentUrl) {
+          window.location.href = res.data.paymentUrl; // गेटवेको पेजमा रिडाइरेक्ट गर्ने
+        } else {
+          navigate(`/booking-success?bookingId=${bookingId}`);
+          onClose();
+        }
+      } else {
+        // बैंक ट्रान्सफर हो भने स्लिप फाइल अपलोड गर्ने
+        if (!bankSlip) {
+          toast.dismiss(processingToast);
+          setLoading(false);
+          return toast.error("Please upload bank transfer slip!");
+        }
+
+        const fd = new FormData();
+        fd.append("file", bankSlip);
+
+        await axios.post(
+          `/bookings/${bookingId}/slip`,
+          fd,
+          getAuthHeader({
+            "Content-Type": "multipart/form-data",
+          }),
+        );
+
+        toast.dismiss(processingToast);
+        toast.success("Booking submitted! Receipt awaiting operator audit.", {
+          duration: 5000,
+        });
+        navigate(`/booking-success?bookingId=${bookingId}`);
+        onClose();
+      }
+    } catch (err) {
+      console.error(err);
+      const errMsg =
+        err.response?.data?.message ||
+        err.message ||
+        "Booking creation failure.";
+      setError(errMsg);
+      toast.error(errMsg);
+    } finally {
+      setLoading(false);
     }
-
-    setLoading(true);
-
-  
-  const payload = {
-  tripId: trip._id,
-  buyer: form.buyer,
-  participants: form.participants,
-  numberOfPeople: form.participants.length,
-  travelDate: new Date(form.travelDate).toISOString(),
-  paymentMethod,
-};
-    // 1. CREATE BOOKING
-    const { data: booking } = await axios.post(
-      "/bookings",
-      payload
-    );
-
-    const bookingId = booking._id;
-
-    // 2. PAYMENT FLOW
-    if (paymentMethod === "card") {
-      const { data } = await axios.post(
-        "/payments/create-checkout",
-        { bookingId }
-      );
-
-      window.location.href = data.paymentUrl;
-    } else {
-      const fd = new FormData();
-     fd.append("slip", bankSlip);
-
-      await axios.post(
-        `/bookings/${bookingId}/slip`,
-        fd,
-        {
-    headers: {
-      "Content-Type": "multipart/form-data",
-    },}
-      );
-
-      alert(
-        "Booking submitted. Admin will verify your payment."
-      );
-
-      onClose();
-    }
-  } catch (err) {
-    console.log(err);
-    setError(err.response?.data?.message || "Booking failed");
-  } finally {
-    setLoading(false);
-  }
-};
+  };
 
   return (
     <div className="fixed inset-0 bg-black/70 z-[9999] overflow-y-auto">
-
       <div className="min-h-screen flex justify-center p-4 py-10">
-
-        <div className="bg-white max-w-6xl w-full rounded-3xl overflow-hidden">
-
-          {/* HEADER */}
-
+        <div className="bg-white max-w-6xl w-full rounded-3xl overflow-hidden shadow-2xl">
           <div className="bg-black text-white px-8 py-6 flex justify-between items-center">
-
             <div>
-              <h2 className="text-3xl font-bold">
-                Book Expedition
-              </h2>
-
+              <h2 className="text-3xl font-bold">Book Expedition</h2>
               <p className="text-gray-400 text-sm mt-1">
                 Complete your secure booking
               </p>
             </div>
-
             <button
               onClick={onClose}
-              className="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center"
+              className="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center hover:bg-white/20 transition-colors"
             >
               <X size={20} />
             </button>
-
           </div>
 
           <div className="grid lg:grid-cols-3">
-
-            {/* LEFT */}
-
             <div className="lg:col-span-2 p-8 space-y-8">
-
-              {/* PACKAGE */}
-
+              {/* Packages */}
               <div>
-
-                <h3 className="text-xl font-bold mb-4">
-                  Select Package
-                </h3>
-
+                <h3 className="text-xl font-bold mb-4">Select Package</h3>
                 <div className="grid md:grid-cols-2 gap-4">
-
-                  {trip.packages?.map(
-                    (pkg, index) => (
-                      <button
-                        key={index}
-                        type="button"
-                        onClick={() =>
-                          setSelectedPackage(
-                            pkg.name
-                          )
-                        }
-                        className={`border rounded-2xl p-5 text-left ${
-                          selectedPackage ===
-                          pkg.name
-                            ? "border-amber-500 bg-amber-50"
-                            : "border-gray-200"
-                        }`}
-                      >
-                        <h4 className="font-bold text-lg">
-                          {pkg.name}
-                        </h4>
-
-                        <p className="text-gray-500 text-sm mt-2">
-                          {
-                            pkg.description
-                          }
-                        </p>
-
-                        <p className="mt-4 text-2xl font-bold">
-                          USD {pkg.price}
-                        </p>
-
-                      </button>
-                    )
-                  )}
-
+                  {trip.packages?.map((pkg, i) => (
+                    <button
+                      key={i}
+                      type="button"
+                      onClick={() => setSelectedPackage(pkg)}
+                      className={`border rounded-2xl p-5 text-left transition-all ${
+                        selectedPackage?.name === pkg.name
+                          ? "border-amber-500 bg-amber-50/70 shadow-sm"
+                          : "hover:bg-gray-50 border-gray-200"
+                      }`}
+                    >
+                      <h4 className="font-bold text-slate-900">{pkg.name}</h4>
+                      <p className="text-sm text-gray-500 mt-1 line-clamp-2">
+                        {pkg.description}
+                      </p>
+                      <p className="text-xl font-black mt-3 text-slate-900">
+                        USD {pkg.price}
+                      </p>
+                    </button>
+                  ))}
                 </div>
-
               </div>
 
-              {/* DATES */}
-
+              {/* Buyer Info */}
               <div>
-
-                <h3 className="text-xl font-bold mb-4">
-                  Select Date
-                </h3>
-
+                <h3 className="text-xl font-bold mb-4">Buyer Information</h3>
                 <div className="grid md:grid-cols-2 gap-4">
-
-                  {trip.availableDates?.map(
-                    (d, index) => (
-                      <button
-                        key={index}
-                        type="button"
-                        onClick={() =>
-                          setForm({
-                            ...form,
-                            travelDate:
-                              d.date,
-                          })
-                        }
-                        className={`border rounded-2xl p-4 flex justify-between ${
-                          form.travelDate ===
-                          d.date
-                            ? "border-amber-500 bg-amber-50"
-                            : "border-gray-200"
-                        }`}
-                      >
-                        <div>
-                          <p className="font-semibold">
-                            {d.date}
-                          </p>
-
-                          <p className="text-xs text-gray-500">
-                            {
-                              d.totalSeats
-                            } seats
-                          </p>
-                        </div>
-
-                        <Calendar size={18} />
-
-                      </button>
-                    )
-                  )}
-
-                </div>
-
-              </div>
-
-              {/* BUYER */}
-
-              <div>
-
-                <h3 className="text-xl font-bold mb-4">
-                  Buyer Information
-                </h3>
-
-                <div className="grid md:grid-cols-2 gap-4">
-
                   <input
                     placeholder="First Name"
-                    className="border rounded-xl px-4 py-3"
-                    value={
-                      form.buyer
-                        .firstName
-                    }
-                    onChange={(e) =>
-                      setForm({
-                        ...form,
-                        buyer: {
-                          ...form.buyer,
-                          firstName:
-                            e.target
-                              .value,
-                        },
-                      })
-                    }
+                    value={form.buyer.firstName}
+                    onChange={(e) => updateBuyer("firstName", e.target.value)}
+                    className="border border-gray-200 rounded-xl px-4 py-3 outline-none focus:border-amber-500 transition-colors"
                   />
-
                   <input
                     placeholder="Last Name"
-                    className="border rounded-xl px-4 py-3"
-                    value={
-                      form.buyer
-                        .lastName
-                    }
-                    onChange={(e) =>
-                      setForm({
-                        ...form,
-                        buyer: {
-                          ...form.buyer,
-                          lastName:
-                            e.target
-                              .value,
-                        },
-                      })
-                    }
+                    value={form.buyer.lastName}
+                    onChange={(e) => updateBuyer("lastName", e.target.value)}
+                    className="border border-gray-200 rounded-xl px-4 py-3 outline-none focus:border-amber-500 transition-colors"
                   />
-
                 </div>
-
                 <input
                   placeholder="Email"
-                  className="border rounded-xl px-4 py-3 mt-4 w-full"
-                  value={
-                    form.buyer.email
-                  }
-                  onChange={(e) =>
-                    setForm({
-                      ...form,
-                      buyer: {
-                        ...form.buyer,
-                        email:
-                          e.target
-                            .value,
-                      },
-                    })
-                  }
+                  type="email"
+                  value={form.buyer.email}
+                  onChange={(e) => updateBuyer("email", e.target.value)}
+                  className="border border-gray-200 rounded-xl px-4 py-3 mt-4 w-full outline-none focus:border-amber-500 transition-colors"
                 />
-
               </div>
 
-              {/* PARTICIPANTS */}
-
-              <div>
-
-                <div className="flex justify-between items-center mb-4">
-
+              {/* Participants */}
+              <div className="space-y-6">
+                <div className="flex justify-between items-center border-b border-gray-100 pb-3">
                   <h3 className="text-xl font-bold">
-                    Travelers
+                    Travelers / Participants
                   </h3>
-
                   <button
                     type="button"
-                    onClick={
-                      addParticipant
-                    }
-                    className="bg-black text-white px-4 py-2 rounded-xl"
+                    onClick={addParticipant}
+                    className="flex items-center gap-1 text-sm font-bold bg-amber-500 text-black px-4 py-2 rounded-xl hover:bg-amber-600 transition"
                   >
-                    Add Traveler
+                    <Plus size={16} /> Add Traveler
                   </button>
-
                 </div>
 
-                <div className="space-y-6">
+                {form.participants.map((participant, index) => (
+                  <div
+                    key={index}
+                    className="border border-gray-200 p-5 rounded-2xl bg-gray-50/50 space-y-4 relative"
+                  >
+                    <div className="flex justify-between items-center">
+                      <span className="text-xs font-bold text-gray-400 uppercase tracking-wider">
+                        Traveler #{index + 1}
+                      </span>
+                      {form.participants.length > 1 && (
+                        <button
+                          type="button"
+                          onClick={() => removeParticipant(index)}
+                          className="text-red-500 hover:text-red-700 p-1.5 rounded-lg hover:bg-red-50 transition"
+                        >
+                          <Trash2 size={18} />
+                        </button>
+                      )}
+                    </div>
 
-                  {form.participants.map(
-                    (
-                      p,
-                      index
-                    ) => (
-                      <div
-                        key={index}
-                        className="border rounded-2xl p-5"
+                    <div className="grid md:grid-cols-2 gap-4">
+                      <input
+                        placeholder="First Name"
+                        value={participant.firstName}
+                        onChange={(e) =>
+                          updateParticipant(index, "firstName", e.target.value)
+                        }
+                        className="border border-gray-200 bg-white rounded-xl px-4 py-2.5 outline-none focus:border-amber-500 transition-colors"
+                      />
+                      <input
+                        placeholder="Last Name"
+                        value={participant.lastName}
+                        onChange={(e) =>
+                          updateParticipant(index, "lastName", e.target.value)
+                        }
+                        className="border border-gray-200 bg-white rounded-xl px-4 py-2.5 outline-none focus:border-amber-500 transition-colors"
+                      />
+                      <input
+                        placeholder="Email"
+                        type="email"
+                        value={participant.email}
+                        onChange={(e) =>
+                          updateParticipant(index, "email", e.target.value)
+                        }
+                        className="border border-gray-200 bg-white rounded-xl px-4 py-2.5 outline-none focus:border-amber-500 transition-colors"
+                      />
+                      <input
+                        placeholder="Phone Number"
+                        value={participant.phone}
+                        onChange={(e) =>
+                          updateParticipant(index, "phone", e.target.value)
+                        }
+                        className="border border-gray-200 bg-white rounded-xl px-4 py-2.5 outline-none focus:border-amber-500 transition-colors"
+                      />
+                    </div>
+
+                    <div className="grid md:grid-cols-3 gap-4">
+                      <select
+                        value={participant.gender}
+                        onChange={(e) =>
+                          updateParticipant(index, "gender", e.target.value)
+                        }
+                        className="border border-gray-200 bg-white rounded-xl px-4 py-2.5 outline-none focus:border-amber-500 text-gray-600 transition-colors"
                       >
-
-                        <div className="flex justify-between mb-4">
-
-                          <h4 className="font-bold">
-                            Traveler {index + 1}
-                          </h4>
-
-                          {index > 0 && (
-                            <button
-                              type="button"
-                              onClick={() =>
-                                removeParticipant(
-                                  index
-                                )
-                              }
-                              className="text-red-500"
-                            >
-                              Remove
-                            </button>
-                          )}
-
-                        </div>
-
-                        <div className="grid md:grid-cols-2 gap-4">
-
-                          {[
-                            "firstName",
-                            "lastName",
-                            "email",
-                            "phone",
-                            "gender",
-                            "dob",
+                        <option value="">Select Gender</option>
+                        <option value="male">Male</option>
+                        <option value="female">Female</option>
+                        <option value="other">Other</option>
+                      </select>
+                      <input
+                        type="date"
+                        value={participant.dob}
+                        onChange={(e) =>
+                          updateParticipant(index, "dob", e.target.value)
+                        }
+                        className="border border-gray-200 bg-white rounded-xl px-4 py-2.5 w-full outline-none focus:border-amber-500 text-gray-600 transition-colors"
+                      />
+                      <input
+                        placeholder="Nationality"
+                        value={participant.nationality}
+                        onChange={(e) =>
+                          updateParticipant(
+                            index,
                             "nationality",
-                            "passportNumber",
-                          ].map(
-                            (
-                              field
-                            ) => (
-                              <input
-                                key={
-                                  field
-                                }
-                                placeholder={
-                                  field
-                                }
-                                value={
-                                  p[
-                                    field
-                                  ]
-                                }
-                                onChange={(
-                                  e
-                                ) =>
-                                  updateParticipant(
-                                    index,
-                                    field,
-                                    e
-                                      .target
-                                      .value
-                                  )
-                                }
-                                className="border rounded-xl px-4 py-3"
-                              />
-                            )
-                          )}
-
-                        </div>
-
-                      </div>
-                    )
-                  )}
-
-                </div>
-
+                            e.target.value,
+                          )
+                        }
+                        className="border border-gray-200 bg-white rounded-xl px-4 py-2.5 outline-none focus:border-amber-500 transition-colors"
+                      />
+                    </div>
+                    <input
+                      placeholder="Passport / ID Number"
+                      value={participant.passportNumber}
+                      onChange={(e) =>
+                        updateParticipant(
+                          index,
+                          "passportNumber",
+                          e.target.value,
+                        )
+                      }
+                      className="border border-gray-200 bg-white rounded-xl px-4 py-2.5 w-full outline-none focus:border-amber-500 transition-colors"
+                    />
+                  </div>
+                ))}
               </div>
 
-              {/* PAYMENT */}
-
+              {/* Travel Dates */}
               <div>
+                <h3 className="text-xl font-bold mb-4">Select Date</h3>
+                <div className="grid md:grid-cols-2 gap-4">
+                  {trip.availableDates?.map((d, i) => (
+                    <button
+                      key={i}
+                      type="button"
+                      onClick={() =>
+                        setForm((prev) => ({ ...prev, travelDate: d.date }))
+                      }
+                      className={`border rounded-2xl p-4 text-left transition-all ${
+                        form.travelDate === d.date
+                          ? "border-amber-500 bg-amber-50 shadow-sm"
+                          : "hover:bg-gray-50 border-gray-200"
+                      }`}
+                    >
+                      <p className="font-bold text-slate-800">{d.date}</p>
+                      <p className="text-xs text-gray-400 mt-1">
+                        {d.totalSeats} seats left
+                      </p>
+                    </button>
+                  ))}
+                </div>
+              </div>
 
-                <h3 className="text-xl font-bold mb-4">
-                  Payment Method
-                </h3>
-
+              {/* Payment Section */}
+              <div>
+                <h3 className="text-xl font-bold mb-4">Payment Method</h3>
                 <PaymentMethodCard
-                  paymentMethod={
-                    paymentMethod
-                  }
-                  setPaymentMethod={
-                    setPaymentMethod
-                  }
+                  paymentMethod={paymentMethod}
+                  setPaymentMethod={setPaymentMethod}
                 />
-
-                {paymentMethod ===
-                  "swift_bank_transfer" && (
-                  <div className="mt-6 border border-amber-200 bg-amber-50 rounded-2xl p-5">
-
-                    <h4 className="font-bold">
-                      Bank Details
-                    </h4>
-
-                    <div className="mt-4 text-sm space-y-2">
-
-                      <p>
-                        Bank:
-                        Himalayan Bank
-                      </p>
-
-                      <p>
-                        Account Name:
-                        Himalayan Expedition Treks
-                      </p>
-
-                      <p>
-                        SWIFT:
-                        HIMANPKA
-                      </p>
-
-                      <p>
-                        Account:
-                        123456789
-                      </p>
-
-                    </div>
-
-                    <div className="mt-5">
-
-                      <label className="block mb-2 text-sm font-medium">
-                        Upload Payment Slip
-                      </label>
-
-                      <div className="border border-dashed rounded-2xl p-5 bg-white">
-
-                        <input
-                          type="file"
-                          onChange={(
-                            e
-                          ) =>
-                            setBankSlip(
-                              e.target
-                                .files[0]
-                            )
-                          }
-                        />
-
-                      </div>
-
-                    </div>
-
+                {/* 1. Show this message ONLY when Online Payment ("card") is active */}
+                {paymentMethod === "card" && (
+                  <div className="mt-4 border border-amber-200 bg-amber-50/40 rounded-xl p-5 text-sm text-amber-900 flex flex-col gap-1.5">
+                    <p className="font-semibold">
+                      ✓ Online Gateway Checkout Selected
+                    </p>
+                    <p className="text-xs text-gray-600 leading-relaxed">
+                      Clicking the <strong>"Proceed to Gateway"</strong> button
+                      below will open a secure merchant terminal to finalize
+                      your transaction via Khalti, eSewa, or Card.
+                    </p>
                   </div>
                 )}
 
-              </div>
+                {/* 2. Your existing Bank Transfer snippet */}
+                {paymentMethod === "swift_bank_transfer" && (
+                  <div className="mt-4 border border-dashed border-gray-300 rounded-xl p-5 bg-gray-50/50">
+                    <label className="block text-sm font-semibold text-gray-700 mb-2">
+                      Upload Bank Transfer Slip / Receipt
+                    </label>
+                    <input
+                      type="file"
+                      accept="image/*,application/pdf"
+                      onChange={(e) => setBankSlip(e.target.files?.[0] || null)}
+                      className="w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-bold file:bg-amber-100 file:text-amber-800 hover:file:bg-amber-200 cursor-pointer"
+                    />
+                  </div>
+                )}
 
+                {paymentMethod === "swift_bank_transfer" && (
+                  <div className="mt-4 border border-dashed border-gray-300 rounded-xl p-5 bg-gray-50/50">
+                    <label className="block text-sm font-semibold text-gray-700 mb-2">
+                      Upload Bank Transfer Slip / Receipt
+                    </label>
+                    <input
+                      type="file"
+                      accept="image/*,application/pdf"
+                      onChange={(e) => setBankSlip(e.target.files?.[0] || null)}
+                      className="w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-bold file:bg-amber-100 file:text-amber-800 hover:file:bg-amber-200 cursor-pointer"
+                    />
+                    {bankSlip && (
+                      <p className="text-xs text-emerald-600 mt-2 font-medium">
+                        ✓ Selected File: {bankSlip.name}
+                      </p>
+                    )}
+                  </div>
+                )}
+              </div>
             </div>
 
-            {/* RIGHT */}
-
-            <div className="bg-gray-50 border-l p-8">
-
-              <div className="bg-white rounded-3xl border p-6 sticky top-10">
-
-                <h3 className="text-2xl font-bold mb-6">
-                  Booking Summary
-                </h3>
-
-                <div className="space-y-4">
-
+            {/* Sidebar Summary */}
+            <div className="bg-gray-50/50 p-8 lg:border-l border-gray-200">
+              <div className="bg-white p-6 rounded-3xl border border-gray-200 shadow-sm sticky top-6">
+                <h3 className="text-2xl font-bold mb-6">Summary</h3>
+                <div className="space-y-4 text-gray-500 pb-5 border-b border-gray-100 text-sm">
                   <div className="flex justify-between">
-                    <span>
-                      Package
-                    </span>
-
-                    <span className="font-semibold">
-                      {selectedPackage ||
-                        "-"}
+                    <span>Package:</span>
+                    <span className="font-bold text-slate-900">
+                      {selectedPackage?.name || "-"}
                     </span>
                   </div>
-
                   <div className="flex justify-between">
-                    <span>
-                      Travelers
-                    </span>
-
-                    <span className="font-semibold">
-                      {
-                        form
-                          .participants
-                          .length
-                      }
+                    <span>Travelers:</span>
+                    <span className="font-bold text-slate-900">
+                      {form.participants.length}
                     </span>
                   </div>
-
                   <div className="flex justify-between">
-                    <span>
-                      Date
-                    </span>
-
-                    <span className="font-semibold">
-                      {form.travelDate ||
-                        "-"}
+                    <span>Departure:</span>
+                    <span className="font-bold text-slate-900">
+                      {form.travelDate || "-"}
                     </span>
                   </div>
-
-                  <div className="border-t pt-5 flex justify-between items-center">
-
-                    <div>
-
-                      <p className="text-sm text-gray-500">
-                        Total
-                      </p>
-
-                      <h4 className="text-3xl font-bold">
-                        USD{" "}
-                        {totalPrice}
-                      </h4>
-
-                    </div>
-
-                  </div>
-
-                  {error && (
-                    <div className="bg-red-100 text-red-700 text-sm p-4 rounded-xl">
-                      {error}
-                    </div>
-                  )}
-
-                  <button
-                    disabled={
-                      loading
-                    }
-                    onClick={
-                      createBooking
-                    }
-                    className="w-full bg-amber-500 hover:bg-amber-400 text-black font-bold py-4 rounded-2xl mt-6"
-                  >
-                    {loading
-                      ? "Processing..."
-                      : paymentMethod ===
-                        "card"
-                      ? "Proceed To Payment"
-                      : "Submit Booking"}
-                  </button>
-
                 </div>
 
+                <div className="flex justify-between items-center mt-5">
+                  <span className="text-gray-400 text-sm font-medium">
+                    Total Price
+                  </span>
+                  <h2 className="text-3xl font-black text-slate-900">
+                    USD {totalPrice.toLocaleString()}
+                  </h2>
+                </div>
+
+                {error && (
+                  <p className="text-red-600 text-xs mt-5 bg-red-50 p-3 rounded-xl border border-red-100">
+                    {error}
+                  </p>
+                )}
+
+                <button
+                  onClick={createBooking}
+                  disabled={loading}
+                  className="w-full bg-amber-500 hover:bg-amber-600 disabled:bg-slate-200 disabled:text-slate-400 transition-all py-3.5 mt-6 rounded-xl font-bold text-black shadow-sm flex items-center justify-center gap-2"
+                >
+                  {loading ? "Processing transaction..." : "Confirm & Book Now"}
+                </button>
               </div>
-
             </div>
-
           </div>
-
         </div>
-
       </div>
-
     </div>
   );
 }

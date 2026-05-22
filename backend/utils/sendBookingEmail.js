@@ -1,64 +1,31 @@
 import nodemailer from "nodemailer";
 
-export const sendBookingEmail =
-  async ({
-    email,
-    booking,
-  }) => {
+export const sendBookingEmail = async ({ email, booking }) => {
+  const transporter = nodemailer.createTransport({
+    service: "gmail", // ✅ FIXED
+    auth: {
+      user: process.env.EMAIL_USER,
+      pass: process.env.EMAIL_PASS,
+    },
+  });
 
-    const transporter =
-      nodemailer.createTransport({
-        service: "smtp.gmail.com",
+  await transporter.sendMail({
+    from: process.env.EMAIL_USER,
+    to: email,
+    subject: "Booking Confirmed 🎉",
 
-        auth: {
-          user:
-            process.env.EMAIL_USER,
+    html: `
+      <h2>Your booking is confirmed</h2>
 
-          pass:
-            process.env.EMAIL_PASS,
-        },
-      });
+      <p><b>Trip:</b> ${booking.trip?.title}</p>
 
-    await transporter.sendMail({
-      from:
-        process.env.EMAIL_USER,
+      <p><b>Date:</b> ${new Date(booking.travelDate).toDateString()}</p>
 
-      to: email,
+      <p><b>People:</b> ${booking.numberOfPeople}</p>
 
-      subject:
-        "Booking Confirmed",
+      <p><b>Amount Paid:</b> $${booking.totalAmount}</p>
 
-      html: `
-      <h2>
-        Your booking is confirmed
-      </h2>
-
-      <p>
-        Trip:
-        ${booking.trip.title}
-      </p>
-
-      <p>
-        Date:
-        ${new Date(
-          booking.travelDate
-        ).toDateString()}
-      </p>
-
-      <p>
-        People:
-        ${booking.numberOfPeople}
-      </p>
-
-      <p>
-        Amount Paid:
-        $${booking.totalAmount}
-      </p>
-
-      <h3>
-        Thank you for booking
-        with us.
-      </h3>
-      `,
-    });
-  };
+      <h3>Thank you for booking with us ❤️</h3>
+    `,
+  });
+};

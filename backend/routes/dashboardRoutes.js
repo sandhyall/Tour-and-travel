@@ -1,36 +1,18 @@
-// import express from "express";
-// import { protect, adminOnly } from "../middleware/authMiddleware.js";
-// import { getDashboardStats } from "../controllers/dashboardController.js";
-
-// const router = express.Router();
-
-// router.get("/", protect, adminOnly, getDashboardStats);
-
-// export default router;
-
 import express from "express";
-import {
-  getDashboardStats,
-  getBookingsByDate,
-  getMonthlyRevenue,
-  getCalendar
+import { 
+  getDashboardStats, 
+  getMonthlyRevenue, 
+  getBookingsByDate, 
+  getCalendar 
 } from "../controllers/dashboardController.js";
-
 import { protect } from "../middleware/authMiddleware.js";
 
 const router = express.Router();
 
-router.get("/", protect, getDashboardStats);
-router.get("/stats", protect, getDashboardStats);
-
+// Ensure these match your axios calls
+router.get("/summary", protect, getDashboardStats);
 router.get("/revenue", protect, getMonthlyRevenue);
-
-router.get(
-  "/calendar",
-  protect,
- getCalendar
-  
-);
-
+router.get("/calendar", protect, getCalendar);
+router.get("/dates", protect, getBookingsByDate);
 
 export default router;

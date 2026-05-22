@@ -99,6 +99,7 @@ export const createTrip = async (req, res) => {
       isPeakClimbing: data.isPeakClimbing === "true",
       isShortTrek: data.isShortTrek === "true",
       isBhutanTour: data.isBhutanTour === "true",
+      isTibetTour: data.isTibetTour === "true",
 
       availableDates: safeParse(data.availableDates),
 
@@ -109,6 +110,11 @@ export const createTrip = async (req, res) => {
       faqs: safeParse(data.faqs),
       packingList: safeParse(data.packingList),
       packages: safeParse(data.packages),
+
+      packages: Array.isArray(data.packages)
+    ? data.packages
+    : safeParse(data.packages),
+    
     });
 
     return res.status(201).json(trip);
@@ -145,6 +151,7 @@ export const getTrips = async (req, res) => {
     if (category === "peak-climbing") filterQuery.isPeakClimbing = true;
     if (category === "short-treks") filterQuery.isShortTrek = true;
     if (category === "bhutan-tours") filterQuery.isBhutanTour = true;
+    if (category === "tibet-tours") filterQuery.isTibetTour = true;
 
     const trips = await Trip.find(filterQuery).sort({ createdAt: -1 });
 
@@ -156,6 +163,7 @@ export const getTrips = async (req, res) => {
         "peak-climbing": trips.filter((t) => t.isPeakClimbing),
         "short-treks": trips.filter((t) => t.isShortTrek),
         "bhutan-tours": trips.filter((t) => t.isBhutanTour),
+        "tibet-tours": trips.filter((t) => t.isTibetTour),
       };
       return res.status(200).json(groupedPackages);
     }
@@ -186,6 +194,140 @@ export const getTripById = async (req, res) => {
 /* =========================
    UPDATE TRIP
 ========================= */
+// export const updateTrip = async (req, res) => {
+//   try {
+//     const trip = await Trip.findById(req.params.id);
+
+//     if (!trip) {
+//       return res.status(404).json({ message: "Trip not found" });
+//     }
+
+//     /* ==========================================================================
+//        1. TEXT FIELDS
+//        ========================================================================== */
+//     const textFields = [
+//       "title",
+//       "country",
+//       "overview",
+//       "difficulty",
+//       "activity",
+//       "maxAltitude",
+//       "bestSeason",
+//       "startPoint",
+//       "endPoint",
+//       "meals",
+//       "accommodation",
+//       "categoryType",
+//     ];
+
+//     textFields.forEach((field) => {
+//       if (req.body[field] !== undefined) {
+//         trip[field] = req.body[field];
+//       }
+//     });
+
+//     /* ==========================================================================
+//        2. NUMBER FIELDS
+//        ========================================================================== */
+//     const numberFields = ["duration", "price", "oldPrice"];
+//     numberFields.forEach((field) => {
+//       if (req.body[field] !== undefined) {
+//         trip[field] = Number(req.body[field]) || 0;
+//       }
+//     });
+
+//     /* ==========================================================================
+//        3. BOOLEAN CATEGORY FLAGS
+//        ========================================================================== */
+//     const booleanCategoryFields = [
+//       "isBestSeller2026",
+//       "isLuxuryVIP",
+//       "isPeakClimbing",
+//       "isShortTrek",
+//       "isBhutanTour",
+//       "badge",
+//     ];
+//     booleanCategoryFields.forEach((field) => {
+//       if (req.body[field] !== undefined) {
+//         // ✅ Handle both string "true"/"false" from FormData and real booleans from JSON
+//         trip[field] = req.body[field] === "true" || req.body[field] === true;
+//       }
+//     });
+
+//     /* ==========================================================================
+//        4. ARRAY / JSON FIELDS
+//        ========================================================================== */
+//     const arrayFields = [
+//       "includes",
+//       "excludes",
+//       "highlights",
+//       "itinerary",
+//       "faqs",
+//       "packages",
+//       "packingList",
+//       "availableDates",
+//     ];
+
+//     arrayFields.forEach((field) => {
+//       if (req.body[field] !== undefined) {
+//         trip[field] = safeParse(req.body[field]);
+//       }
+//     });
+
+//     /* ==========================================================================
+//        5. SLUG UPDATE
+//        ========================================================================== */
+//     if (req.body.title) {
+//       trip.slug = slugify(req.body.title, {
+//         lower: true,
+//         strict: true,
+//       });
+//     }
+
+//     /* ==========================================================================
+//        6. HERO IMAGE UPDATE
+//        ========================================================================== */
+//     if (req.files?.featuredImage?.[0]) {
+//       const result = await uploadBuffer(req.files.featuredImage[0].buffer);
+
+//       trip.heroImage = {
+//         url: result.secure_url,
+//         public_id: result.public_id,
+//       };
+//     }
+
+//     /* ==========================================================================
+//        7. GALLERY IMAGES UPDATE
+//        ========================================================================== */
+//     if (req.files?.gallery?.length) {
+//       const updatedGallery = [];
+
+//       for (let file of req.files.gallery) {
+//         const result = await uploadBuffer(file.buffer);
+
+//         updatedGallery.push({
+//           url: result.secure_url,
+//           public_id: result.public_id,
+//         });
+//       }
+
+//       trip.galleryImages = updatedGallery;
+//     }
+
+//     /* ==========================================================================
+//        8. SAVE & RESPOND
+//        ========================================================================== */
+//     await trip.save();
+
+//     return res.status(200).json(trip);
+//   } catch (err) {
+//     return res.status(500).json({
+//       message: "Update failed",
+//       error: err.message,
+//     });
+//   }
+// };
+
 export const updateTrip = async (req, res) => {
   try {
     const trip = await Trip.findById(req.params.id);
@@ -194,9 +336,7 @@ export const updateTrip = async (req, res) => {
       return res.status(404).json({ message: "Trip not found" });
     }
 
-    /* ==========================================================================
-       1. TEXT FIELDS
-       ========================================================================== */
+    /* ================= TEXT FIELDS ================= */
     const textFields = [
       "title",
       "country",
@@ -212,44 +352,44 @@ export const updateTrip = async (req, res) => {
       "categoryType",
     ];
 
-    textFields.forEach((field) => {
-      if (req.body[field] !== undefined) {
-        trip[field] = req.body[field];
+    textFields.forEach((f) => {
+      if (req.body[f] !== undefined) trip[f] = req.body[f];
+    });
+
+    /* ================= NUMBER FIELDS ================= */
+    ["duration", "price", "oldPrice"].forEach((f) => {
+      if (req.body[f] !== undefined) {
+        trip[f] = Number(req.body[f]) || 0;
       }
     });
 
-    /* ==========================================================================
-       2. NUMBER FIELDS
-       ========================================================================== */
-    const numberFields = ["duration", "price", "oldPrice"];
-    numberFields.forEach((field) => {
-      if (req.body[field] !== undefined) {
-        trip[field] = Number(req.body[field]) || 0;
-      }
-    });
-
-    /* ==========================================================================
-       3. BOOLEAN CATEGORY FLAGS
-       ========================================================================== */
-    const booleanCategoryFields = [
+    /* ================= BOOLEAN FIELDS ================= */
+    const boolFields = [
       "isBestSeller2026",
       "isLuxuryVIP",
       "isPeakClimbing",
       "isShortTrek",
       "isBhutanTour",
+      "isTibetTour",
       "badge",
     ];
-    booleanCategoryFields.forEach((field) => {
-      if (req.body[field] !== undefined) {
-        // ✅ Handle both string "true"/"false" from FormData and real booleans from JSON
-        trip[field] = req.body[field] === "true" || req.body[field] === true;
+
+    boolFields.forEach((f) => {
+      if (req.body[f] !== undefined) {
+        trip[f] = req.body[f] === "true" || req.body[f] === true;
       }
     });
 
-    /* ==========================================================================
-       4. ARRAY / JSON FIELDS
-       ========================================================================== */
-    const arrayFields = [
+    /* ================= ARRAY FIELDS ================= */
+    const parse = (val) => {
+      try {
+        return typeof val === "string" ? JSON.parse(val) : val || [];
+      } catch {
+        return [];
+      }
+    };
+
+    [
       "includes",
       "excludes",
       "highlights",
@@ -258,17 +398,13 @@ export const updateTrip = async (req, res) => {
       "packages",
       "packingList",
       "availableDates",
-    ];
-
-    arrayFields.forEach((field) => {
-      if (req.body[field] !== undefined) {
-        trip[field] = safeParse(req.body[field]);
+    ].forEach((f) => {
+      if (req.body[f] !== undefined) {
+        trip[f] = parse(req.body[f]);
       }
     });
 
-    /* ==========================================================================
-       5. SLUG UPDATE
-       ========================================================================== */
+    /* ================= SLUG ================= */
     if (req.body.title) {
       trip.slug = slugify(req.body.title, {
         lower: true,
@@ -276,11 +412,10 @@ export const updateTrip = async (req, res) => {
       });
     }
 
-    /* ==========================================================================
-       6. HERO IMAGE UPDATE
-       ========================================================================== */
+    /* ================= HERO IMAGE ================= */
     if (req.files?.featuredImage?.[0]) {
-      const result = await uploadBuffer(req.files.featuredImage[0].buffer);
+      const file = req.files.featuredImage[0];
+      const result = await uploadBuffer(file.buffer);
 
       trip.heroImage = {
         url: result.secure_url,
@@ -288,27 +423,26 @@ export const updateTrip = async (req, res) => {
       };
     }
 
-    /* ==========================================================================
-       7. GALLERY IMAGES UPDATE
-       ========================================================================== */
+    /* ================= GALLERY IMAGES ================= */
     if (req.files?.gallery?.length) {
-      const updatedGallery = [];
+      const uploadedGallery = [];
 
       for (let file of req.files.gallery) {
         const result = await uploadBuffer(file.buffer);
 
-        updatedGallery.push({
+        uploadedGallery.push({
           url: result.secure_url,
           public_id: result.public_id,
         });
       }
 
-      trip.galleryImages = updatedGallery;
+      // ✅ KEEP OLD + NEW IMAGES (IMPORTANT FIX)
+      trip.galleryImages = [
+        ...(trip.galleryImages || []),
+        ...uploadedGallery,
+      ];
     }
 
-    /* ==========================================================================
-       8. SAVE & RESPOND
-       ========================================================================== */
     await trip.save();
 
     return res.status(200).json(trip);

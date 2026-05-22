@@ -42,7 +42,7 @@ export default function EditTrip() {
     isPeakClimbing: false,
     isShortTrek: false,
     isBhutanTour: false,
-    isTibetTour: false, // 🎯 New Field for Tibet routing
+    isTibetTour: false, 
   });
 
   // Track raw file state for new uploads
@@ -90,7 +90,7 @@ export default function EditTrip() {
           isPeakClimbing: data.isPeakClimbing || false,
           isShortTrek: data.isShortTrek || false,
           isBhutanTour: data.isBhutanTour || false,
-          isTibetTour: data.isTibetTour || false, // 🎯 Backend bata dynamic check lyaune
+          isTibetTour: data.isTibetTour || false, 
         });
 
         setItinerary(data.itinerary || []);
@@ -121,7 +121,7 @@ export default function EditTrip() {
   }, [featuredImage, gallery]);
 
   /* ==========================================================================
-     🌍 AUTOMATED COUNTRY CONDITIONAL ROUTING HANDLER (EDIT ENGINE)
+      🌍 AUTOMATED COUNTRY CONDITIONAL ROUTING HANDLER (EDIT ENGINE)
      ========================================================================== */
   const handleInputChange = (e) => {
     const { name, value, type, checked } = e.target;
@@ -132,7 +132,6 @@ export default function EditTrip() {
         [name]: type === "checkbox" ? checked : value,
       };
 
-      // Dropdown ma country active swtich huda conditions auto sync hunchha:
       if (name === "country") {
         if (value === "Nepal") {
           updatedForm.isBhutanTour = false;
@@ -195,14 +194,13 @@ export default function EditTrip() {
   };
 
   /* ==========================================================================
-     API DISPATCH WITH STATE NORMALIZATION
+      API DISPATCH WITH STATE NORMALIZATION
      ========================================================================== */
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
       const fd = new FormData();
       
-      // Update data logic arrays before posting out
       const finalizedForm = { ...form };
       if (finalizedForm.country === "Bhutan") {
         finalizedForm.isBhutanTour = true;
@@ -420,12 +418,11 @@ export default function EditTrip() {
                 </div>
               </div>
 
-              {/* 🏷️ DYNAMIC CONDITIONAL PROMOTIONAL CATEGORIES */}
+              {/* DYNAMIC CONDITIONAL PROMOTIONAL CATEGORIES */}
               <div className="pt-2">
                 <label className={labelClass}>Promotional Categories & Tab Visibility</label>
                 <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
                   
-                  {/* Rendering options when country is Nepal */}
                   {form.country === "Nepal" && (
                     <>
                       <label className={checkboxLabelClass}>
@@ -474,7 +471,6 @@ export default function EditTrip() {
                     </>
                   )}
 
-                  {/* Rendering options when country is Bhutan */}
                   {form.country === "Bhutan" && (
                     <label className="flex items-center gap-3 p-3 bg-emerald-50 border border-emerald-200 rounded-xl cursor-not-allowed select-none md:col-span-3 text-xs font-bold text-emerald-800">
                       <input
@@ -488,7 +484,6 @@ export default function EditTrip() {
                     </label>
                   )}
 
-                  {/* Rendering options when country is Tibet */}
                   {form.country === "Tibet" && (
                     <label className="flex items-center gap-3 p-3 bg-blue-50 border border-blue-200 rounded-xl cursor-not-allowed select-none md:col-span-3 text-xs font-bold text-blue-800">
                       <input
@@ -599,7 +594,8 @@ export default function EditTrip() {
             <h2 className="text-lg font-bold text-slate-800 flex items-center gap-2">
               📅 Itinerary Planner
             </h2>
-            <ItineraryBuilder data={itinerary} setData={setItinerary} />
+            {/* ✅ FIXED: Props updated to match the expected signature in ItineraryForm.jsx */}
+            <ItineraryBuilder itinerary={itinerary} setItinerary={setItinerary} />
           </section>
 
           <section className={sectionClass}>

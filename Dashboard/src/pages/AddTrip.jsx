@@ -37,8 +37,7 @@ export default function AddTrip() {
     accommodation: "",
 
     categoryType: "standard", // default Value
-    badge: false, 
-
+    badge: false,
 
     // Reset bug bypass values declaration handles uncontrolled input safely
     isBestSeller2026: false,
@@ -46,6 +45,7 @@ export default function AddTrip() {
     isPeakClimbing: false,
     isShortTrek: false,
     isBhutanTour: false,
+    isTibetTour: false,
   });
 
   // Media Collections File Upload State Array Buffers
@@ -78,7 +78,7 @@ export default function AddTrip() {
     };
   }, [featuredImage, gallery]);
 
- const handleInputChange = (e) => {
+  const handleInputChange = (e) => {
     const { name, value, type, checked } = e.target;
 
     setForm((prev) => {
@@ -225,13 +225,14 @@ export default function AddTrip() {
     formData.append("availableDates", JSON.stringify(filteredDates));
 
     // 3. Append Single Featured Image File Binary
+    // ✅ CORRECT FIELD NAMES
     if (featuredImage) {
-  formData.append("heroImage", featuredImage);
-}
+      formData.append("featuredImage", featuredImage);
+    }
 
-gallery.forEach((file) => {
-  formData.append("galleryImages", file);
-});
+    gallery.forEach((file) => {
+      formData.append("gallery", file);
+    });
 
     try {
       const response = await axios.post("/trips", formData, {
@@ -263,6 +264,7 @@ gallery.forEach((file) => {
         isPeakClimbing: false,
         isShortTrek: false,
         isBhutanTour: false,
+        isTibetTour: false,
       });
       setFeaturedImage(null);
       setGallery([]);
@@ -489,7 +491,8 @@ gallery.forEach((file) => {
             <section className="bg-white rounded-3xl shadow-sm border border-slate-100 p-8 lg:p-10 relative overflow-hidden">
               <div className="absolute top-0 left-0 w-2 h-full bg-blue-500"></div>
               <h2 className="text-xl font-black mb-6 flex items-center gap-3">
-                <FaAward className="text-blue-500" /> Service Tiers & Popular Badges
+                <FaAward className="text-blue-500" /> Service Tiers & Popular
+                Badges
               </h2>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                 <div>
@@ -520,7 +523,8 @@ gallery.forEach((file) => {
                         Mark as Popular Trek (Homepage Default)
                       </span>
                       <span className="block text-[11px] text-slate-400 font-medium">
-                        यदि यो चेक गरियो भने, युजरले कुनै पनि ट्याब क्लिक नगर्दा सुरुमै यो ट्रेक देखिनेछ।
+                        यदि यो चेक गरियो भने, युजरले कुनै पनि ट्याब क्लिक नगर्दा
+                        सुरुमै यो ट्रेक देखिनेछ।
                       </span>
                     </div>
                   </label>
@@ -532,7 +536,8 @@ gallery.forEach((file) => {
             <section className="bg-white rounded-3xl shadow-sm border border-slate-100 p-8 lg:p-10 relative overflow-hidden">
               <div className="absolute top-0 left-0 w-2 h-full bg-emerald-500"></div>
               <h2 className="text-xl font-black mb-6 flex items-center gap-3">
-                <FaTags className="text-emerald-500" /> Promotional Categories & Tabs
+                <FaTags className="text-emerald-500" /> Promotional Categories &
+                Tabs
               </h2>
               <p className="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-6">
                 Active Content Filter Tabs for Homepage Display:
@@ -551,8 +556,12 @@ gallery.forEach((file) => {
                         className="w-5 h-5 rounded-lg text-indigo-600 focus:ring-indigo-500 border-slate-300 transition-all cursor-pointer"
                       />
                       <div>
-                        <span className="block text-sm font-bold text-slate-700">Best Seller 2026</span>
-                        <span className="block text-[11px] text-slate-400 font-medium">Trending journeys</span>
+                        <span className="block text-sm font-bold text-slate-700">
+                          Best Seller 2026
+                        </span>
+                        <span className="block text-[11px] text-slate-400 font-medium">
+                          Trending journeys
+                        </span>
                       </div>
                     </label>
 
@@ -565,8 +574,12 @@ gallery.forEach((file) => {
                         className="w-5 h-5 rounded-lg text-indigo-600 focus:ring-indigo-500 border-slate-300 transition-all cursor-pointer"
                       />
                       <div>
-                        <span className="block text-sm font-bold text-slate-700">Luxury / VIP Tour</span>
-                        <span className="block text-[11px] text-slate-400 font-medium">Premium packages</span>
+                        <span className="block text-sm font-bold text-slate-700">
+                          Luxury / VIP Tour
+                        </span>
+                        <span className="block text-[11px] text-slate-400 font-medium">
+                          Premium packages
+                        </span>
                       </div>
                     </label>
 
@@ -579,8 +592,12 @@ gallery.forEach((file) => {
                         className="w-5 h-5 rounded-lg text-indigo-600 focus:ring-indigo-500 border-slate-300 transition-all cursor-pointer"
                       />
                       <div>
-                        <span className="block text-sm font-bold text-slate-700">Peak Climbing</span>
-                        <span className="block text-[11px] text-slate-400 font-medium">High expeditions</span>
+                        <span className="block text-sm font-bold text-slate-700">
+                          Peak Climbing
+                        </span>
+                        <span className="block text-[11px] text-slate-400 font-medium">
+                          High expeditions
+                        </span>
                       </div>
                     </label>
 
@@ -593,8 +610,12 @@ gallery.forEach((file) => {
                         className="w-5 h-5 rounded-lg text-indigo-600 focus:ring-indigo-500 border-slate-300 transition-all cursor-pointer"
                       />
                       <div>
-                        <span className="block text-sm font-bold text-slate-700">Short Trek</span>
-                        <span className="block text-[11px] text-slate-400 font-medium">Under 7 days</span>
+                        <span className="block text-sm font-bold text-slate-700">
+                          Short Trek
+                        </span>
+                        <span className="block text-[11px] text-slate-400 font-medium">
+                          Under 7 days
+                        </span>
                       </div>
                     </label>
                   </>
@@ -611,9 +632,12 @@ gallery.forEach((file) => {
                       className="w-5 h-5 rounded-lg text-emerald-600 border-slate-300 cursor-not-allowed"
                     />
                     <div>
-                      <span className="block text-sm font-bold text-emerald-800">Bhutan Exclusive Active</span>
+                      <span className="block text-sm font-bold text-emerald-800">
+                        Bhutan Exclusive Active
+                      </span>
                       <span className="block text-[11px] text-emerald-600 font-medium">
-                        यो ट्रिप स्वतः भूटान एक्सक्लुसिभ होमपेज ट्याब (Bhutan Tour Tab) मा देखा पर्नेछ।
+                        यो ट्रिप स्वतः भूटान एक्सक्लुसिभ होमपेज ट्याब (Bhutan
+                        Tour Tab) मा देखा पर्नेछ।
                       </span>
                     </div>
                   </label>
@@ -630,9 +654,12 @@ gallery.forEach((file) => {
                       className="w-5 h-5 rounded-lg text-blue-600 border-slate-300 cursor-not-allowed"
                     />
                     <div>
-                      <span className="block text-sm font-bold text-blue-800">Tibet Exclusive Active</span>
+                      <span className="block text-sm font-bold text-blue-800">
+                        Tibet Exclusive Active
+                      </span>
                       <span className="block text-[11px] text-blue-600 font-medium">
-                        यो ट्रिप स्वतः तिब्बत एक्सक्लुसिभ होमपेज ट्याब (Tibet Tour Tab) मा देखा पर्नेछ।
+                        यो ट्रिप स्वतः तिब्बत एक्सक्लुसिभ होमपेज ट्याब (Tibet
+                        Tour Tab) मा देखा पर्नेछ।
                       </span>
                     </div>
                   </label>
@@ -884,7 +911,10 @@ gallery.forEach((file) => {
               <h2 className="text-xl font-black mb-6">
                 🗺️ Tactical Route Itinerary
               </h2>
-              <ItineraryBuilder data={itinerary} setData={setItinerary} />
+              <ItineraryBuilder
+                itinerary={itinerary}
+                setItinerary={setItinerary}
+              />
             </section>
 
             {/* 💬 FAQ MATRIX ACCORDION */}

@@ -1,142 +1,231 @@
-export default function ItineraryBuilder({ data, setData }) {
+// import React from "react";
+// import { Plus, Trash2, Calendar, Utensils, AlignLeft } from "lucide-react";
 
+// export default function ItineraryBuilder({ data, setData }) {
+//   const addDay = () => {
+//     setData([
+//       ...data,
+//       { day: data.length + 1, title: "", description: "", meals: "" }
+//     ]);
+//   };
+
+//   const removeDay = (index) => {
+//     setData(data.filter((_, i) => i !== index));
+//   };
+
+//   const update = (i, key, value) => {
+//     const copy = [...data];
+//     copy[i][key] = value;
+//     setData(copy);
+//   };
+
+//   return (
+//     <div className="flex flex-col gap-6 w-full max-w-4xl mx-auto p-4">
+//       <div className="flex items-center justify-between border-b pb-4">
+//         <h2 className="text-2xl font-bold text-slate-800 flex items-center gap-2">
+//           <Calendar className="text-blue-600" size={28} />
+//           Trip Itinerary
+//         </h2>
+//         <span className="text-sm text-slate-500 font-medium bg-slate-100 px-3 py-1 rounded-full">
+//           Total Days: {data.length}
+//         </span>
+//       </div>
+
+//       <div className="space-y-6">
+//         {data.map((d, i) => (
+//           <div 
+//             key={i} 
+//             className="group relative bg-white border border-slate-200 rounded-xl p-6 shadow-sm hover:shadow-md transition-all duration-300 animate-in fade-in slide-in-from-bottom-2"
+//           >
+//             {/* Header Section */}
+//             <div className="flex justify-between items-center mb-5">
+//               <div className="flex items-center gap-3">
+//                 <div className="bg-blue-600 text-white w-10 h-10 rounded-lg flex items-center justify-center font-bold shadow-blue-200 shadow-lg">
+//                   {i + 1}
+//                 </div>
+//                 <h4 className="text-lg font-semibold text-slate-700">Day Plan</h4>
+//               </div>
+              
+//               {data.length > 1 && (
+//                 <button
+//                   type="button"
+//                   onClick={() => removeDay(i)}
+//                   className="p-2 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-full transition-colors"
+//                   title="Remove Day"
+//                 >
+//                   <Trash2 size={20} />
+//                 </button>
+//               )}
+//             </div>
+
+//             {/* Inputs Grid */}
+//             <div className="space-y-4">
+//               <div className="relative">
+//                 <input
+//                   placeholder="Day Title (e.g., Arrival & City Tour)"
+//                   value={d.title || ""}
+//                   className="w-full pl-3 pr-4 py-2.5 bg-slate-50 border border-slate-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 focus:bg-white outline-none transition-all text-slate-800 placeholder:text-slate-400 font-medium"
+//                   onChange={(e) => update(i, "title", e.target.value)}
+//                 />
+//               </div>
+
+//               <div className="relative">
+//                 <div className="absolute top-3 left-3 text-slate-400">
+//                   <AlignLeft size={18} />
+//                 </div>
+//                 <textarea
+//                   placeholder="Day Description (activities, places to visit, etc.)"
+//                   value={d.description || ""}
+//                   rows={3}
+//                   className="w-full pl-10 pr-4 py-2.5 bg-slate-50 border border-slate-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 focus:bg-white outline-none transition-all text-slate-800 placeholder:text-slate-400 resize-none"
+//                   onChange={(e) => update(i, "description", e.target.value)}
+//                 />
+//               </div>
+
+//               <div className="relative">
+//                 <div className="absolute top-1/2 -translate-y-1/2 left-3 text-slate-400">
+//                   <Utensils size={18} />
+//                 </div>
+//                 <input
+//                   placeholder="Meals Included (e.g., Breakfast, Lunch)"
+//                   value={d.meals || ""}
+//                   className="w-full pl-10 pr-4 py-2.5 bg-slate-50 border border-slate-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 focus:bg-white outline-none transition-all text-slate-800 placeholder:text-slate-400"
+//                   onChange={(e) => update(i, "meals", e.target.value)}
+//                 />
+//               </div>
+//             </div>
+//           </div>
+//         ))}
+//       </div>
+
+//       {/* Action Button */}
+//       <button
+//         type="button"
+//         onClick={addDay}
+//         className="mt-4 flex items-center justify-center gap-2 w-full py-4 border-2 border-dashed border-slate-300 rounded-xl text-slate-500 font-semibold hover:border-blue-500 hover:text-blue-600 hover:bg-blue-50 transition-all duration-200 group"
+//       >
+//         <div className="bg-slate-100 group-hover:bg-blue-100 p-1 rounded-md transition-colors">
+//           <Plus size={20} />
+//         </div>
+//         Add Another Day
+//       </button>
+//     </div>
+//   );
+// }
+
+import React from "react";
+import { Plus, Trash2, Calendar, Utensils, AlignLeft } from "lucide-react";
+
+// ✅ Changed props to match parent: itinerary and setItinerary (with fallback)
+export default function ItineraryBuilder({ itinerary = [], setItinerary }) {
+  
   const addDay = () => {
-    setData([
-      ...data,
-      { day: data.length + 1, title: "", description: "", meals: "" }
+    setItinerary([
+      ...itinerary,
+      { day: itinerary.length + 1, title: "", description: "", meals: "" }
     ]);
   };
 
   const removeDay = (index) => {
-    setData(data.filter((_, i) => i !== index));
+    setItinerary(itinerary.filter((_, i) => i !== index));
   };
 
   const update = (i, key, value) => {
-    const copy = [...data];
+    const copy = [...itinerary];
     copy[i][key] = value;
-    setData(copy);
+    setItinerary(copy);
   };
 
   return (
-    <div style={styles.container}>
-      {data.map((d, i) => (
-        <div key={i} style={styles.dayBox}>
-          {/* Day Header */}
-          <div style={styles.dayHeader}>
-            <h4 style={styles.dayTitle}>📅 Day {i + 1}</h4>
-            {data.length > 1 && (
-              <button 
-                type="button" 
-                style={styles.removeButton}
-                onClick={() => removeDay(i)}
-              >
-                ✕
-              </button>
-            )}
+    <div className="flex flex-col gap-6 w-full max-w-4xl mx-auto p-4">
+      <div className="flex items-center justify-between border-b pb-4">
+        <h2 className="text-2xl font-bold text-slate-800 flex items-center gap-2">
+          <Calendar className="text-blue-600" size={28} />
+          Trip Itinerary
+        </h2>
+        <span className="text-sm text-slate-500 font-medium bg-slate-100 px-3 py-1 rounded-full">
+          Total Days: {itinerary.length}
+        </span>
+      </div>
+
+      <div className="space-y-6">
+        {itinerary.map((d, i) => (
+          <div 
+            key={i} 
+            className="group relative bg-white border border-slate-200 rounded-xl p-6 shadow-sm hover:shadow-md transition-all duration-300 animate-in fade-in slide-in-from-bottom-2"
+          >
+            {/* Header Section */}
+            <div className="flex justify-between items-center mb-5">
+              <div className="flex items-center gap-3">
+                <div className="bg-blue-600 text-white w-10 h-10 rounded-lg flex items-center justify-center font-bold shadow-blue-200 shadow-lg">
+                  {i + 1}
+                </div>
+                <h4 className="text-lg font-semibold text-slate-700">Day Plan</h4>
+              </div>
+              
+              {itinerary.length > 1 && (
+                <button
+                  type="button"
+                  onClick={() => removeDay(i)}
+                  className="p-2 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-full transition-colors"
+                  title="Remove Day"
+                >
+                  <Trash2 size={20} />
+                </button>
+              )}
+            </div>
+
+            {/* Inputs Grid */}
+            <div className="space-y-4">
+              <div className="relative">
+                <input
+                  placeholder="Day Title (e.g., Arrival & City Tour)"
+                  value={d.title || ""}
+                  className="w-full pl-3 pr-4 py-2.5 bg-slate-50 border border-slate-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 focus:bg-white outline-none transition-all text-slate-800 placeholder:text-slate-400 font-medium"
+                  onChange={(e) => update(i, "title", e.target.value)}
+                />
+              </div>
+
+              <div className="relative">
+                <div className="absolute top-3 left-3 text-slate-400">
+                  <AlignLeft size={18} />
+                </div>
+                <textarea
+                  placeholder="Day Description (activities, places to visit, etc.)"
+                  value={d.description || ""}
+                  rows={3}
+                  className="w-full pl-10 pr-4 py-2.5 bg-slate-50 border border-slate-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 focus:bg-white outline-none transition-all text-slate-800 placeholder:text-slate-400 resize-none"
+                  onChange={(e) => update(i, "description", e.target.value)}
+                />
+              </div>
+
+              <div className="relative">
+                <div className="absolute top-1/2 -translate-y-1/2 left-3 text-slate-400">
+                  <Utensils size={18} />
+                </div>
+                <input
+                  placeholder="Meals Included (e.g., Breakfast, Lunch)"
+                  value={d.meals || ""}
+                  className="w-full pl-10 pr-4 py-2.5 bg-slate-50 border border-slate-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 focus:bg-white outline-none transition-all text-slate-800 placeholder:text-slate-400"
+                  onChange={(e) => update(i, "meals", e.target.value)}
+                />
+              </div>
+            </div>
           </div>
+        ))}
+      </div>
 
-          {/* Day Title Input */}
-          <input
-            placeholder="Day Title (e.g., Arrival & City Tour)"
-            value={d.title || ""}
-            style={styles.input}
-            onChange={(e)=>update(i,"title",e.target.value)}
-          />
-
-          {/* Day Description */}
-          <textarea
-            placeholder="Day Description (activities, places to visit, etc.)"
-            value={d.description || ""}
-            style={{...styles.input, ...styles.textarea}}
-            onChange={(e)=>update(i,"description",e.target.value)}
-          />
-
-          {/* Meals Input */}
-          <input
-            placeholder="Meals Included (e.g., Breakfast, Lunch, Dinner)"
-            value={d.meals || ""}
-            style={styles.input}
-            onChange={(e)=>update(i,"meals",e.target.value)}
-          />
+      {/* Action Button */}
+      <button
+        type="button"
+        onClick={addDay}
+        className="mt-4 flex items-center justify-center gap-2 w-full py-4 border-2 border-dashed border-slate-300 rounded-xl text-slate-500 font-semibold hover:border-blue-500 hover:text-blue-600 hover:bg-blue-50 transition-all duration-200 group"
+      >
+        <div className="bg-slate-100 group-hover:bg-blue-100 p-1 rounded-md transition-colors">
+          <Plus size={20} />
         </div>
-      ))}
-
-      <button type="button" style={styles.addButton} onClick={addDay}>
-        ➕ Add Another Day
+        Add Another Day
       </button>
     </div>
   );
 }
-
-const styles = {
-  container: {
-    display: "flex",
-    flexDirection: "column",
-    gap: "15px"
-  },
-  dayBox: {
-    padding: "20px",
-    border: "2px solid #e9ecef",
-    borderRadius: "10px",
-    backgroundColor: "#fff",
-    transition: "all 0.3s ease",
-    boxShadow: "0 2px 6px rgba(0, 0, 0, 0.05)"
-  },
-  dayHeader: {
-    display: "flex",
-    justifyContent: "space-between",
-    alignItems: "center",
-    marginBottom: "15px",
-    paddingBottom: "12px",
-    borderBottom: "2px solid #f0f0f0"
-  },
-  dayTitle: {
-    color: "#1a1a2e",
-    fontSize: "1.1rem",
-    margin: "0",
-    fontWeight: "600"
-  },
-  removeButton: {
-    background: "#dc3545",
-    color: "#fff",
-    border: "none",
-    borderRadius: "50%",
-    width: "32px",
-    height: "32px",
-    fontSize: "1.2rem",
-    cursor: "pointer",
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "center",
-    transition: "all 0.3s ease",
-    fontWeight: "bold"
-  },
-  input: {
-    width: "100%",
-    padding: "12px 15px",
-    marginBottom: "12px",
-    border: "2px solid #e9ecef",
-    borderRadius: "8px",
-    fontSize: "0.95rem",
-    fontFamily: "inherit",
-    transition: "all 0.3s ease",
-    boxSizing: "border-box"
-  },
-  textarea: {
-    minHeight: "100px",
-    resize: "vertical"
-  },
-  addButton: {
-    padding: "12px 24px",
-    backgroundColor: "#28a745",
-    color: "#fff",
-    border: "none",
-    borderRadius: "8px",
-    fontSize: "0.95rem",
-    fontWeight: "600",
-    cursor: "pointer",
-    transition: "all 0.3s ease",
-    boxShadow: "0 4px 12px rgba(40, 167, 69, 0.3)",
-    marginTop: "10px"
-  }
-};

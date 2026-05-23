@@ -1,94 +1,91 @@
 import mongoose from "mongoose";
 
 const participantSchema = new mongoose.Schema({
-  firstName: String,
-  lastName: String,
-  email: String,
-  gender: String,
-  dob: String,
-  phone: String,
-  nationality: String,
-  passportNumber: String,
-  notes: String,
+  firstName: { type: String, required: true, trim: true },
+  lastName: { type: String, required: true, trim: true },
+  email: { type: String, trim: true, lowercase: true },
+  gender: { type: String, enum: ["male", "female", "other"] },
+  dob: { type: Date }, // Changed to Date for reliable age metrics / sorting
+  phone: { type: String, trim: true },
+  nationality: { type: String, trim: true },
+  passportNumber: { type: String, trim: true },
+  notes: { type: String, trim: true },
 });
 
 const bookingSchema = new mongoose.Schema(
   {
-    trip: {
-      type: mongoose.Schema.Types.ObjectId,
+    trip: { 
+      type: mongoose.Schema.Types.ObjectId, 
       ref: "Trip",
+      required: [true, "A booking must belong to a specific trip"]
     },
 
     buyer: {
-      firstName: String,
-      lastName: String,
-      email: String,
+      firstName: { type: String, required: true, trim: true },
+      lastName: { type: String, required: true, trim: true },
+      email: { type: String, required: true, trim: true, lowercase: true },
     },
 
     participants: [participantSchema],
 
-    numberOfPeople: Number,
+    packageName: { 
+      type: String, 
+      required: [true, "Package name is required"] 
+    },
+    packagePrice: { 
+      type: Number, 
+      required: [true, "Package price is required"] 
+    },
 
-    travelDate: Date,
-
-    totalAmount: Number,
-
-    paymentStatus: {
-      type: String,
-      enum: [
-        "pending",
-        "paid",
-        "failed",
-        "refunded",
-      ],
-      default: "pending",
+    numberOfPeople: { 
+      type: Number, 
+      required: true, 
+      min: [1, "Must book for at least 1 person"] 
+    },
+    
+    travelDate: { 
+      type: Date, 
+      required: [true, "Travel date is required"] 
+    },
+    
+    totalAmount: { 
+      type: Number, 
+      required: true, 
+      min: 0 
     },
 
     bookingStatus: {
       type: String,
-      enum: [
-        "pending",
-        "confirmed",
-        "cancelled",
-      ],
+      enum: ["pending", "confirmed", "cancelled"],
       default: "pending",
+      lowercase: true,
     },
 
-    paymentMethod: {
+   
+    invoiceNumber: {
       type: String,
-      enum: [
-        "card",
-        "swift_bank_transfer",
-      ],
-      default: "card",
+      unique: true,
+      sparse: true 
     },
 
-    transactionId: String,
+   
+    successfulPaymentId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Payment",
+      default: null
+    },
 
-    stripeSessionId: String,
-
-    stripePaymentIntentId: String,
-
-    swiftReferenceNumber: String,
-
+    // Kept here because it is a physical asset directly tied to verifying the booking manually
     bankSlip: {
-      url: String,
-      public_id: String,
+      url: { type: String },
+      public_id: { type: String },
     },
 
-    ticketPdf: String,
-
-    invoiceNumber: String,
-
-    confirmationEmailSent: {
-      type: Boolean,
-      default: false,
-    },
+    ticketPdf: { type: String },
   },
+
+  
   { timestamps: true }
 );
 
-export default mongoose.model(
-  "Booking",
-  bookingSchema
-);
+export default mongoose.model("Booking", bookingSchema);

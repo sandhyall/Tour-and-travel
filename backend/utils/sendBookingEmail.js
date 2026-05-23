@@ -1,64 +1,103 @@
 import nodemailer from "nodemailer";
 
-export const sendBookingEmail =
-  async ({
-    email,
-    booking,
-  }) => {
+// SINGLE reusable transporter
+export const transporter = nodemailer.createTransport({
+  host: "smtp.gmail.com",
+  port: 465,
+  secure: true,
 
-    const transporter =
-      nodemailer.createTransport({
-        service: "gmail",
+  auth: {
+    user: process.env.EMAIL_USER,
+    pass: process.env.EMAIL_PASS,
+  },
+});
 
-        auth: {
-          user:
-            process.env.EMAIL_USER,
+export const sendBookingEmail = async ({
+  to,
+  type = "confirmed",
+  booking,
+}) => {
+  try {
+    let subject = "";
+    let statusMessage = "";
 
-          pass:
-            process.env.EMAIL_PASS,
-        },
-      });
+    // Email type handling
+    switch (type) {
+      case "pending":
+        subject = "Booking Received";
+        statusMessage =
+          "Your booking request has been received and is pending verification.";
+        break;
+
+      case "confirmed":
+        subject = "Booking Confirmed";
+        statusMessage =
+          "Your booking has been confirmed successfully.";
+        break;
+
+      case "cancelled":
+        subject = "Booking Cancelled";
+        statusMessage =
+          "Your booking has been cancelled.";
+        break;
+
+      default:
+        subject = "Booking Update";
+        statusMessage = "Your booking status has been updated.";
+    }
 
     await transporter.sendMail({
-      from:
-        process.env.EMAIL_USER,
+      from: `"Tour & Travel" <${process.env.EMAIL_USER}>`,
+      to,
 
-      to: email,
-
-      subject:
-        "Booking Confirmed",
+      subject,
 
       html: `
-      <h2>
-        Your booking is confirmed
-      </h2>
+        <div style="font-family: Arial; padding: 20px;">
+          <h2>${subject}</h2>
 
-      <p>
-        Trip:
-        ${booking.trip.title}
-      </p>
+          <p>${statusMessage}</p>
 
-      <p>
-        Date:
-        ${new Date(
-          booking.travelDate
-        ).toDateString()}
-      </p>
+          <hr />
 
-      <p>
-        People:
-        ${booking.numberOfPeople}
-      </p>
+          <p>
+            <strong>Trip:</strong>
+            ${booking.trip?.title || "Trip"}
+          </p>
 
-      <p>
-        Amount Paid:
-        $${booking.totalAmount}
-      </p>
+          <p>
+            <strong>Date:</strong>
+            ${new Date(
+              booking.travelDate
+            ).toDateString()}
+          </p>
 
-      <h3>
-        Thank you for booking
-        with us.
-      </h3>
+          <p>
+            <strong>Travelers:</strong>
+            ${booking.numberOfPeople}
+          </p>
+
+          <p>
+            <strong>Total Amount:</strong>
+            $${booking.totalAmount}
+          </p>
+
+          <p>
+            <strong>Invoice:</strong>
+            ${booking.invoiceNumber}
+          </p>
+
+          <br />
+
+          <p>
+            Thank you for booking with us.
+          </p>
+        </div>
       `,
     });
-  };
+
+    console.log("Email sent to:", to);
+  } catch (err) {
+    console.error("sendBookingEmail error:", err.message);
+  }
+};

@@ -1,9 +1,3 @@
-@media (max-width: 768px) {
-  .sidebar {
-    width: 100px;
-  }
-
-  .container {
-    margin-left: 110px;
-  }
-}
+@tailwind base;
+@tailwind components;
+@tailwind utilities;

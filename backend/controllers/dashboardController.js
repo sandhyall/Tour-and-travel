@@ -1,131 +1,230 @@
-// import Trip from "../models/Trip.js";
+// // import Trip from "../models/Trip.js";
+// // import Booking from "../models/Booking.js";
+
+// // export const getDashboardStats = async (req, res) => {
+// //   try {
+// //     const totalTrips = await Trip.countDocuments();
+// //     const totalBookings = await Booking.countDocuments();
+
+// //     const pendingBookings = await Booking.countDocuments({
+// //       paymentStatus: "pending"
+// //     });
+
+// //     const verifiedBookings = await Booking.countDocuments({
+// //       paymentStatus: "verified"
+// //     });
+
+// //     const revenue = await Booking.aggregate([
+// //       { $match: { paymentStatus: "verified" } },
+// //       {
+// //         $group: {
+// //           _id: null,
+// //           total: { $sum: "$totalAmount" }
+// //         }
+// //       }
+// //     ]);
+
+// //     // Monthly revenue
+// //     const monthlyRevenue = await Booking.aggregate([
+// //       {
+// //         $group: {
+// //           _id: { $month: "$createdAt" },
+// //           revenue: { $sum: "$totalAmount" }
+// //         }
+// //       }
+// //     ]);
+
+// //     // Weekly bookings
+// //     const weeklyBookings = await Booking.aggregate([
+// //       {
+// //         $group: {
+// //           _id: { $dayOfWeek: "$createdAt" },
+// //           bookings: { $sum: 1 }
+// //         }
+// //       }
+// //     ]);
+
+// //     // Country distribution
+// //     const countryDistribution = await Booking.aggregate([
+// //       {
+// //         $lookup: {
+// //           from: "trips",
+// //           localField: "trip",
+// //           foreignField: "_id",
+// //           as: "tripData"
+// //         }
+// //       },
+// //       { $unwind: "$tripData" },
+// //       {
+// //         $group: {
+// //           _id: "$tripData.country",
+// //           value: { $sum: 1 }
+// //         }
+// //       }
+// //     ]);
+
+// //     res.json({
+// //       totalTrips,
+// //       totalBookings,
+// //       pendingBookings,
+// //       verifiedBookings,
+// //       totalRevenue: revenue[0]?.total || 0,
+
+// //       monthlyRevenue: monthlyRevenue.map(m => ({
+// //         name: `M${m._id}`,
+// //         revenue: m.revenue
+// //       })),
+
+// //       weeklyBookings: weeklyBookings.map(w => ({
+// //         name: `D${w._id}`,
+// //         bookings: w.bookings
+// //       })),
+
+// //       countryDistribution: countryDistribution.map(c => ({
+// //         name: c._id,
+// //         value: c.value
+// //       }))
+// //     });
+
+// //   } catch (err) {
+// //     res.status(500).json({ message: err.message });
+// //   }
+// // };
+
 // import Booking from "../models/Booking.js";
+// import Trip from "../models/Trip.js";
 
 // export const getDashboardStats = async (req, res) => {
 //   try {
-//     const totalTrips = await Trip.countDocuments();
+//     const totalTrips = await Trip.countDocuments({});
 //     const totalBookings = await Booking.countDocuments();
+
+//     const totalRevenueAgg = await Booking.aggregate([
+//       { $match: { paymentStatus: "verified" } },
+//       { $group: { _id: null, total: { $sum: "$totalAmount" } } }
+//     ]);
+
+//     const totalRevenue = totalRevenueAgg[0]?.total || 0;
 
 //     const pendingBookings = await Booking.countDocuments({
 //       paymentStatus: "pending"
 //     });
 
-//     const verifiedBookings = await Booking.countDocuments({
+//     const verifiedPayments = await Booking.countDocuments({
 //       paymentStatus: "verified"
 //     });
-
-//     const revenue = await Booking.aggregate([
-//       { $match: { paymentStatus: "verified" } },
-//       {
-//         $group: {
-//           _id: null,
-//           total: { $sum: "$totalAmount" }
-//         }
-//       }
-//     ]);
-
-//     // Monthly revenue
-//     const monthlyRevenue = await Booking.aggregate([
-//       {
-//         $group: {
-//           _id: { $month: "$createdAt" },
-//           revenue: { $sum: "$totalAmount" }
-//         }
-//       }
-//     ]);
-
-//     // Weekly bookings
-//     const weeklyBookings = await Booking.aggregate([
-//       {
-//         $group: {
-//           _id: { $dayOfWeek: "$createdAt" },
-//           bookings: { $sum: 1 }
-//         }
-//       }
-//     ]);
-
-//     // Country distribution
-//     const countryDistribution = await Booking.aggregate([
-//       {
-//         $lookup: {
-//           from: "trips",
-//           localField: "trip",
-//           foreignField: "_id",
-//           as: "tripData"
-//         }
-//       },
-//       { $unwind: "$tripData" },
-//       {
-//         $group: {
-//           _id: "$tripData.country",
-//           value: { $sum: 1 }
-//         }
-//       }
-//     ]);
 
 //     res.json({
 //       totalTrips,
 //       totalBookings,
+//       totalRevenue,
 //       pendingBookings,
-//       verifiedBookings,
-//       totalRevenue: revenue[0]?.total || 0,
-
-//       monthlyRevenue: monthlyRevenue.map(m => ({
-//         name: `M${m._id}`,
-//         revenue: m.revenue
-//       })),
-
-//       weeklyBookings: weeklyBookings.map(w => ({
-//         name: `D${w._id}`,
-//         bookings: w.bookings
-//       })),
-
-//       countryDistribution: countryDistribution.map(c => ({
-//         name: c._id,
-//         value: c.value
-//       }))
+//       verifiedPayments
 //     });
 
 //   } catch (err) {
 //     res.status(500).json({ message: err.message });
 //   }
 // };
+// export const getMonthlyRevenue = async (req, res) => {
+//   try {
+//     const data = await Booking.aggregate([
+//       { $match: { paymentStatus: "verified" } },
+//       {
+//         $group: {
+//           _id: { $month: "$createdAt" },
+//           revenue: { $sum: "$totalAmount" }
+//         }
+//       },
+//       { $sort: { _id: 1 } }
+//     ]);
+
+//     res.json(data);
+
+//   } catch (err) {
+//     res.status(500).json({ message: err.message });
+//   }
+// };
+// export const getBookingsByDate = async (req, res) => {
+//   try {
+//     const data = await Booking.aggregate([
+//       {
+//         $group: {
+//           _id: {
+//             $dateToString: { format: "%Y-%m-%d", date: "$travelDate" }
+//           },
+//           count: { $sum: 1 }
+//         }
+//       }
+//     ]);
+
+//     res.json(data);
+
+//   } catch (err) {
+//     res.status(500).json({ message: err.message });
+//   }
+// };
+
+// export const getCalendar = async (req, res) => {
+//   try {
+//     const bookings = await Booking.find()
+//       .populate("trip")
+//       .lean();
+
+//     const calendar = bookings
+//       .filter(b => b.travelDate && b.trip)
+//       .map(b => ({
+//         id: b._id,
+//         title: b.trip?.title || "Trip",
+//         date: new Date(b.travelDate).toISOString().split("T")[0],
+//         status: b.bookingStatus || "pending",
+//         payment: b.paymentStatus || "pending",
+//         people: b.numberOfPeople || 0,
+//         buyer: b.buyer || {},
+//       }));
+
+//     return res.json(calendar);
+
+//   } catch (err) {
+//     console.error("CALENDAR ERROR:", err);
+//     return res.status(500).json({ message: err.message });
+//   }
+// };
 
 import Booking from "../models/Booking.js";
 import Trip from "../models/Trip.js";
 
+
 export const getDashboardStats = async (req, res) => {
   try {
+    
     const totalTrips = await Trip.countDocuments({});
-    const totalBookings = await Booking.countDocuments();
+    const totalBookings = await Booking.countDocuments({});
 
-    const totalRevenueAgg = await Booking.aggregate([
+   
+    const pendingBookings = await Booking.countDocuments({ paymentStatus: "pending" });
+    const verifiedPayments = await Booking.countDocuments({ paymentStatus: "verified" });
+    const cancelledBookings = await Booking.countDocuments({ paymentStatus: "cancelled" });
+
+    
+    const revenueAgg = await Booking.aggregate([
       { $match: { paymentStatus: "verified" } },
       { $group: { _id: null, total: { $sum: "$totalAmount" } } }
     ]);
 
-    const totalRevenue = totalRevenueAgg[0]?.total || 0;
-
-    const pendingBookings = await Booking.countDocuments({
-      paymentStatus: "pending"
-    });
-
-    const verifiedPayments = await Booking.countDocuments({
-      paymentStatus: "verified"
-    });
-
     res.json({
       totalTrips,
       totalBookings,
-      totalRevenue,
+      totalRevenue: revenueAgg[0]?.total || 0,
       pendingBookings,
-      verifiedPayments
+      verifiedPayments,
+      cancelledBookings
     });
-
   } catch (err) {
     res.status(500).json({ message: err.message });
   }
 };
+
 export const getMonthlyRevenue = async (req, res) => {
   try {
     const data = await Booking.aggregate([
@@ -133,35 +232,53 @@ export const getMonthlyRevenue = async (req, res) => {
       {
         $group: {
           _id: { $month: "$createdAt" },
-          revenue: { $sum: "$totalAmount" }
-        }
+          revenue: { $sum: "$totalAmount" },
+        },
       },
-      { $sort: { _id: 1 } }
+      { $sort: { _id: 1 } },
     ]);
-
     res.json(data);
-
   } catch (err) {
     res.status(500).json({ message: err.message });
   }
 };
+
 export const getBookingsByDate = async (req, res) => {
   try {
     const data = await Booking.aggregate([
       {
         $group: {
-          _id: {
-            $dateToString: { format: "%Y-%m-%d", date: "$travelDate" }
-          },
-          count: { $sum: 1 }
-        }
-      }
+          _id: { $dateToString: { format: "%Y-%m-%d", date: "$travelDate" } },
+          count: { $sum: 1 },
+        },
+      },
+      { $sort: { _id: 1 } },
     ]);
-
     res.json(data);
-
   } catch (err) {
     res.status(500).json({ message: err.message });
   }
 };
 
+export const getCalendar = async (req, res) => {
+  try {
+    const bookings = await Booking.find().populate("trip").lean();
+
+    const calendar = bookings
+      .filter((b) => b.travelDate && b.trip)
+      .map((b) => ({
+        id: b._id,
+        title: b.trip?.title || "Trip",
+        date: new Date(b.travelDate).toISOString().split("T")[0],
+        status: b.bookingStatus || "pending",
+        payment: b.paymentStatus || "pending",
+        people: b.numberOfPeople || 0,
+        buyer: b.buyer || {},
+      }));
+
+    return res.json(calendar);
+  } catch (err) {
+    console.error("CALENDAR ERROR:", err);
+    return res.status(500).json({ message: err.message });
+  }
+};

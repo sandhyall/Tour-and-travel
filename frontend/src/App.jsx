@@ -10,12 +10,22 @@ import LegalDocuments from "./Component/Feature/legaldoucment";
 import TermsAndCondition from "./Component/Feature/TermsAndCondition";
 import Newsletter from "./Component/Feature/Newsletter";
 import Contactus from "./Component/Feature/Contactus";
-
+import Everestfeature from "./Pages/Everestfeature";
+import Nepal from "./Pages/Nepal";
+import Bhutan from "./Pages/Bhutan";
+import Tibet from "./Pages/Tibet";
+import PaymentSuccess from "./pages/PaymentSuccess";
+import { BookingCancel, BookingSuccess } from "./Pages/BookingStatus.jsx";
+import { Toaster } from 'react-hot-toast';
 
 const App = () => {
   return (
     <div>
       <BrowserRouter>
+      <Toaster
+        position="top-center"
+        reverseOrder={false}
+      />
         <Routes>
           <Route path="/" element={<Layout />} >
             <Route index element={<Landing />} />
@@ -26,8 +36,15 @@ const App = () => {
             <Route path="/legal-documents" element={<LegalDocuments/>}/>
             <Route path="/terms-and-conditions" element={<TermsAndCondition/>}/>
             <Route path="/sign-up-for-newsletter" element={<Newsletter/>}/>
-            <Route path="/contact-us" element={<Contactus/>}/>
-            
+            <Route path="/contact" element={<Contactus/>}/>
+            <Route path="feature/:id" element={<Everestfeature/>}/>
+            <Route path="/nepal" element={<Nepal/>}/>
+            <Route path="/butan" element={<Bhutan/>}/>
+            <Route path="/tibet" element={<Tibet/>}/>
+            <Route path="/payment-success" element={<PaymentSuccess />}/>
+            <Route path="/booking-success" element={<BookingSuccess />} />
+            <Route path="/booking-cancel" element={<BookingCancel />} />
+           
           </Route>
         
         </Routes>

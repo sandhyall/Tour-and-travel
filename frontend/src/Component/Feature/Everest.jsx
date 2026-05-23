@@ -1,287 +1,407 @@
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useEffect } from "react";
+import { Link } from "react-router-dom";
+import axios from "../../api/axios";
 import {
   Calendar,
   ChevronRight,
+  ChevronLeft,
   Flame,
   Gem,
   Mountain,
   Map,
   MapPin,
+  Loader2,
+  ArrowUpRight,
+  Tag,
 } from "lucide-react";
 
 const Everest = () => {
+  const [allTrips, setAllTrips] = useState([]);
   const [activeTab, setActiveTab] = useState("best-sellers");
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [canScrollLeft, setCanScrollLeft] = useState(false);
+  const [canScrollRight, setCanScrollRight] = useState(true);
 
   const scrollRef = useRef(null);
 
   const tabs = [
     {
       id: "best-sellers",
-      label: "Best Sellers for 2026",
-      icon: <Flame className="w-5 h-5 text-orange-500" />,
+      label: "Best Sellers 2026",
+      icon: <Flame className="w-3.5 h-3.5" />,
+      accent: "#E8520A",
     },
-
     {
       id: "luxury",
-      label: "Luxury & VIP Adventures",
-      icon: <Gem className="w-5 h-5 text-blue-600" />,
+      label: "Luxury VIP",
+      icon: <Gem className="w-3.5 h-3.5" />,
+      accent: "#2563EB",
     },
-
     {
       id: "peak-climbing",
       label: "Peak Climbing",
-      icon: <Mountain className="w-5 h-5 text-gray-700" />,
+      icon: <Mountain className="w-3.5 h-3.5" />,
+      accent: "#374151",
     },
-
     {
       id: "short-treks",
       label: "Short Treks",
-      icon: <Map className="w-5 h-5 text-green-600" />,
+      icon: <Map className="w-3.5 h-3.5" />,
+      accent: "#059669",
     },
-
     {
       id: "bhutan-tours",
       label: "Bhutan Tours",
-      icon: <MapPin className="w-5 h-5 text-red-600" />,
+      icon: <MapPin className="w-3.5 h-3.5" />,
+      accent: "#DC2626",
     },
   ];
 
-  const packages = {
-    "best-sellers": [
-      {
-        id: 1,
-        title: "Everest Base Camp Trek",
-        days: "14 Days",
-        price: "1,550",
-        image:
-          "https://images.unsplash.com/photo-1544735716-392fe2489ffa?auto=format&fit=crop&q=80&w=600",
-        badge: "Best of the Best",
-      },
+  const activeAccent = tabs.find((t) => t.id === activeTab)?.accent || "#111";
 
-      {
-        id: 2,
-        title: "Everest Base Camp Trek with Helicopter Return",
-        days: "12 Days",
-        price: "2,350",
-        image:
-          "https://images.unsplash.com/photo-1533130061792-64b345e4a833?auto=format&fit=crop&q=80&w=600",
-      },
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        setLoading(true);
+        setError(null);
+        const response = await axios.get("/trips");
+        const tripsArray = Array.isArray(response.data)
+          ? response.data
+          : response.data.trips || [];
+        setAllTrips(tripsArray);
+      } catch (err) {
+        setError(err.response?.data?.message || "Failed to load trips");
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchData();
+  }, []);
 
-      {
-        id: 3,
-        title: "Annapurna Base Camp Trek",
-        days: "13 Days",
-        price: "1,050",
-        image:
-          "https://images.unsplash.com/photo-1585016495481-91613a3ab1bc?auto=format&fit=crop&q=80&w=600",
-      },
-
-      {
-        id: 4,
-        title: "Annapurna Circuit Trek",
-        days: "16 Days",
-        price: "1,420",
-        image:
-          "https://images.unsplash.com/photo-1544735716-392fe2489ffa?auto=format&fit=crop&q=80&w=600",
-      },
-    ],
-
-    luxury: [
-      {
-        id: 5,
-        title: "Luxury Everest Base Camp Heli Trek",
-        days: "11 Days",
-        price: "4,500",
-        image:
-          "https://images.unsplash.com/photo-1605640840605-14ac1855827b?auto=format&fit=crop&q=80&w=600",
-        badge: "Premium",
-      },
-
-      {
-        id: 6,
-        title: "Luxury Annapurna Heritage Trek",
-        days: "10 Days",
-        price: "3,200",
-        image:
-          "https://images.unsplash.com/photo-1521334885634-9552f105e991?auto=format&fit=crop&q=80&w=600",
-      },
-    ],
-
-    "peak-climbing": [
-      {
-        id: 7,
-        title: "Island Peak Climbing",
-        days: "18 Days",
-        price: "2,800",
-        image:
-          "https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?auto=format&fit=crop&q=80&w=600",
-      },
-
-      {
-        id: 8,
-        title: "Mera Peak Climbing",
-        days: "20 Days",
-        price: "3,100",
-        image:
-          "https://images.unsplash.com/photo-1501555088652-021faa106b9b?auto=format&fit=crop&q=80&w=600",
-      },
-    ],
-
-    "short-treks": [
-      {
-        id: 9,
-        title: "Ghorepani Poon Hill Trek",
-        days: "5 Days",
-        price: "550",
-        image:
-          "https://images.unsplash.com/photo-1585016495481-91613a3ab1bc?auto=format&fit=crop&q=80&w=600",
-      },
-
-      {
-        id: 10,
-        title: "Everest View Trek",
-        days: "7 Days",
-        price: "950",
-        image:
-          "https://images.unsplash.com/photo-1544735716-392fe2489ffa?auto=format&fit=crop&q=80&w=600",
-      },
-    ],
-
-    "bhutan-tours": [
-      {
-        id: 11,
-        title: "Glimpse of Bhutan",
-        days: "4 Days",
-        price: "1,200",
-        image:
-          "https://images.unsplash.com/photo-1578500484596-f04642131238?auto=format&fit=crop&q=80&w=600",
-      },
-    ],
+  const checkScrollState = () => {
+    const el = scrollRef.current;
+    if (!el) return;
+    setCanScrollLeft(el.scrollLeft > 8);
+    setCanScrollRight(el.scrollLeft + el.clientWidth < el.scrollWidth - 8);
   };
 
-  const scrollRight = () => {
+  useEffect(() => {
+    const el = scrollRef.current;
+    if (!el) return;
+    el.addEventListener("scroll", checkScrollState);
+    checkScrollState();
+    return () => el.removeEventListener("scroll", checkScrollState);
+  }, [activeTab]);
+
+  const scroll = (dir) => {
     if (scrollRef.current) {
-      scrollRef.current.scrollBy({
-        left: 350,
-        behavior: "smooth",
-      });
+      scrollRef.current.scrollBy({ left: dir * 320, behavior: "smooth" });
     }
   };
 
-  return (
-    <div className="min-h-screen bg-white p-4 md:p-12 font-sans text-gray-800">
-      <div className="max-w-7xl mx-auto">
-        <div className="flex border-b border-gray-200 overflow-x-auto no-scrollbar mb-10 gap-x-10 whitespace-nowrap">
-          {tabs.map((tab) => (
-            <button
-              key={tab.id}
-              onClick={() => setActiveTab(tab.id)}
-              className={`flex items-center gap-2 pb-4 px-1 transition-all duration-300 relative
-              
-              ${
-                activeTab === tab.id
-                  ? "text-black font-bold"
-                  : "text-gray-500 hover:text-black"
-              }
-              
-              `}
-            >
-              {tab.icon}
+  const getActivePackages = () => {
+    if (!Array.isArray(allTrips) || allTrips.length === 0) return [];
+    const keyMap = {
+      "best-sellers": "isBestSeller2026",
+      luxury: "isLuxuryVIP",
+      "peak-climbing": "isPeakClimbing",
+      "short-treks": "isShortTrek",
+      "bhutan-tours": "isBhutanTour",
+    };
+    return allTrips.filter((pkg) => pkg[keyMap[activeTab]] === true);
+  };
 
-              <span className="text-[15px]">{tab.label}</span>
+  if (loading) {
+    return (
+      <div className="min-h-[420px] flex flex-col items-center justify-center bg-white gap-3">
+        <Loader2 className="w-6 h-6 animate-spin text-gray-300" />
+        <span className="text-[11px] tracking-[0.15em] uppercase text-gray-300 font-medium">
+          Loading Expeditions
+        </span>
+      </div>
+    );
+  }
 
-              {activeTab === tab.id && (
-                <div className="absolute bottom-0 left-0 w-full h-[3px] bg-black rounded-full" />
-              )}
-            </button>
-          ))}
-        </div>
-
-        <div className="relative">
-          <div
-            ref={scrollRef}
-            className="flex gap-6 overflow-x-auto no-scrollbar scroll-smooth pb-10"
-          >
-            {packages[activeTab].map((pkg) => (
-              <div
-                key={pkg.id}
-                className="min-w-[300px] max-w-[300px] bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden flex flex-col hover:shadow-lg transition-shadow duration-300"
-              >
-                <div className="h-48 relative overflow-hidden group">
-                  <img
-                    src={pkg.image}
-                    alt={pkg.title}
-                    className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
-                  />
-
-                  {pkg.badge && (
-                    <div className="absolute bottom-3 left-3 bg-white px-2 py-1.5 rounded-lg text-[10px] font-bold flex items-center gap-1.5 shadow-md border border-gray-100">
-                      <div className="bg-orange-500 p-0.5 rounded text-[8px]">
-                        <Flame className="w-3 h-3 text-white" fill="white" />
-                      </div>
-
-                      <div className="flex flex-col leading-none">
-                        <span className="text-[8px] text-gray-500 uppercase tracking-tighter">
-                          Travelers' Choice
-                        </span>
-
-                        <span>{pkg.badge}</span>
-                      </div>
-                    </div>
-                  )}
-                </div>
-
-                <div className="p-6 flex-grow flex flex-col justify-between">
-                  <div>
-                    <div className="flex items-center gap-2 text-gray-500 text-[13px] mb-2 font-medium">
-                      <Calendar className="w-4 h-4" />
-
-                      <span>{pkg.days}</span>
-                    </div>
-
-                    <h3 className="font-bold text-[17px] text-gray-900 leading-snug mb-4">
-                      {pkg.title}
-                    </h3>
-                  </div>
-
-                  <div className="border-t border-gray-100 pt-4 mt-auto">
-                    <span className="text-gray-500 text-[12px] block mb-0.5 font-medium">
-                      from
-                    </span>
-
-                    <div className="flex items-baseline gap-1">
-                      <span className="text-xl font-extrabold text-gray-900">
-                        USD {pkg.price}
-                      </span>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
-
+  if (error) {
+    return (
+      <div className="min-h-[260px] flex items-center justify-center">
+        <div className="text-center">
+          <p className="text-[13px] text-gray-400">{error}</p>
           <button
-            onClick={scrollRight}
-            className="absolute right-[-15px] top-[40%] -translate-y-1/2 bg-white rounded-full p-3 shadow-xl border border-gray-100 z-10 hover:bg-gray-100 transition-all hover:scale-110 hidden md:flex items-center justify-center"
+            onClick={() => window.location.reload()}
+            className="mt-3 text-[11px] tracking-[0.12em] uppercase text-gray-500 border border-gray-200 px-4 py-2 hover:bg-gray-50 transition-colors"
           >
-            <ChevronRight className="w-6 h-6 text-black" strokeWidth={3} />
+            Retry
           </button>
         </div>
       </div>
+    );
+  }
 
+  const activePackages = getActivePackages();
+
+  return (
+    <section className="w-full bg-white">
       <style>{`
+        .ev-scroll::-webkit-scrollbar { display: none; }
+        .ev-scroll { -ms-overflow-style: none; scrollbar-width: none; }
 
-        .no-scrollbar::-webkit-scrollbar {
-          display: none;
+        .ev-card {
+          transition: transform 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94),
+                      box-shadow 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
         }
-
-        .no-scrollbar {
-          -ms-overflow-style: none;
-          scrollbar-width: none;
+        .ev-card:hover {
+          transform: translateY(-4px);
+          box-shadow: 0 20px 40px rgba(0,0,0,0.10), 0 4px 12px rgba(0,0,0,0.06);
         }
-
+        .ev-card:hover .ev-img {
+          transform: scale(1.04);
+        }
+        .ev-img {
+          transition: transform 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+        }
+        .ev-tab-ink {
+          transition: left 0.25s cubic-bezier(0.4,0,0.2,1), width 0.25s cubic-bezier(0.4,0,0.2,1);
+        }
+        .ev-arrow-btn {
+          transition: background 0.18s, opacity 0.18s, transform 0.18s;
+        }
+        .ev-arrow-btn:hover { background: #111; }
+        .ev-arrow-btn:hover svg { color: #fff; }
+        .ev-arrow-btn:active { transform: scale(0.94); }
+        .ev-arrow-btn:disabled { opacity: 0; pointer-events: none; }
       `}</style>
-    </div>
+
+      <div className="max-w-[1400px] mx-auto px-5 md:px-14 py-10">
+        <div className="flex flex-col items-center text-center mb-12">
+          <p className=" tracking-[0.25em] text-base uppercase text-orange-600 font-bold mb-3">
+            Handpicked Journeys
+          </p>
+
+          <h2 className="text-[28px] md:text-[36px] font-bold text-gray-950 tracking-tight mb-2">
+            Explore Our Collections
+          </h2>
+
+          {activePackages.length > 0 && (
+            <span className="text-[11px] font-medium text-gray-400 uppercase tracking-widest">
+              {activePackages.length} active expeditions available
+            </span>
+          )}
+        </div>
+
+        <div className="flex justify-center   w-full mb-8">
+          <div className="flex flex-wrap items-center justify-center gap-2 overflow-x-auto pb-2">
+            {tabs.map((tab) => {
+              const isActive = activeTab === tab.id;
+              return (
+                <button
+                  key={tab.id}
+                  onClick={() => setActiveTab(tab.id)}
+                  className={`
+            flex items-center gap-2 px-6 py-2.5 rounded-full border text-[13px] font-medium
+            transition-all duration-300 ease-in-out whitespace-nowrap
+            ${
+              isActive
+                ? "bg-white border-orange-500 text-orange-600 shadow-sm shadow-orange-100"
+                : "border-transparent text-gray-500 hover:text-gray-800 hover:bg-gray-50"
+            }
+          `}
+                >
+                  <span
+                    className={isActive ? "text-orange-500" : "text-gray-400"}
+                  >
+                    {tab.icon}
+                  </span>
+                  {tab.label}
+                </button>
+              );
+            })}
+          </div>
+        </div>
+
+      
+        {activePackages.length === 0 ? (
+          <div className="flex flex-col items-center justify-center py-20 border border-dashed border-gray-150 rounded-2xl bg-gray-50/40">
+            <Mountain className="w-8 h-8 text-gray-200 mb-3" />
+            <p className="text-[13px] text-gray-400">
+              No expeditions in this category yet
+            </p>
+            <p className="text-[11px] text-gray-300 mt-1">
+              {allTrips.length} total trips in database
+            </p>
+          </div>
+        ) : (
+          <div className="relative">
+           
+            <button
+              onClick={() => scroll(-1)}
+              disabled={!canScrollLeft}
+              className="ev-arrow-btn absolute left-[-16px] top-[40%] -translate-y-1/2 z-20
+                         w-9 h-9 rounded-full bg-white border border-gray-200 flex items-center
+                         justify-center shadow-md hidden md:flex"
+              aria-label="Scroll left"
+            >
+              <ChevronLeft className="w-4 h-4 text-gray-700" />
+            </button>
+
+            <div
+              ref={scrollRef}
+              onScroll={checkScrollState}
+              className="ev-scroll flex gap-4 overflow-x-auto pb-6"
+            >
+              {activePackages.map((pkg) => {
+                const imgUrl =
+                  pkg.featuredImage?.url ||
+                  pkg.featuredImage ||
+                  (Array.isArray(pkg.gallery) && pkg.gallery[0]?.url) ||
+                  (Array.isArray(pkg.gallery) && pkg.gallery[0]) ||
+                  "https://images.unsplash.com/photo-1544735716-392fe2489ffa?q=80&w=600";
+
+                const tripId = pkg._id || pkg.id;
+                const hasDiscount =
+                  pkg.oldPrice > pkg.price && pkg.oldPrice > 0;
+                const discountPct = hasDiscount
+                  ? Math.round((1 - pkg.price / pkg.oldPrice) * 100)
+                  : 0;
+
+                return (
+                  <Link
+                    to={`/feature/${tripId}`}
+                    key={tripId}
+                    className="ev-card group shrink-0 w-[272px] bg-white rounded-2xl
+                               border border-gray-100 overflow-hidden flex flex-col"
+                  >
+                    <div className="h-[176px] w-full overflow-hidden bg-gray-100 relative">
+                      <img
+                        src={imgUrl}
+                        alt={pkg.title}
+                        className="ev-img w-full h-full object-cover"
+                        onError={(e) => {
+                          e.target.src =
+                            "https://images.unsplash.com/photo-1544735716-392fe2489ffa?q=80&w=600";
+                        }}
+                      />
+                      
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/30 via-transparent to-transparent" />
+
+                    
+                      {hasDiscount && (
+                        <div
+                          className="absolute top-3 left-3 flex items-center gap-1 bg-white/95 backdrop-blur-sm
+                                        rounded-md px-2 py-1 border border-gray-100/60 shadow-sm"
+                        >
+                          <Tag className="w-2.5 h-2.5 text-orange-500" />
+                          <span className="text-[10px] font-bold text-orange-600">
+                            {discountPct}% OFF
+                          </span>
+                        </div>
+                      )}
+
+                     
+                      <div
+                        className="absolute bottom-3 right-3 w-7 h-7 rounded-full bg-white/90
+                                      backdrop-blur-sm flex items-center justify-center
+                                      opacity-0 group-hover:opacity-100 transition-opacity duration-200 shadow-sm"
+                      >
+                        <ArrowUpRight className="w-3.5 h-3.5 text-gray-800" />
+                      </div>
+                    </div>
+
+                 
+                    <div className="p-4 flex-grow flex flex-col gap-3">
+                    
+                      <div className="flex items-center gap-2">
+                        <span className="flex items-center gap-1 text-[11px] text-gray-400">
+                          <Calendar className="w-3 h-3" />
+                          {pkg.duration ? `${pkg.duration}D` : "—"}
+                        </span>
+                        {pkg.region && (
+                          <>
+                            <span className="text-gray-200 text-[10px]">•</span>
+                            <span className="text-[11px] text-gray-400 truncate max-w-[120px]">
+                              {pkg.region}
+                            </span>
+                          </>
+                        )}
+                        {pkg.difficulty && (
+                          <span
+                            className="ml-auto text-[9px] uppercase tracking-widest font-semibold px-2 py-0.5 rounded-full"
+                            style={{
+                              background:
+                                pkg.difficulty === "Easy"
+                                  ? "#ECFDF5"
+                                  : pkg.difficulty === "Moderate"
+                                    ? "#FFF7ED"
+                                    : "#FFF1F2",
+                              color:
+                                pkg.difficulty === "Easy"
+                                  ? "#059669"
+                                  : pkg.difficulty === "Moderate"
+                                    ? "#EA580C"
+                                    : "#DC2626",
+                            }}
+                          >
+                            {pkg.difficulty}
+                          </span>
+                        )}
+                      </div>
+
+                      <h3 className="text-[14px] font-bold text-gray-900 leading-snug line-clamp-2 flex-grow">
+                        {pkg.title}
+                      </h3>
+
+                      
+                      <div className="pt-3 border-t border-gray-100">
+                        <div className="flex items-end justify-between">
+                          <div>
+                            {hasDiscount && (
+                              <span className="block text-[10px] text-gray-300 line-through leading-none mb-0.5">
+                                USD {pkg.oldPrice.toLocaleString()}
+                              </span>
+                            )}
+                            <div className="flex items-baseline gap-1">
+                              <span className="text-[10px] text-gray-400 font-medium">
+                                from
+                              </span>
+                              <span className="text-[20px] font-black text-gray-950 tracking-tight leading-none">
+                                ${pkg.price?.toLocaleString()}
+                              </span>
+                            </div>
+                          </div>
+                          <div
+                            className="text-[10px] font-semibold tracking-wide uppercase
+                                       border px-2.5 py-1.5 rounded-lg transition-colors duration-200
+                                       group-hover:bg-gray-950 group-hover:text-white group-hover:border-gray-950
+                                       text-gray-700 border-gray-200"
+                          >
+                            Book
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </Link>
+                );
+              })}
+
+            
+            </div>
+
+          
+            <button
+              onClick={() => scroll(1)}
+              disabled={!canScrollRight}
+              className="ev-arrow-btn absolute right-[-16px] top-[40%] -translate-y-1/2 z-20
+                         w-9 h-9 rounded-full bg-white border border-gray-200 flex items-center
+                         justify-center shadow-md hidden md:flex"
+              aria-label="Scroll right"
+            >
+              <ChevronRight className="w-4 h-4 text-gray-700" />
+            </button>
+          </div>
+        )}
+      </div>
+    </section>
   );
 };
 

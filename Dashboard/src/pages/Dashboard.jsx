@@ -2,61 +2,79 @@ import { useEffect, useState } from "react";
 import axios from "../api/axios";
 import { useNavigate } from "react-router-dom";
 import Sidebar from "../components/Sidebar";
-import "../styles/dashboard.css";
-import "../styles/buttons.css";
 import {
-  LineChart,
-  Line,
-  BarChart,
-  Bar,
-  XAxis,
-  YAxis,
-  CartesianGrid,
-  Tooltip,
-  Legend,
-  ResponsiveContainer
+  LineChart, Line, BarChart, Bar, XAxis, YAxis, CartesianGrid,
+  Tooltip, Legend, ResponsiveContainer
 } from "recharts";
 
-export default function Dashboard() {
+// ── Palette ─────────────────────────────────────────────────────────────────
+const palette = {
+  blue:    { bg: "#EBF3FF", border: "#3B82F6", text: "#1D4ED8", icon: "#3B82F6" },
+  emerald: { bg: "#ECFDF5", border: "#10B981", text: "#047857", icon: "#10B981" },
+  amber:   { bg: "#FFFBEB", border: "#F59E0B", text: "#B45309", icon: "#F59E0B" },
+  rose:    { bg: "#FFF1F2", border: "#F43F5E", text: "#BE123C", icon: "#F43F5E" },
+  violet:  { bg: "#F5F3FF", border: "#8B5CF6", text: "#6D28D9", icon: "#8B5CF6" },
+  slate:   { bg: "#F8FAFC", border: "#94A3B8", text: "#475569", icon: "#94A3B8" },
+};
 
-  const [stats, setStats] = useState({});
-  const [bookings, setBookings] = useState([]);
+// ── Custom Tooltip ───────────────────────────────────────────────────────────
+const CustomTooltip = ({ active, payload, label }) => {
+  if (!active || !payload?.length) return null;
+  return (
+    <div style={{
+      background: "#fff",
+      border: "1px solid #E2E8F0",
+      borderRadius: 10,
+      padding: "10px 16px",
+      boxShadow: "0 4px 20px rgba(0,0,0,0.08)",
+      fontSize: 13,
+    }}>
+      <p style={{ margin: "0 0 6px", fontWeight: 600, color: "#0F172A" }}>{label}</p>
+      {payload.map((p) => (
+        <p key={p.dataKey} style={{ margin: "2px 0", color: p.color }}>
+          {p.name}: <strong>{typeof p.value === "number" ? p.value.toLocaleString() : p.value}</strong>
+        </p>
+      ))}
+    </div>
+  );
+};
+
+// ── Status Badge ─────────────────────────────────────────────────────────────
+const statusConfig = {
+  pending:   { label: "Pending",   bg: "#FFFBEB", color: "#B45309", dot: "#F59E0B" },
+  verified:  { label: "Completed", bg: "#ECFDF5", color: "#047857", dot: "#10B981" },
+  cancelled: { label: "Cancelled", bg: "#FFF1F2", color: "#BE123C", dot: "#F43F5E" },
+};
+
+// ── Main Dashboard ───────────────────────────────────────────────────────────
+export default function Dashboard() {
+  const [stats, setStats]             = useState({});
   const [revenueData, setRevenueData] = useState([]);
-  const [showGraphs, setShowGraphs] = useState(false);
-  const [loading, setLoading] = useState(true);
+  const [showGraphs, setShowGraphs]   = useState(false);
+  const [loading, setLoading]         = useState(true);
   const navigate = useNavigate();
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const statsRes = await axios.get("/dashboard/stats");
-        setStats(statsRes.data);
+        const [statsRes, revenueRes] = await Promise.all([
+          axios.get("/dashboard/summary"),
+          axios.get("/dashboard/revenue"),
+        ]);
 
-        const bookingsRes = await axios.get("/bookings");
-        setBookings(bookingsRes.data || []);
+        setStats(statsRes.data || {});
 
-        const revenueRes = await axios.get("/dashboard/revenue");
-        const monthNames = [
-          "Jan",
-          "Feb",
-          "Mar",
-          "Apr",
-          "May",
-          "Jun",
-          "Jul",
-          "Aug",
-          "Sep",
-          "Oct",
-          "Nov",
-          "Dec"
-        ];
-        const formattedData = revenueRes.data.map((item) => ({
-          month: monthNames[item._id - 1] || `M${item._id}`,
-          revenue: item.revenue
-        }));
-        setRevenueData(formattedData);
-      } catch (error) {
-        console.error("Error fetching dashboard data:", error);
+        const monthNames = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+        setRevenueData(
+          Array.isArray(revenueRes.data)
+            ? revenueRes.data.map((item) => ({
+                month:   monthNames[item._id - 1] || `M${item._id}`,
+                revenue: item.revenue || 0,
+              }))
+            : []
+        );
+      } catch (err) {
+        console.error("Dashboard fetch error:", err);
       } finally {
         setLoading(false);
       }
@@ -64,390 +82,395 @@ export default function Dashboard() {
     fetchData();
   }, []);
 
-  return (
-    <>
-      <Sidebar />
-      <div className="dashboard-container" style={styles.container}>
-        {/* Header */}
-        <div style={styles.header}>
-          <div>
-            <h1 style={styles.title} className="dashboard-title">
-              📊 Dashboard
-            </h1>
-            <p style={styles.subtitle}>
-              Welcome to Travel Wales Admin Panel
-            </p>
-          </div>
-          <div style={styles.quickActions} className="quick-actions">
-            <button
-              style={styles.addButton}
-              onClick={() => navigate("/add-trip")}
-            >
-              ➕ Add New Trip
-            </button>
-            <button
-              style={{
-                ...styles.addButton,
-                backgroundColor: showGraphs ? "#28a745" : "#666"
-              }}
-              onClick={() => setShowGraphs(!showGraphs)}
-            >
-              📈 {showGraphs ? "Hide" : "Show"} Graphs
-            </button>
-          </div>
-        </div>
-
-        {/* Stats Grid */}
-        <div style={styles.statsGrid}>
-          <Card
-            title="Total Trips"
-            value={stats.totalTrips || 0}
-            icon="✈️"
-            color="#007bff"
-          />
-          <Card
-            title="Total Bookings"
-            value={stats.totalBookings || 0}
-            icon="📅"
-            color="#28a745"
-          />
-          <Card
-            title="Total Revenue"
-            value={"₹" + (stats.totalRevenue || 0)}
-            icon="💰"
-            color="#ffc107"
-          />
-          <Card
-            title="Pending Bookings"
-            value={stats.pendingBookings || 0}
-            icon="⏳"
-            color="#dc3545"
-          />
-        </div>
-
-        {/* Graphs Section */}
-        {showGraphs && (
-          <div className="charts-grid" style={styles.chartsContainer}>
-            {/* Monthly Revenue Chart */}
-            {revenueData.length > 0 && (
-              <div className="chart-section" style={styles.chartSection}>
-                <h2 style={styles.chartTitle}>💰 Monthly Revenue</h2>
-                <ResponsiveContainer width="100%" height={300}>
-                  <LineChart data={revenueData}>
-                    <CartesianGrid strokeDasharray="3 3" stroke="#e9ecef" />
-                    <XAxis dataKey="month" stroke="#999" />
-                    <YAxis stroke="#999" />
-                    <Tooltip
-                      contentStyle={{
-                        backgroundColor: "#fff",
-                        border: "1px solid #ddd",
-                        borderRadius: "8px"
-                      }}
-                    />
-                    <Legend />
-                    <Line
-                      type="monotone"
-                      dataKey="revenue"
-                      stroke="#007bff"
-                      strokeWidth={2}
-                      dot={{ fill: "#007bff", r: 5 }}
-                      activeDot={{ r: 7 }}
-                    />
-                  </LineChart>
-                </ResponsiveContainer>
-              </div>
-            )}
-
-            {/* Stats Overview Chart */}
-            <div className="chart-section" style={styles.chartSection}>
-              <h2 style={styles.chartTitle}>📊 Booking Statistics</h2>
-              <ResponsiveContainer width="100%" height={300}>
-                <BarChart
-                  data={[
-                    {
-                      name: "Bookings",
-                      total: stats.totalBookings,
-                      pending: stats.pendingBookings,
-                      verified: stats.verifiedPayments
-                    }
-                  ]}
-                >
-                  <CartesianGrid strokeDasharray="3 3" stroke="#e9ecef" />
-                  <XAxis dataKey="name" stroke="#999" />
-                  <YAxis stroke="#999" />
-                  <Tooltip
-                    contentStyle={{
-                      backgroundColor: "#fff",
-                      border: "1px solid #ddd",
-                      borderRadius: "8px"
-                    }}
-                  />
-                  <Legend />
-                  <Bar dataKey="total" fill="#007bff" name="Total Bookings" />
-                  <Bar dataKey="pending" fill="#ffc107" name="Pending" />
-                  <Bar dataKey="verified" fill="#28a745" name="Verified" />
-                </BarChart>
-              </ResponsiveContainer>
-            </div>
-          </div>
-        )}
-
-        {/* Analytics Section */}
-        <div style={styles.analyticsSection}>
-          <h2 style={styles.sectionTitle}>📈 Recent Bookings</h2>
-
-          {bookings.length === 0 ? (
-            <div style={styles.emptyState}>
-              <p>No bookings yet</p>
-            </div>
-          ) : (
-            <div style={styles.bookingsList}>
-              {bookings.slice(0, 5).map((booking, idx) => (
-                <div key={idx} style={styles.bookingItem} className="booking-item">
-                  <div style={styles.bookingInfo}>
-                    <h4 style={styles.bookingTitle}>
-                      {booking.tripTitle || booking.trip?.title || "Trip"}
-                    </h4>
-                    <p style={styles.bookingDetails}>
-                      👤 {booking.userName || booking.user?.name || "User"}
-                    </p>
-                    <p style={styles.bookingDetails}>
-                      📅 {new Date(booking.createdAt).toLocaleDateString()}
-                    </p>
-                  </div>
-                  <div style={styles.bookingAmount}>
-                    <p style={styles.amount}>
-                      ₹{booking.totalPrice || booking.amount || 0}
-                    </p>
-                    <span
-                      style={{
-                        ...styles.status,
-                        backgroundColor:
-                          booking.status === "confirmed"
-                            ? "#28a745"
-                            : booking.status === "pending"
-                              ? "#ffc107"
-                              : "#dc3545"
-                      }}
-                    >
-                      {booking.status || "pending"}
-                    </span>
-                  </div>
-                </div>
-              ))}
-            </div>
-          )}
-        </div>
-
-        {/* Quick Info */}
-        <div style={styles.quickInfo}>
-          <p style={styles.infoText}>
-            💡 Manage Nepal, Bhutan, and Tibet trips easily from this
-            dashboard.
-          </p>
+  if (loading) {
+    return (
+      <div style={{ display: "flex", alignItems: "center", justifyContent: "center", minHeight: "100vh", background: "#F8FAFC" }}>
+        <div style={{ textAlign: "center" }}>
+          <div style={spinnerStyle} />
+          <p style={{ marginTop: 16, fontSize: 15, color: "#64748B", fontWeight: 500 }}>Loading dashboard…</p>
         </div>
       </div>
-    </>
+    );
+  }
+
+  const total     = stats.totalBookings    || 0;
+  const pending   = stats.pendingBookings  || 0;
+  const verified  = stats.verifiedPayments || 0;
+  const cancelled = stats.cancelledBookings || 0;
+
+  const barData = [{ name: "Overview", Total: total, Pending: pending, Completed: verified, Cancelled: cancelled }];
+
+  // Donut segments (simple inline SVG)
+  const donutSegments = [
+    { label: "Completed", value: verified,  color: "#10B981" },
+    { label: "Pending",   value: pending,   color: "#F59E0B" },
+    { label: "Cancelled", value: cancelled, color: "#F43F5E" },
+  ].filter(s => s.value > 0);
+
+  return (
+    <div style={{ display: "flex", minHeight: "100vh", background: "#F8FAFC", fontFamily: "'Inter', system-ui, sans-serif" }}>
+      <Sidebar />
+
+      <main style={{ flex: 1, marginLeft: 256, padding: "36px 40px", maxWidth: "calc(100vw - 256px)" }}>
+
+        {/* ── Header ── */}
+        <header style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 36, paddingBottom: 28, borderBottom: "1.5px solid #E2E8F0" }}>
+          <div>
+            <p style={{ margin: "0 0 4px", fontSize: 13, fontWeight: 600, letterSpacing: "0.08em", textTransform: "uppercase", color: "#94A3B8" }}>
+              Admin Panel
+            </p>
+            <h1 style={{ margin: 0, fontSize: 28, fontWeight: 700, color: "#0F172A", letterSpacing: "-0.5px" }}>
+              Wales Trek &amp; Travel
+            </h1>
+            <p style={{ margin: "4px 0 0", fontSize: 14, color: "#64748B" }}>
+              Dashboard overview — {new Date().toLocaleDateString("en-GB", { weekday: "long", year: "numeric", month: "long", day: "numeric" })}
+            </p>
+          </div>
+          <div style={{ display: "flex", gap: 10, marginTop: 4 }}>
+            <button onClick={() => navigate("/add-trip")} style={btnPrimary}>+ Add New Trip</button>
+            <button onClick={() => setShowGraphs(!showGraphs)} style={showGraphs ? btnActiveSecondary : btnSecondary}>
+              {showGraphs ? "Hide Analytics" : "Show Analytics"}
+            </button>
+          </div>
+        </header>
+
+        {/* ── Top Stat Cards: Trips + Revenue ── */}
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(2, 1fr)", gap: 20, marginBottom: 20 }}>
+          <StatCard title="Total Trips"   value={stats.totalTrips ?? 0}  subtitle="Active packages"   color="blue"   icon={<PlaneIcon />} />
+          <StatCard title="Total Revenue" value={`₹${(stats.totalRevenue || 0).toLocaleString("en-IN")}`} subtitle="From verified payments" color="amber" icon={<CoinIcon />} />
+        </div>
+
+        {/* ── Booking Status Row ── */}
+        <SectionLabel>Booking Status</SectionLabel>
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 16, marginBottom: 36 }}>
+
+          {/* Total bookings */}
+          <div style={statusCardBase("#F8FAFC", "#E2E8F0")}>
+            <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 10 }}>
+              <div style={{ width: 8, height: 8, borderRadius: "50%", background: "#3B82F6" }} />
+              <span style={{ fontSize: 11, fontWeight: 700, letterSpacing: "0.07em", textTransform: "uppercase", color: "#94A3B8" }}>
+                Total Bookings
+              </span>
+            </div>
+            <p style={{ margin: 0, fontSize: 30, fontWeight: 800, color: "#0F172A", letterSpacing: "-0.5px" }}>{total}</p>
+            <p style={{ margin: "4px 0 0", fontSize: 12, color: "#94A3B8" }}>All time</p>
+          </div>
+
+          {/* Pending */}
+          <BookingStatusCard
+            label="Pending"
+            value={pending}
+            total={total}
+            color="#F59E0B"
+            bg="#FFFBEB"
+            border="#FDE68A"
+            icon={<ClockIcon color="#F59E0B" />}
+          />
+
+          {/* Completed */}
+          <BookingStatusCard
+            label="Completed"
+            value={verified}
+            total={total}
+            color="#10B981"
+            bg="#ECFDF5"
+            border="#A7F3D0"
+            icon={<CheckIcon />}
+          />
+
+          {/* Cancelled */}
+          <BookingStatusCard
+            label="Cancelled"
+            value={cancelled}
+            total={total}
+            color="#F43F5E"
+            bg="#FFF1F2"
+            border="#FECDD3"
+            icon={<XIcon />}
+          />
+        </div>
+
+        {/* ── Booking Breakdown Visual ── */}
+        <div style={{ display: "grid", gridTemplateColumns: "1fr 2fr", gap: 20, marginBottom: 36 }}>
+
+          {/* Donut-style ratio card */}
+          <div style={{ background: "#fff", borderRadius: 14, border: "1px solid #E2E8F0", padding: "24px" }}>
+            <p style={{ margin: "0 0 4px", fontSize: 15, fontWeight: 700, color: "#0F172A" }}>Booking Mix</p>
+            <p style={{ margin: "0 0 20px", fontSize: 12, color: "#94A3B8" }}>Status distribution</p>
+
+            {total === 0 ? (
+              <p style={{ fontSize: 13, color: "#94A3B8", textAlign: "center", paddingTop: 20 }}>No bookings yet</p>
+            ) : (
+              <>
+                {/* Stacked bar */}
+                <div style={{ display: "flex", height: 10, borderRadius: 6, overflow: "hidden", marginBottom: 20, background: "#F1F5F9" }}>
+                  {donutSegments.map((s) => (
+                    <div key={s.label} style={{
+                      width: `${(s.value / total) * 100}%`,
+                      background: s.color,
+                      transition: "width 0.4s ease",
+                    }} />
+                  ))}
+                </div>
+
+                {/* Legend */}
+                <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+                  {[
+                    { label: "Completed", value: verified,  color: "#10B981" },
+                    { label: "Pending",   value: pending,   color: "#F59E0B" },
+                    { label: "Cancelled", value: cancelled, color: "#F43F5E" },
+                  ].map((s) => (
+                    <div key={s.label} style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                      <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                        <div style={{ width: 10, height: 10, borderRadius: 2, background: s.color }} />
+                        <span style={{ fontSize: 13, color: "#374151" }}>{s.label}</span>
+                      </div>
+                      <div style={{ textAlign: "right" }}>
+                        <span style={{ fontSize: 13, fontWeight: 700, color: "#0F172A" }}>{s.value}</span>
+                        <span style={{ fontSize: 12, color: "#94A3B8", marginLeft: 6 }}>
+                          {total ? `${((s.value / total) * 100).toFixed(0)}%` : "—"}
+                        </span>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </>
+            )}
+          </div>
+
+          {/* Mini summary table */}
+          <div style={{ background: "#fff", borderRadius: 14, border: "1px solid #E2E8F0", overflow: "hidden" }}>
+            <div style={{ padding: "20px 24px 16px", borderBottom: "1px solid #F1F5F9" }}>
+              <p style={{ margin: 0, fontSize: 15, fontWeight: 700, color: "#0F172A" }}>Key Metrics</p>
+              <p style={{ margin: "3px 0 0", fontSize: 12, color: "#94A3B8" }}>Derived from booking data</p>
+            </div>
+            {[
+              {
+                label: "Conversion rate",
+                value: total ? `${((verified / total) * 100).toFixed(1)}%` : "—",
+                hint: "Verified / total bookings",
+                good: true,
+              },
+              {
+                label: "Avg. revenue / trip",
+                value: stats.totalTrips ? `₹${Math.round((stats.totalRevenue || 0) / stats.totalTrips).toLocaleString("en-IN")}` : "—",
+                hint: "Total revenue ÷ trips",
+                good: true,
+              },
+              {
+                label: "Pending rate",
+                value: total ? `${((pending / total) * 100).toFixed(1)}%` : "—",
+                hint: "Awaiting payment verification",
+                good: false,
+              },
+              {
+                label: "Cancellation rate",
+                value: total ? `${((cancelled / total) * 100).toFixed(1)}%` : "—",
+                hint: "Cancelled / total bookings",
+                good: false,
+              },
+            ].map((row, i, arr) => (
+              <div key={row.label} style={{
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "space-between",
+                padding: "14px 24px",
+                borderBottom: i < arr.length - 1 ? "1px solid #F8FAFC" : "none",
+              }}>
+                <div>
+                  <p style={{ margin: 0, fontSize: 13, fontWeight: 600, color: "#0F172A" }}>{row.label}</p>
+                  <p style={{ margin: "2px 0 0", fontSize: 11, color: "#94A3B8" }}>{row.hint}</p>
+                </div>
+                <span style={{
+                  fontSize: 16,
+                  fontWeight: 700,
+                  color: row.value === "—" ? "#94A3B8" : row.good ? "#047857" : "#BE123C",
+                  letterSpacing: "-0.3px",
+                }}>{row.value}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* ── Analytics ── */}
+        {showGraphs && (
+          <>
+            <SectionLabel>Analytics</SectionLabel>
+            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 20, marginBottom: 36 }}>
+
+              <ChartCard title="Monthly Revenue" subtitle="Verified bookings only">
+                <ResponsiveContainer width="100%" height={260}>
+                  <LineChart data={revenueData} margin={{ top: 4, right: 8, bottom: 0, left: 0 }}>
+                    <CartesianGrid strokeDasharray="4 4" stroke="#F1F5F9" />
+                    <XAxis dataKey="month" tick={{ fontSize: 12, fill: "#94A3B8" }} axisLine={false} tickLine={false} />
+                    <YAxis tick={{ fontSize: 12, fill: "#94A3B8" }} axisLine={false} tickLine={false}
+                           tickFormatter={(v) => `₹${(v / 1000).toFixed(0)}k`} />
+                    <Tooltip content={<CustomTooltip />} />
+                    <Line type="monotone" dataKey="revenue" name="Revenue" stroke="#3B82F6" strokeWidth={2.5}
+                      dot={{ r: 4, fill: "#3B82F6", strokeWidth: 0 }} activeDot={{ r: 6 }} />
+                  </LineChart>
+                </ResponsiveContainer>
+              </ChartCard>
+
+              <ChartCard title="Booking Breakdown" subtitle="Total · Pending · Completed · Cancelled">
+                <ResponsiveContainer width="100%" height={260}>
+                  <BarChart data={barData} margin={{ top: 4, right: 8, bottom: 0, left: 0 }} barGap={4}>
+                    <CartesianGrid strokeDasharray="4 4" stroke="#F1F5F9" />
+                    <XAxis dataKey="name" tick={{ fontSize: 12, fill: "#94A3B8" }} axisLine={false} tickLine={false} />
+                    <YAxis tick={{ fontSize: 12, fill: "#94A3B8" }} axisLine={false} tickLine={false} />
+                    <Tooltip content={<CustomTooltip />} />
+                    <Legend wrapperStyle={{ fontSize: 12, paddingTop: 12 }} iconType="circle" iconSize={8} />
+                    <Bar dataKey="Total"     fill="#3B82F6" radius={[4,4,0,0]} name="Total" />
+                    <Bar dataKey="Pending"   fill="#F59E0B" radius={[4,4,0,0]} name="Pending" />
+                    <Bar dataKey="Completed" fill="#10B981" radius={[4,4,0,0]} name="Completed" />
+                    <Bar dataKey="Cancelled" fill="#F43F5E" radius={[4,4,0,0]} name="Cancelled" />
+                  </BarChart>
+                </ResponsiveContainer>
+              </ChartCard>
+
+            </div>
+          </>
+        )}
+
+      </main>
+    </div>
   );
 }
 
-function Card({ title, value, icon, color }) {
+// ── BookingStatusCard ────────────────────────────────────────────────────────
+function BookingStatusCard({ label, value, total, color, bg, border, icon }) {
+  const pct = total > 0 ? ((value / total) * 100).toFixed(0) : 0;
   return (
-    <div style={{ ...styles.card, borderLeftColor: color }}>
-      <div style={styles.cardIcon}>{icon}</div>
-      <div style={styles.cardContent}>
-        <p style={styles.cardTitle}>{title}</p>
-        <h2 style={styles.cardValue}>{value}</h2>
+    <div style={{ ...statusCardBase(bg, border) }}>
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 10 }}>
+        <div style={{ display: "flex", alignItems: "center", gap: 7 }}>
+          <div style={{ width: 8, height: 8, borderRadius: "50%", background: color }} />
+          <span style={{ fontSize: 11, fontWeight: 700, letterSpacing: "0.07em", textTransform: "uppercase", color: "#94A3B8" }}>
+            {label}
+          </span>
+        </div>
+        <div style={{ color, opacity: 0.8 }}>{icon}</div>
+      </div>
+      <p style={{ margin: 0, fontSize: 30, fontWeight: 800, color: "#0F172A", letterSpacing: "-0.5px" }}>{value}</p>
+      <div style={{ display: "flex", alignItems: "center", gap: 6, marginTop: 6 }}>
+        {/* Mini progress bar */}
+        <div style={{ flex: 1, height: 4, borderRadius: 4, background: "#E2E8F0", overflow: "hidden" }}>
+          <div style={{ width: `${pct}%`, height: "100%", borderRadius: 4, background: color, transition: "width 0.5s ease" }} />
+        </div>
+        <span style={{ fontSize: 12, fontWeight: 600, color, minWidth: 30 }}>{pct}%</span>
       </div>
     </div>
   );
 }
 
-const styles = {
-  container: {
-    padding: "20px",
-    backgroundColor: "#f8f9fa",
-    minHeight: "100vh",
-    marginLeft: "260px"
-  },
-  header: {
-    display: "flex",
-    justifyContent: "space-between",
-    alignItems: "center",
-    marginBottom: "40px",
-    paddingBottom: "20px",
-    borderBottom: "3px solid #007bff",
-    flexWrap: "wrap",
-    gap: "20px"
-  },
-  title: {
-    fontSize: "clamp(1.8rem, 4vw, 2.5rem)",
-    color: "#1a1a2e",
-    margin: "0 0 8px 0",
-    fontWeight: "600"
-  },
-  subtitle: {
-    color: "#666",
-    fontSize: "0.95rem",
-    margin: "0"
-  },
-  quickActions: {
-    display: "flex",
-    gap: "10px",
-    flexWrap: "wrap"
-  },
-  addButton: {
-    padding: "12px 24px",
-    backgroundColor: "#007bff",
-    color: "#fff",
-    border: "none",
-    borderRadius: "8px",
-    fontSize: "0.95rem",
-    fontWeight: "600",
-    cursor: "pointer",
-    transition: "all 0.3s ease",
-    boxShadow: "0 4px 12px rgba(0, 123, 255, 0.3)",
-    whiteSpace: "nowrap"
-  },
-  statsGrid: {
-    display: "grid",
-    gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))",
-    gap: "20px",
-    marginBottom: "40px"
-  },
-  chartsContainer: {
-    display: "grid",
-    gridTemplateColumns: "repeat(auto-fit, minmax(500px, 1fr))",
-    gap: "20px",
-    marginBottom: "40px"
-  },
-  chartSection: {
-    backgroundColor: "#fff",
-    borderRadius: "12px",
-    padding: "25px",
-    boxShadow: "0 4px 12px rgba(0, 0, 0, 0.08)",
-    border: "1px solid #e9ecef"
-  },
-  chartTitle: {
-    fontSize: "1.2rem",
-    color: "#1a1a2e",
-    margin: "0 0 20px 0",
-    fontWeight: "600"
-  },
-  card: {
-    background: "#fff",
-    padding: "20px",
-    borderRadius: "12px",
-    boxShadow: "0 4px 12px rgba(0, 0, 0, 0.08)",
-    border: "1px solid #e9ecef",
-    borderLeft: "4px solid #007bff",
-    display: "flex",
-    alignItems: "center",
-    gap: "15px",
-    transition: "all 0.3s ease",
-    cursor: "pointer"
-  },
-  cardIcon: {
-    fontSize: "2.5rem",
-    minWidth: "50px",
-    textAlign: "center"
-  },
-  cardContent: {
-    flex: 1
-  },
-  cardTitle: {
-    color: "#999",
-    fontSize: "0.9rem",
-    margin: "0 0 5px 0",
-    fontWeight: "500",
-    textTransform: "uppercase",
-    letterSpacing: "0.5px"
-  },
-  cardValue: {
-    color: "#1a1a2e",
-    fontSize: "clamp(1.5rem, 3vw, 2rem)",
-    margin: "0",
-    fontWeight: "700"
-  },
-  analyticsSection: {
-    backgroundColor: "#fff",
-    borderRadius: "12px",
-    padding: "25px",
-    boxShadow: "0 4px 12px rgba(0, 0, 0, 0.08)",
-    border: "1px solid #e9ecef",
-    marginBottom: "30px"
-  },
-  sectionTitle: {
-    fontSize: "1.3rem",
-    color: "#1a1a2e",
-    margin: "0 0 20px 0",
-    fontWeight: "600"
-  },
-  bookingsList: {
-    display: "flex",
-    flexDirection: "column",
-    gap: "15px"
-  },
-  bookingItem: {
-    display: "flex",
-    justifyContent: "space-between",
-    alignItems: "center",
-    padding: "15px",
-    backgroundColor: "#f8f9fa",
-    borderRadius: "8px",
-    border: "1px solid #e9ecef",
-    transition: "all 0.3s ease",
-    flexWrap: "wrap",
-    gap: "15px"
-  },
-  bookingInfo: {
-    flex: 1
-  },
-  bookingTitle: {
-    color: "#1a1a2e",
-    fontSize: "1rem",
-    margin: "0 0 5px 0",
-    fontWeight: "600"
-  },
-  bookingDetails: {
-    color: "#999",
-    fontSize: "0.85rem",
-    margin: "3px 0"
-  },
-  bookingAmount: {
-    display: "flex",
-    alignItems: "center",
-    gap: "12px",
-    flexWrap: "wrap"
-  },
-  amount: {
-    color: "#007bff",
-    fontSize: "1.2rem",
-    fontWeight: "700",
-    margin: "0"
-  },
-  status: {
-    padding: "6px 12px",
-    borderRadius: "20px",
-    color: "#fff",
-    fontSize: "0.8rem",
-    fontWeight: "600",
-    textTransform: "capitalize"
-  },
-  emptyState: {
-    textAlign: "center",
-    padding: "40px 20px",
-    color: "#999"
-  },
-  quickInfo: {
-    backgroundColor: "#e7f3ff",
-    border: "1px solid #b3d9ff",
-    padding: "15px 20px",
-    borderRadius: "8px"
-  },
-  infoText: {
-    color: "#0056b3",
-    margin: "0",
-    fontSize: "0.95rem"
-  }
+// ── StatCard ─────────────────────────────────────────────────────────────────
+function StatCard({ title, value, subtitle, color, icon }) {
+  const p = palette[color];
+  return (
+    <div style={{
+      background: "#fff", borderRadius: 14,
+      border: `1px solid ${p.border}22`,
+      padding: "22px 24px",
+      borderTop: `3px solid ${p.border}`,
+    }}>
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start" }}>
+        <div>
+          <p style={{ margin: "0 0 10px", fontSize: 12, fontWeight: 600, letterSpacing: "0.07em", textTransform: "uppercase", color: "#94A3B8" }}>
+            {title}
+          </p>
+          <h2 style={{ margin: 0, fontSize: 26, fontWeight: 800, color: "#0F172A", letterSpacing: "-0.5px" }}>{value}</h2>
+          <p style={{ margin: "5px 0 0", fontSize: 12, color: "#94A3B8" }}>{subtitle}</p>
+        </div>
+        <div style={{
+          width: 42, height: 42, borderRadius: 10, background: p.bg,
+          display: "flex", alignItems: "center", justifyContent: "center",
+          color: p.icon, flexShrink: 0,
+        }}>
+          {icon}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function ChartCard({ title, subtitle, children }) {
+  return (
+    <div style={{ background: "#fff", borderRadius: 14, border: "1px solid #E2E8F0", padding: "24px 20px 16px" }}>
+      <div style={{ marginBottom: 20 }}>
+        <p style={{ margin: 0, fontSize: 15, fontWeight: 700, color: "#0F172A" }}>{title}</p>
+        <p style={{ margin: "3px 0 0", fontSize: 12, color: "#94A3B8" }}>{subtitle}</p>
+      </div>
+      {children}
+    </div>
+  );
+}
+
+function SectionLabel({ children }) {
+  return (
+    <p style={{ margin: "0 0 14px", fontSize: 11, fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase", color: "#94A3B8" }}>
+      {children}
+    </p>
+  );
+}
+
+// ── Shared card base ─────────────────────────────────────────────────────────
+const statusCardBase = (bg, border) => ({
+  background: bg,
+  borderRadius: 14,
+  border: `1px solid ${border}`,
+  padding: "20px 20px 16px",
+});
+
+// ── Icons ────────────────────────────────────────────────────────────────────
+const PlaneIcon = () => (
+  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M17.8 19.2L16 11l3.5-3.5C21 6 21 4 19 4c-1 0-1.5.5-3.5 2.5L11 8 2.8 6.2c-.5-.1-.9.4-.8.9L3.3 9c.1.5.5.8 1 .9L8 11l-4 4H2l-1 2 3 1 1 3 2-1v-2l4-4 1.2 3.7c.1.5.4.9.9 1l2.1.4c.5.1 1-.3.9-.8z"/>
+  </svg>
+);
+const CoinIcon = () => (
+  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <line x1="12" y1="1" x2="12" y2="23"/>
+    <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>
+  </svg>
+);
+const ClockIcon = ({ color = "currentColor" }) => (
+  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>
+  </svg>
+);
+const CheckIcon = () => (
+  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#10B981" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+    <polyline points="20 6 9 17 4 12"/>
+  </svg>
+);
+const XIcon = () => (
+  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#F43F5E" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+    <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+  </svg>
+);
+
+// ── Spinner ──────────────────────────────────────────────────────────────────
+const spinnerStyle = {
+  width: 36, height: 36, borderRadius: "50%",
+  border: "3px solid #E2E8F0", borderTopColor: "#3B82F6",
+  animation: "spin 0.8s linear infinite", margin: "0 auto",
+};
+if (typeof document !== "undefined" && !document.getElementById("__spin_kf")) {
+  const s = document.createElement("style");
+  s.id = "__spin_kf";
+  s.textContent = "@keyframes spin { to { transform: rotate(360deg); } }";
+  document.head.appendChild(s);
+}
+
+// ── Button styles ─────────────────────────────────────────────────────────────
+const btnPrimary = {
+  background: "#2563EB", color: "#fff", border: "none", borderRadius: 9,
+  padding: "9px 18px", fontSize: 13, fontWeight: 600, cursor: "pointer", letterSpacing: "0.01em",
+};
+const btnSecondary = {
+  background: "#fff", color: "#374151", border: "1px solid #E2E8F0", borderRadius: 9,
+  padding: "9px 18px", fontSize: 13, fontWeight: 600, cursor: "pointer",
+};
+const btnActiveSecondary = {
+  ...btnSecondary, background: "#EFF6FF", color: "#1D4ED8", borderColor: "#BFDBFE",
 };

@@ -1,8 +1,18 @@
 import { Link, useLocation, useNavigate } from "react-router-dom";
-import { FaHome, FaPlus, FaList, FaChartBar, FaBars, FaTimes, FaCalendarAlt, FaBookOpen, FaSignOutAlt, FaUser } from "react-icons/fa";
+import { 
+  LayoutDashboard, 
+  PlusCircle, 
+  Map, 
+  BookOpenCheck, 
+  CalendarDays, 
+  LogOut, 
+  User, 
+  Menu, 
+  X,
+  ChevronRight
+} from "lucide-react";
 import { useState, useContext } from "react";
 import { AuthContext } from "../context/AuthContext";
-import "../styles/sidebar.css";
 
 export default function Sidebar() {
   const [isOpen, setIsOpen] = useState(false);
@@ -11,10 +21,6 @@ export default function Sidebar() {
   const { user, logout, loginTime } = useContext(AuthContext);
 
   const isActive = (path) => location.pathname === path;
-
-  const toggleSidebar = () => {
-    setIsOpen(!isOpen);
-  };
 
   const handleLogout = () => {
     logout();
@@ -25,215 +31,118 @@ export default function Sidebar() {
     if (!loginTime) return "Just now";
     const loginDate = new Date(loginTime);
     const now = new Date();
-    const diffMs = now - loginDate;
-    const diffMins = Math.floor(diffMs / 60000);
-    
+    const diffMins = Math.floor((now - loginDate) / 60000);
     if (diffMins < 1) return "Just now";
     if (diffMins < 60) return `${diffMins}m ago`;
-    
     const diffHours = Math.floor(diffMins / 60);
-    if (diffHours < 24) return `${diffHours}h ago`;
-    
-    const diffDays = Math.floor(diffHours / 24);
-    return `${diffDays}d ago`;
+    return diffHours < 24 ? `${diffHours}h ago` : `${Math.floor(diffHours / 24)}d ago`;
   };
+
+  const navItems = [
+    { name: "Dashboard", path: "/", icon: LayoutDashboard },
+    { name: "Add Trip", path: "/add-trip", icon: PlusCircle },
+    { name: "All Trips", path: "/trips", icon: Map },
+    { name: "Bookings", path: "/admin-bookings", icon: BookOpenCheck },
+    { name: "Calendar", path: "/admin-calendar", icon: CalendarDays },
+  ];
 
   return (
     <>
-      {/* Mobile Toggle Button */}
-      <button className="sidebar-mobile-toggle" onClick={toggleSidebar}>
-        {isOpen ? <FaTimes size={24} /> : <FaBars size={24} />}
+      {/* Mobile Toggle */}
+      <button 
+        className="lg:hidden fixed top-4 left-4 z-50 p-2 bg-indigo-600 text-white rounded-lg shadow-lg"
+        onClick={() => setIsOpen(!isOpen)}
+      >
+        {isOpen ? <X size={24} /> : <Menu size={24} />}
       </button>
 
-      {/* Sidebar */}
-      <div className={`sidebar ${isOpen ? 'open' : ''}`}>
-        {/* Header */}
-        <div style={styles.header}>
-          <h2 style={styles.title}>✈️ Travel Admin</h2>
-          <p style={styles.subtitle}>Dashboard Panel</p>
+      {/* Sidebar Container */}
+      <div className={`
+        fixed inset-y-0 left-0 z-40 w-72 bg-[#0f172a] text-slate-300 transform transition-transform duration-300 ease-in-out
+        ${isOpen ? "translate-x-0" : "-translate-x-full"} lg:translate-x-0
+        flex flex-col border-r border-slate-800 shadow-2xl
+      `}>
+        
+        {/* Logo/Header */}
+        <div className="p-8 border-b border-slate-800/50">
+          <div className="flex items-center gap-3">
+            <div className="bg-indigo-600 p-2 rounded-xl text-white shadow-lg shadow-indigo-500/20">
+              <Map size={24} />
+            </div>
+            <div>
+              <h2 className="text-xl font-bold text-white tracking-tight">TravelAdmin</h2>
+              <p className="text-[10px] uppercase tracking-[2px] text-indigo-400 font-bold">Control Panel</p>
+            </div>
+          </div>
         </div>
 
-        {/* User Stats Section */}
+        {/* User Profile Card */}
         {user && (
-          <div style={styles.userSection}>
-            <div style={styles.userAvatar}>
-              <FaUser size={24} />
+          <div className="mx-4 my-6 p-4 bg-slate-800/40 rounded-2xl border border-slate-700/50">
+            <div className="flex items-center gap-3">
+              <div className="w-12 h-12 rounded-full bg-indigo-500/20 border border-indigo-500/30 flex items-center justify-center text-indigo-400">
+                <User size={24} />
+              </div>
+              <div className="overflow-hidden">
+                <h3 className="text-sm font-semibold text-white truncate">{user.name}</h3>
+                <p className="text-xs text-slate-400 capitalize">{user.role}</p>
+              </div>
             </div>
-            <h3 style={styles.userName}>{user.name}</h3>
-            <p style={styles.userRole}>{user.role}</p>
-            <p style={styles.userEmail}>{user.email}</p>
-            <p style={styles.loginStatus}>
-              🟢 Logged in {getLoginDuration()}
-            </p>
+            <div className="mt-3 pt-3 border-t border-slate-700/50 flex items-center gap-2">
+              <span className="w-2 h-2 bg-emerald-500 rounded-full animate-pulse"></span>
+              <span className="text-[11px] font-medium text-emerald-500/80">Active: {getLoginDuration()}</span>
+            </div>
           </div>
         )}
 
-        {/* Navigation Links */}
-        <nav style={styles.nav}>
-          <Link 
-            className={`sidebar-link ${isActive("/") || isActive("/dashboard") ? 'active' : ''}`}
-            to="/"
-            onClick={() => setIsOpen(false)}
-          >
-            <FaHome style={styles.icon} /> Dashboard
-          </Link>
-
-          <Link 
-            className={`sidebar-link ${isActive("/add-trip") || isActive("/add") ? 'active' : ''}`}
-            to="/add-trip"
-            onClick={() => setIsOpen(false)}
-          >
-            <FaPlus style={styles.icon} /> Add Trip
-          </Link>
-
-          
-          <Link 
-            className={`sidebar-link ${isActive("/trips") ? 'active' : ''}`}
-            to="/trips"
-            onClick={() => setIsOpen(false)}
-          >
-            <FaList style={styles.icon} /> Trips
-          </Link>
-
-          <Link 
-            className={`sidebar-link ${isActive("/admin-bookings") ? 'active' : ''}`}
-            to="/admin-bookings"
-            onClick={() => setIsOpen(false)}
-          >
-            <FaBookOpen style={styles.icon} /> Admin Bookings
-          </Link>
-
-          <Link 
-            className={`sidebar-link ${isActive("/admin-calendar") ? 'active' : ''}`}
-            to="/admin-calendar"
-            onClick={() => setIsOpen(false)}
-          >
-            <FaCalendarAlt style={styles.icon} /> Admin Calendar
-          </Link>
+        {/* Navigation */}
+        <nav className="flex-1 px-4 space-y-1 overflow-y-auto custom-scrollbar">
+          <p className="px-4 py-2 text-[11px] font-bold text-slate-500 uppercase tracking-widest">Main Menu</p>
+          {navItems.map((item) => (
+            <Link
+              key={item.path}
+              to={item.path}
+              onClick={() => setIsOpen(false)}
+              className={`
+                group flex items-center justify-between px-4 py-3.5 rounded-xl transition-all duration-200
+                ${isActive(item.path) 
+                  ? "bg-indigo-600 text-white shadow-lg shadow-indigo-600/20" 
+                  : "hover:bg-slate-800/60 hover:text-white"}
+              `}
+            >
+              <div className="flex items-center gap-3">
+                <item.icon size={20} className={isActive(item.path) ? "text-white" : "text-slate-400 group-hover:text-indigo-400"} />
+                <span className="text-sm font-medium">{item.name}</span>
+              </div>
+              {isActive(item.path) && <ChevronRight size={16} />}
+            </Link>
+          ))}
         </nav>
 
-        {/* Logout Button */}
-        <button
-          onClick={handleLogout}
-          style={styles.logoutButton}
-          className="sidebar-logout-btn"
-        >
-          <FaSignOutAlt style={styles.icon} /> Logout
-        </button>
-
-        {/* Footer */}
-        <div style={styles.footer}>
-          <p style={styles.footerText}>Travel Wales © 2024</p>
+        {/* Logout Section */}
+        <div className="p-4 border-t border-slate-800/50 space-y-4">
+          <button
+            onClick={handleLogout}
+            className="flex items-center gap-3 w-full px-4 py-3 text-slate-400 hover:text-red-400 hover:bg-red-400/10 rounded-xl transition-all duration-200 font-medium text-sm"
+          >
+            <LogOut size={20} />
+            Logout Account
+          </button>
+          
+          <div className="px-4 py-2">
+            <p className="text-[10px] text-slate-600 font-medium">© 2024 Travel Wales Admin</p>
+            <p className="text-[10px] text-slate-700 mt-1">v2.0.4 Stable</p>
+          </div>
         </div>
       </div>
 
-      {/* Mobile Overlay */}
-      {isOpen && <div className="sidebar-overlay" onClick={() => setIsOpen(false)} />}
+      {/* Backdrop for Mobile */}
+      {isOpen && (
+        <div 
+          className="fixed inset-0 bg-black/60 backdrop-blur-sm z-30 lg:hidden transition-opacity"
+          onClick={() => setIsOpen(false)}
+        />
+      )}
     </>
   );
 }
-
-
-
-const styles = {
-  header: {
-    padding: "25px 20px",
-    borderBottom: "2px solid rgba(0, 123, 255, 0.2)",
-    backgroundColor: "rgba(0, 123, 255, 0.05)"
-  },
-  title: {
-    color: "#fff",
-    margin: "0 0 5px 0",
-    fontSize: "1.3rem",
-    fontWeight: "700",
-    letterSpacing: "0.5px"
-  },
-  subtitle: {
-    color: "#b3b3cc",
-    margin: "0",
-    fontSize: "0.8rem",
-    textTransform: "uppercase",
-    letterSpacing: "1px"
-  },
-  userSection: {
-    padding: "20px",
-    backgroundColor: "rgba(0, 123, 255, 0.1)",
-    borderBottom: "2px solid rgba(0, 123, 255, 0.2)",
-    textAlign: "center",
-    margin: "0"
-  },
-  userAvatar: {
-    width: "60px",
-    height: "60px",
-    borderRadius: "50%",
-    backgroundColor: "rgba(0, 123, 255, 0.3)",
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "center",
-    margin: "0 auto 12px",
-    color: "#007bff",
-    fontSize: "1.5rem"
-  },
-  userName: {
-    color: "#fff",
-    margin: "0 0 5px 0",
-    fontSize: "1rem",
-    fontWeight: "600"
-  },
-  userRole: {
-    color: "#b3b3cc",
-    margin: "0 0 3px 0",
-    fontSize: "0.8rem",
-    textTransform: "uppercase",
-    letterSpacing: "0.5px"
-  },
-  userEmail: {
-    color: "#999",
-    margin: "0 0 8px 0",
-    fontSize: "0.8rem"
-  },
-  loginStatus: {
-    color: "#4caf50",
-    margin: "0",
-    fontSize: "0.8rem",
-    fontWeight: "600"
-  },
-  nav: {
-    flex: 1,
-    padding: "20px 0",
-    display: "flex",
-    flexDirection: "column"
-  },
-  icon: {
-    fontSize: "1.1rem",
-    minWidth: "20px"
-  },
-  logoutButton: {
-    width: "90%",
-    margin: "20px auto",
-    padding: "12px 20px",
-    backgroundColor: "#dc3545",
-    color: "#fff",
-    border: "none",
-    borderRadius: "6px",
-    fontSize: "0.95rem",
-    fontWeight: "600",
-    cursor: "pointer",
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "center",
-    gap: "8px",
-    transition: "all 0.3s ease",
-    boxShadow: "0 2px 8px rgba(220, 53, 69, 0.3)"
-  },
-  footer: {
-    padding: "20px",
-    borderTop: "1px solid rgba(0, 123, 255, 0.1)",
-    textAlign: "center"
-  },
-  footerText: {
-    color: "#666",
-    fontSize: "0.8rem",
-    margin: "0"
-  }
-};

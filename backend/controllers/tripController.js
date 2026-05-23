@@ -3,7 +3,9 @@ import slugify from "slugify";
 import cloudinary from "../config/cloudinary.js";
 import streamifier from "streamifier";
 
-// upload buffer helper
+/* =========================
+   Cloudinary Upload Helper
+========================= */
 const uploadBuffer = (buffer) => {
   return new Promise((resolve, reject) => {
     const stream = cloudinary.uploader.upload_stream(
@@ -11,14 +13,16 @@ const uploadBuffer = (buffer) => {
       (err, result) => {
         if (err) return reject(err);
         resolve(result);
-      }
+      },
     );
 
     streamifier.createReadStream(buffer).pipe(stream);
   });
 };
 
-// safe JSON parse
+/* =========================
+   Safe JSON Parse
+========================= */
 const safeParse = (val) => {
   try {
     return typeof val === "string" ? JSON.parse(val) : val || [];
@@ -32,25 +36,32 @@ const safeParse = (val) => {
 ========================= */
 export const createTrip = async (req, res) => {
   try {
-    console.log("BODY RECEIVED:", req.body);
-
     const data = req.body;
 
-    const slug = slugify(data.title || "trip", { lower: true });
+    const slug = slugify(data.title || "trip", {
+      lower: true,
+      strict: true,
+    });
 
-    let heroImage = {};
-    if (req.files?.heroImage?.[0]) {
-      const result = await uploadBuffer(req.files.heroImage[0].buffer);
+    // HERO IMAGE
+    let heroImage = null;
+
+    if (req.files?.featuredImage?.[0]) {
+      const result = await uploadBuffer(req.files.featuredImage[0].buffer);
+
       heroImage = {
         url: result.secure_url,
         public_id: result.public_id,
       };
     }
 
+    // GALLERY IMAGES
     let galleryImages = [];
-    if (req.files?.galleryImages?.length) {
-      for (let file of req.files.galleryImages) {
+
+    if (req.files?.gallery?.length) {
+      for (let file of req.files.gallery) {
         const result = await uploadBuffer(file.buffer);
+
         galleryImages.push({
           url: result.secure_url,
           public_id: result.public_id,
@@ -58,76 +69,60 @@ export const createTrip = async (req, res) => {
       }
     }
 
-  const trip = await Trip.create({
-  title: data.title,
+    const trip = await Trip.create({
+      title: data.title,
+      country: data.country,
+      duration: Number(data.duration) || 0,
+      price: Number(data.price) || 0,
+      oldPrice: Number(data.oldPrice) || 0,
 
-  country: data.country,
+      overview: data.overview,
+      difficulty: data.difficulty,
+      activity: data.activity,
+      maxAltitude: data.maxAltitude,
+      bestSeason: data.bestSeason,
+      startPoint: data.startPoint,
+      endPoint: data.endPoint,
+      meals: data.meals,
+      accommodation: data.accommodation,
 
-  duration: Number(data.duration),
+      slug,
+      heroImage,
+      galleryImages,
 
-  price: Number(data.price),
+      categoryType: data.categoryType ? data.categoryType.toLowerCase() : "standard",
+      badge: data.badge === "true" || data.badge === true,
 
-  oldPrice: Number(data.oldPrice),
+      // ✅ FIXED: Strings "true"/"false" converted to actual booleans
+      isBestSeller2026: data.isBestSeller2026 === "true",
+      isLuxuryVIP: data.isLuxuryVIP === "true",
+      isPeakClimbing: data.isPeakClimbing === "true",
+      isShortTrek: data.isShortTrek === "true",
+      isBhutanTour: data.isBhutanTour === "true",
+      isTibetTour: data.isTibetTour === "true",
 
-  overview: data.overview,
+      availableDates: safeParse(data.availableDates),
 
-  difficulty: data.difficulty,
+      includes: safeParse(data.includes),
+      excludes: safeParse(data.excludes),
+      highlights: safeParse(data.highlights),
+      itinerary: safeParse(data.itinerary),
+      faqs: safeParse(data.faqs),
+      packingList: safeParse(data.packingList),
+      packages: safeParse(data.packages),
 
-  activity: data.activity,
-
-  maxAltitude: data.maxAltitude,
-
-  bestSeason: data.bestSeason,
-
-  startPoint: data.startPoint,
-
-  endPoint: data.endPoint,
-
-  meals: data.meals,
-
-  accommodation: data.accommodation,
-
-  /* NEW */
-  category: data.category,
-
-  equipmentRequired: safeParse(
-    data.equipmentRequired
-  ),
-
-  slug,
-
-  heroImage,
-
-  galleryImages,
-
-  packages: safeParse(data.packages),
-
-  itinerary: safeParse(data.itinerary),
-
-  includes: safeParse(data.includes),
-
-  excludes: safeParse(data.excludes),
-
-  highlights: safeParse(data.highlights),
-
-  faqs: safeParse(data.faqs),
-
-  packingList: safeParse(data.packingList),
-
-  availableDates: safeParse(
-    data.availableDates
-  ),
-});
-
-    console.log("✅ TRIP CREATED:", trip._id);
+      packages: Array.isArray(data.packages)
+    ? data.packages
+    : safeParse(data.packages),
+    
+    });
 
     return res.status(201).json(trip);
-
   } catch (err) {
-    console.error("❌ CREATE TRIP ERROR:", err);
+    console.error(err);
     return res.status(500).json({
       message: "Trip creation failed",
-      error: err.message
+      error: err.message,
     });
   }
 };
@@ -136,20 +131,51 @@ export const createTrip = async (req, res) => {
    GET ALL TRIPS
 ========================= */
 export const getTrips = async (req, res) => {
-  const trips = await Trip.find();
-  res.json(trips);
+  try {
+    const { category, format,type } = req.query;
+    let filterQuery = {};
+
+    if (type) {
+      if (type === "popular") {
+        filterQuery = {
+          $or: [{ isBestSeller2026: true }, { badge: true }]
+        };
+      } else if (["standard", "comfort", "luxury"].includes(type.toLowerCase())) {
+        filterQuery.categoryType = type.toLowerCase();
+      }
+    }
+
+    // Frontend category filter mapping
+    if (category === "best-sellers") filterQuery.isBestSeller2026 = true;
+    if (category === "luxury") filterQuery.isLuxuryVIP = true;
+    if (category === "peak-climbing") filterQuery.isPeakClimbing = true;
+    if (category === "short-treks") filterQuery.isShortTrek = true;
+    if (category === "bhutan-tours") filterQuery.isBhutanTour = true;
+    if (category === "tibet-tours") filterQuery.isTibetTour = true;
+
+    const trips = await Trip.find(filterQuery).sort({ createdAt: -1 });
+
+    // If frontend requests grouped format (for tab-based components)
+    if (format === "grouped") {
+      const groupedPackages = {
+        "best-sellers": trips.filter((t) => t.isBestSeller2026),
+        luxury: trips.filter((t) => t.isLuxuryVIP),
+        "peak-climbing": trips.filter((t) => t.isPeakClimbing),
+        "short-treks": trips.filter((t) => t.isShortTrek),
+        "bhutan-tours": trips.filter((t) => t.isBhutanTour),
+        "tibet-tours": trips.filter((t) => t.isTibetTour),
+      };
+      return res.status(200).json(groupedPackages);
+    }
+
+    return res.status(200).json(trips);
+  } catch (err) {
+    return res.status(500).json({ message: err.message });
+  }
 };
 
 /* =========================
-   GET TRIP BY SLUG
-========================= */
-export const getTrip = async (req, res) => {
-  const trip = await Trip.findOne({ slug: req.params.slug });
-  res.json(trip);
-};
-
-/* =========================
-   GET TRIP BY ID (ONLY ONCE)
+   GET BY ID
 ========================= */
 export const getTripById = async (req, res) => {
   try {
@@ -159,15 +185,149 @@ export const getTripById = async (req, res) => {
       return res.status(404).json({ message: "Trip not found" });
     }
 
-    res.json(trip);
+    return res.status(200).json(trip);
   } catch (err) {
-    res.status(500).json({ message: err.message });
+    return res.status(500).json({ message: err.message });
   }
 };
 
 /* =========================
    UPDATE TRIP
 ========================= */
+// export const updateTrip = async (req, res) => {
+//   try {
+//     const trip = await Trip.findById(req.params.id);
+
+//     if (!trip) {
+//       return res.status(404).json({ message: "Trip not found" });
+//     }
+
+//     /* ==========================================================================
+//        1. TEXT FIELDS
+//        ========================================================================== */
+//     const textFields = [
+//       "title",
+//       "country",
+//       "overview",
+//       "difficulty",
+//       "activity",
+//       "maxAltitude",
+//       "bestSeason",
+//       "startPoint",
+//       "endPoint",
+//       "meals",
+//       "accommodation",
+//       "categoryType",
+//     ];
+
+//     textFields.forEach((field) => {
+//       if (req.body[field] !== undefined) {
+//         trip[field] = req.body[field];
+//       }
+//     });
+
+//     /* ==========================================================================
+//        2. NUMBER FIELDS
+//        ========================================================================== */
+//     const numberFields = ["duration", "price", "oldPrice"];
+//     numberFields.forEach((field) => {
+//       if (req.body[field] !== undefined) {
+//         trip[field] = Number(req.body[field]) || 0;
+//       }
+//     });
+
+//     /* ==========================================================================
+//        3. BOOLEAN CATEGORY FLAGS
+//        ========================================================================== */
+//     const booleanCategoryFields = [
+//       "isBestSeller2026",
+//       "isLuxuryVIP",
+//       "isPeakClimbing",
+//       "isShortTrek",
+//       "isBhutanTour",
+//       "badge",
+//     ];
+//     booleanCategoryFields.forEach((field) => {
+//       if (req.body[field] !== undefined) {
+//         // ✅ Handle both string "true"/"false" from FormData and real booleans from JSON
+//         trip[field] = req.body[field] === "true" || req.body[field] === true;
+//       }
+//     });
+
+//     /* ==========================================================================
+//        4. ARRAY / JSON FIELDS
+//        ========================================================================== */
+//     const arrayFields = [
+//       "includes",
+//       "excludes",
+//       "highlights",
+//       "itinerary",
+//       "faqs",
+//       "packages",
+//       "packingList",
+//       "availableDates",
+//     ];
+
+//     arrayFields.forEach((field) => {
+//       if (req.body[field] !== undefined) {
+//         trip[field] = safeParse(req.body[field]);
+//       }
+//     });
+
+//     /* ==========================================================================
+//        5. SLUG UPDATE
+//        ========================================================================== */
+//     if (req.body.title) {
+//       trip.slug = slugify(req.body.title, {
+//         lower: true,
+//         strict: true,
+//       });
+//     }
+
+//     /* ==========================================================================
+//        6. HERO IMAGE UPDATE
+//        ========================================================================== */
+//     if (req.files?.featuredImage?.[0]) {
+//       const result = await uploadBuffer(req.files.featuredImage[0].buffer);
+
+//       trip.heroImage = {
+//         url: result.secure_url,
+//         public_id: result.public_id,
+//       };
+//     }
+
+//     /* ==========================================================================
+//        7. GALLERY IMAGES UPDATE
+//        ========================================================================== */
+//     if (req.files?.gallery?.length) {
+//       const updatedGallery = [];
+
+//       for (let file of req.files.gallery) {
+//         const result = await uploadBuffer(file.buffer);
+
+//         updatedGallery.push({
+//           url: result.secure_url,
+//           public_id: result.public_id,
+//         });
+//       }
+
+//       trip.galleryImages = updatedGallery;
+//     }
+
+//     /* ==========================================================================
+//        8. SAVE & RESPOND
+//        ========================================================================== */
+//     await trip.save();
+
+//     return res.status(200).json(trip);
+//   } catch (err) {
+//     return res.status(500).json({
+//       message: "Update failed",
+//       error: err.message,
+//     });
+//   }
+// };
+
 export const updateTrip = async (req, res) => {
   try {
     const trip = await Trip.findById(req.params.id);
@@ -176,52 +336,86 @@ export const updateTrip = async (req, res) => {
       return res.status(404).json({ message: "Trip not found" });
     }
 
-    Object.assign(trip, req.body);
+    /* ================= TEXT FIELDS ================= */
+    const textFields = [
+      "title",
+      "country",
+      "overview",
+      "difficulty",
+      "activity",
+      "maxAltitude",
+      "bestSeason",
+      "startPoint",
+      "endPoint",
+      "meals",
+      "accommodation",
+      "categoryType",
+    ];
 
-   if (req.body.itinerary)
-  trip.itinerary =
-    safeParse(req.body.itinerary);
+    textFields.forEach((f) => {
+      if (req.body[f] !== undefined) trip[f] = req.body[f];
+    });
 
-if (req.body.packages)
-  trip.packages =
-    safeParse(req.body.packages);
+    /* ================= NUMBER FIELDS ================= */
+    ["duration", "price", "oldPrice"].forEach((f) => {
+      if (req.body[f] !== undefined) {
+        trip[f] = Number(req.body[f]) || 0;
+      }
+    });
 
-if (req.body.includes)
-  trip.includes =
-    safeParse(req.body.includes);
+    /* ================= BOOLEAN FIELDS ================= */
+    const boolFields = [
+      "isBestSeller2026",
+      "isLuxuryVIP",
+      "isPeakClimbing",
+      "isShortTrek",
+      "isBhutanTour",
+      "isTibetTour",
+      "badge",
+    ];
 
-if (req.body.excludes)
-  trip.excludes =
-    safeParse(req.body.excludes);
+    boolFields.forEach((f) => {
+      if (req.body[f] !== undefined) {
+        trip[f] = req.body[f] === "true" || req.body[f] === true;
+      }
+    });
 
-if (req.body.highlights)
-  trip.highlights =
-    safeParse(req.body.highlights);
+    /* ================= ARRAY FIELDS ================= */
+    const parse = (val) => {
+      try {
+        return typeof val === "string" ? JSON.parse(val) : val || [];
+      } catch {
+        return [];
+      }
+    };
 
-if (req.body.faqs)
-  trip.faqs =
-    safeParse(req.body.faqs);
+    [
+      "includes",
+      "excludes",
+      "highlights",
+      "itinerary",
+      "faqs",
+      "packages",
+      "packingList",
+      "availableDates",
+    ].forEach((f) => {
+      if (req.body[f] !== undefined) {
+        trip[f] = parse(req.body[f]);
+      }
+    });
 
-if (req.body.packingList)
-  trip.packingList =
-    safeParse(req.body.packingList);
+    /* ================= SLUG ================= */
+    if (req.body.title) {
+      trip.slug = slugify(req.body.title, {
+        lower: true,
+        strict: true,
+      });
+    }
 
-/* NEW */
-if (req.body.equipmentRequired) {
-  trip.equipmentRequired =
-    safeParse(
-      req.body.equipmentRequired
-    );
-}
-
-/* NEW */
-if (req.body.category) {
-  trip.category =
-    req.body.category;
-}
-    // HERO IMAGE UPDATE
-    if (req.files?.heroImage?.[0]) {
-      const result = await uploadBuffer(req.files.heroImage[0].buffer);
+    /* ================= HERO IMAGE ================= */
+    if (req.files?.featuredImage?.[0]) {
+      const file = req.files.featuredImage[0];
+      const result = await uploadBuffer(file.buffer);
 
       trip.heroImage = {
         url: result.secure_url,
@@ -229,28 +423,34 @@ if (req.body.category) {
       };
     }
 
-    // GALLERY UPDATE
-    if (req.files?.galleryImages?.length) {
-      const gallery = [];
+    /* ================= GALLERY IMAGES ================= */
+    if (req.files?.gallery?.length) {
+      const uploadedGallery = [];
 
-      for (let file of req.files.galleryImages) {
+      for (let file of req.files.gallery) {
         const result = await uploadBuffer(file.buffer);
 
-        gallery.push({
+        uploadedGallery.push({
           url: result.secure_url,
           public_id: result.public_id,
         });
       }
 
-      trip.galleryImages = gallery;
+      // ✅ KEEP OLD + NEW IMAGES (IMPORTANT FIX)
+      trip.galleryImages = [
+        ...(trip.galleryImages || []),
+        ...uploadedGallery,
+      ];
     }
 
     await trip.save();
 
-    res.json(trip);
+    return res.status(200).json(trip);
   } catch (err) {
-    console.log("UPDATE TRIP ERROR:", err);
-    res.status(500).json({ message: err.message });
+    return res.status(500).json({
+      message: "Update failed",
+      error: err.message,
+    });
   }
 };
 
@@ -259,53 +459,85 @@ if (req.body.category) {
 ========================= */
 export const deleteTrip = async (req, res) => {
   try {
-    await Trip.findByIdAndDelete(req.params.id);
-    res.json({ message: "Deleted" });
+    const trip = await Trip.findById(req.params.id);
+
+    if (!trip) {
+      return res.status(404).json({ message: "Trip not found" });
+    }
+
+    await trip.deleteOne();
+
+    return res.status(200).json({
+      success: true,
+      message: "Trip deleted successfully",
+    });
   } catch (err) {
-    res.status(500).json({ message: err.message });
+    return res.status(500).json({ message: err.message });
   }
 };
 
-export const addTripDate =
-  async (req, res) => {
-    try {
-      const {
-        tripId,
-        date,
-        totalSeats,
-      } = req.body;
+/* =========================
+   ADD TRIP DATE
+========================= */
+export const addTripDate = async (req, res) => {
+  try {
+    const { tripId, date, totalSeats, price, status } = req.body;
 
-      const trip =
-        await Trip.findById(
-          tripId
-        );
-
-      if (!trip) {
-        return res.status(404)
-          .json({
-            message:
-              "Trip not found",
-          });
-      }
-
-      trip.availableDates.push({
-        date,
-        totalSeats,
-      });
-      
-      availableDates: JSON.parse(
-  req.body.availableDates || "[]"
-),
-
-      await trip.save();
-
-      res.json({
-        message:
-          "Date added successfully",
-      });
-    } catch (err) {
-      res.status(500).json({
-        message: err.message,
+    if (!tripId || !date || !totalSeats) {
+      return res.status(400).json({
+        message: "tripId, date, and totalSeats fields are required",
       });
     }
-  };
+
+    const trip = await Trip.findById(tripId);
+    if (!trip) {
+      return res.status(404).json({ message: "Target trip not found" });
+    }
+
+    const newDateVariant = {
+      date: new Date(date),
+      totalSeats: Number(totalSeats),
+      bookedSeats: 0,
+    };
+
+    if (price !== undefined) {
+      newDateVariant.price = Number(price);
+    }
+
+    if (status) {
+      newDateVariant.status = status;
+    }
+
+    trip.availableDates.push(newDateVariant);
+    await trip.save();
+
+    return res.status(200).json({
+      success: true,
+      message: "Date variant added successfully",
+      trip,
+    });
+  } catch (err) {
+    console.error("❌ ADD TRIP DATE ERROR:", err);
+    return res.status(500).json({
+      message: "Failed to add date",
+      error: err.message,
+    });
+  }
+};
+
+/* =========================
+   GET BY SLUG
+========================= */
+export const getTrip = async (req, res) => {
+  try {
+    const trip = await Trip.findOne({ slug: req.params.slug });
+
+    if (!trip) {
+      return res.status(404).json({ message: "Trip not found" });
+    }
+
+    return res.status(200).json(trip);
+  } catch (err) {
+    return res.status(500).json({ message: err.message });
+  }
+};

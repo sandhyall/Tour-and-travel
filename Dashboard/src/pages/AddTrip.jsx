@@ -17,9 +17,7 @@ import {
 } from "react-icons/fa";
 
 export default function AddTrip() {
-  /* ==========================================================================
-     CORE STATE MANAGEMENT
-     ========================================================================== */
+  
   const [form, setForm] = useState({
     title: "",
     country: "Nepal",
@@ -45,7 +43,7 @@ export default function AddTrip() {
     isTibetTour: false,
   });
 
-  // FIX 1: Separate loading + success/error feedback state instead of bare alert()
+  
   const [submitting, setSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState("");
   const [submitSuccess, setSubmitSuccess] = useState(false);
@@ -64,9 +62,7 @@ export default function AddTrip() {
     { date: "", totalSeats: "", price: "", status: "available" },
   ]);
 
-  /* ==========================================================================
-     CLEANUP MEMORY LEAKS ON UNMOUNT (BLOBS)
-     ========================================================================== */
+ 
   useEffect(() => {
     return () => {
       if (featuredImage?.preview) URL.revokeObjectURL(featuredImage.preview);
@@ -74,13 +70,10 @@ export default function AddTrip() {
         if (img.preview) URL.revokeObjectURL(img.preview);
       });
     };
-    // FIX 2: Dependencies were missing — effect was stale on every render.
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+  
   }, []);
 
-  /* ==========================================================================
-     INPUT HANDLER
-     ========================================================================== */
+
   const handleInputChange = (e) => {
     const { name, value, type, checked } = e.target;
 
@@ -115,9 +108,7 @@ export default function AddTrip() {
     });
   };
 
-  /* ==========================================================================
-     AVAILABLE DATES HANDLERS
-     ========================================================================== */
+
   const handleDateChange = (index, field, value) => {
     setAvailableDates((prev) =>
       prev.map((item, i) => (i === index ? { ...item, [field]: value } : item))
@@ -177,9 +168,7 @@ export default function AddTrip() {
   const addFaq = () => setFaqs((prev) => [...prev, { question: "", answer: "" }]);
   const removeFaq = (index) => setFaqs((prev) => prev.filter((_, i) => i !== index));
 
-  /* ==========================================================================
-     RESET HELPER
-     ========================================================================== */
+ 
   const resetForm = () => {
     setForm({
       title: "",
@@ -224,7 +213,7 @@ export default function AddTrip() {
     setSubmitError("");
     setSubmitSuccess(false);
 
-    // FIX 3: Basic client-side guard — title and country are the minimum required
+    
     if (!form.title.trim()) {
       setSubmitError("Expedition title is required.");
       window.scrollTo({ top: 0, behavior: "smooth" });
@@ -235,29 +224,21 @@ export default function AddTrip() {
 
     const formData = new FormData();
 
-    // FIX 4: The original code derived finalizedForm but then appended `form` (not
-    // finalizedForm) to FormData, so country-specific boolean overrides were lost.
-    // Build the correct final values first, then append them.
+   
     const finalizedForm = {
       ...form,
       isBhutanTour: form.country === "Bhutan",
       isTibetTour: form.country === "Tibet",
     };
 
-    // FIX 5: Booleans must be sent as strings in FormData — FormData.append(key, false)
-    // sends the literal string "false" which is fine, but `false` being falsy was
-    // causing the original `if (form[key] !== "")` guard to silently skip ALL boolean
-    // false values, meaning unchecked checkboxes were never sent to the backend.
+    
     Object.entries(finalizedForm).forEach(([key, value]) => {
-      // Skip undefined/null; send everything else including false and 0
+     
       if (value !== undefined && value !== null && value !== "") {
         formData.append(key, value);
       }
     });
 
-    // FIX 6: badge was missing from the reset state object (original reset block
-    // omitted it), causing badge to persist as stale true after a successful submit.
-    // It's now included in resetForm() above.
 
     const filteredDates = availableDates.filter(
       (d) => d.date !== "" && d.totalSeats !== ""
@@ -280,9 +261,7 @@ export default function AddTrip() {
     });
 
     try {
-      // FIX 7: Do NOT manually set Content-Type for FormData — same issue as
-      // BookingModal. Axios auto-sets multipart/form-data with the correct boundary.
-      // Passing it manually breaks the boundary and the backend can't parse files.
+     
       await axios.post("/trips", formData);
 
       setSubmitSuccess(true);
@@ -318,7 +297,7 @@ export default function AddTrip() {
             </h1>
           </header>
 
-          {/* FIX 1: Inline feedback banners instead of alert() */}
+         
           {submitSuccess && (
             <div className="mb-8 p-4 bg-emerald-50 border border-emerald-200 rounded-2xl flex items-center gap-3">
               <span className="text-emerald-600 text-lg">✓</span>
@@ -335,12 +314,12 @@ export default function AddTrip() {
           )}
 
           <form onSubmit={handleSubmit} className="space-y-12" encType="multipart/form-data">
-            {/* 🖼️ MEDIA GALLERY */}
+          
             <section className="bg-white rounded-3xl shadow-sm border border-slate-100 p-8 lg:p-10 relative overflow-hidden">
               <div className="absolute top-0 left-0 w-2 h-full bg-violet-600"></div>
               <h2 className="text-xl font-black mb-8">🖼️ Media Gallery</h2>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-                {/* Featured Image */}
+               
                 <div className="md:col-span-1 space-y-2">
                   <label className={labelStyle}>Cover Image</label>
                   <div className="relative border-2 border-dashed border-slate-200 hover:border-indigo-500 rounded-2xl h-64 flex flex-col items-center justify-center bg-slate-50 overflow-hidden group transition-all">
@@ -379,7 +358,7 @@ export default function AddTrip() {
                   </div>
                 </div>
 
-                {/* Gallery */}
+              
                 <div className="md:col-span-2 space-y-2">
                   <label className={labelStyle}>Gallery Images</label>
                   <div className="border-2 border-dashed border-slate-200 hover:border-indigo-500 rounded-2xl p-6 min-h-64 flex flex-col bg-slate-50 transition-all">
@@ -425,7 +404,7 @@ export default function AddTrip() {
               </div>
             </section>
 
-            {/* 📍 PRIMARY INFO */}
+          
             <section className="bg-white rounded-3xl shadow-sm border border-slate-100 p-8 lg:p-10 relative overflow-hidden">
               <div className="absolute top-0 left-0 w-2 h-full bg-indigo-600"></div>
               <h2 className="text-xl font-black mb-8">📍 Primary Information</h2>
@@ -501,7 +480,7 @@ export default function AddTrip() {
               </div>
             </section>
 
-            {/* 🌟 SERVICE TIERS & BADGES */}
+         
             <section className="bg-white rounded-3xl shadow-sm border border-slate-100 p-8 lg:p-10 relative overflow-hidden">
               <div className="absolute top-0 left-0 w-2 h-full bg-blue-500"></div>
               <h2 className="text-xl font-black mb-6 flex items-center gap-3">
@@ -535,7 +514,7 @@ export default function AddTrip() {
                         Mark as Popular Trek (Homepage Default)
                       </span>
                       <span className="block text-[11px] text-slate-400 font-medium">
-                        यदि यो चेक गरियो भने, युजरले कुनै पनि ट्याब क्लिक नगर्दा सुरुमै यो ट्रेक देखिनेछ।
+                        
                       </span>
                     </div>
                   </label>

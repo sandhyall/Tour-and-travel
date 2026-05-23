@@ -124,18 +124,18 @@ export const verifyKhaltiPayment = async (req, res) => {
 
     const khaltiData = verificationResponse.data;
 
-    // Check if Khalti official logs match a "Completed" successful transaction state
+    
     if (khaltiData.status !== "Completed") {
       return res.status(400).json({ message: "Transaction verification failed on Khalti servers." });
     }
 
-    // 2. FIND AND VALIDATE LINKED BOOKING
+    
     const booking = await Booking.findById(purchase_order_id).populate("trip");
     if (!booking) {
       return res.status(404).json({ message: "Linked booking record not found." });
     }
 
-    // 3. AVOID PROCESSING COPIES
+   
     const existingPayment = await Payment.findOne({ bookingId: booking._id });
     if (existingPayment && existingPayment.status === "success") {
       return res.json({ success: true, message: "Payment already processed previously." });
@@ -147,19 +147,19 @@ export const verifyKhaltiPayment = async (req, res) => {
       {
         status: "success",
         transactionId: pidx, 
-        metadata: khaltiData, // Logs the complete verification receipt safely inside the map field
+        metadata: khaltiData, 
       },
       { upsert: true, new: true }
     );
 
-    // 5. CONFIRM BOOKING STATE
+   
     booking.bookingStatus = "confirmed";
     if (updatedPayment) {
       booking.successfulPaymentId = updatedPayment._id;
     }
     await booking.save();
 
-    // 6. ALLOCATE SEATS SAFELY
+    
     const trip = await Trip.findById(booking.trip._id);
     if (trip) {
       const selectedDate = trip.availableDates.find(
@@ -180,7 +180,7 @@ export const verifyKhaltiPayment = async (req, res) => {
       }
     }
 
-    // 7. TICKETING & EMAIL DISPATCH
+   
     const pdfPath = await generateTicketPdf(booking);
     booking.ticketPdf = pdfPath;
     await booking.save();

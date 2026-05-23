@@ -39,7 +39,7 @@ export default function PaymentMethodCard({ paymentMethod, setPaymentMethod }) {
         </p>
       </button>
 
-      {/* BANK TRANSFER */}
+    
       <button
         type="button"
         onClick={() => setPaymentMethod("swift_bank_transfer")}
@@ -49,7 +49,7 @@ export default function PaymentMethodCard({ paymentMethod, setPaymentMethod }) {
             : "border-gray-200 hover:bg-gray-50/80"
         }`}
       >
-        {/* यहाँ केवल Landmark मात्र हुनुपर्छ */}
+        
         <Landmark
           size={24}
           className={`mb-3 transition-colors ${

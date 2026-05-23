@@ -20,7 +20,7 @@ export default function Bookings() {
   const [search, setSearch] = useState("");
   const [loading, setLoading] = useState(true);
   
-  // State for viewing bank transfer slips
+
   const [selectedSlip, setSelectedSlip] = useState(null);
 
   const getAuthHeader = () => {
@@ -35,7 +35,7 @@ export default function Bookings() {
         headers: getAuthHeader(),
       });
 
-      // FIXED: Comprehensive extraction fallback to support all backend shapes (Array, .bookings, or .data)
+
       let bookingsArray = [];
       if (Array.isArray(data)) {
         bookingsArray = data;

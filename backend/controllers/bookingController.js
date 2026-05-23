@@ -1,21 +1,16 @@
 import Booking from "../models/Booking.js";
 import Trip from "../models/Trip.js";
-import cloudinary from "../config/cloudinary.js"; 
-import { sendBookingEmail } from "../utils/sendBookingEmail.js"; 
+import cloudinary from "../config/cloudinary.js";
+import { sendBookingEmail } from "../utils/sendBookingEmail.js";
 
-// ─────────────────────────────────────────────
-// HELPER: generate invoice number
-// ─────────────────────────────────────────────
+
 const generateInvoiceNumber = () => {
   const timestamp = Date.now().toString(36).toUpperCase();
   const random = Math.random().toString(36).substring(2, 6).toUpperCase();
   return `INV-${timestamp}-${random}`;
 };
 
-// ─────────────────────────────────────────────
-// CREATE BOOKING
-// POST /api/bookings
-// ─────────────────────────────────────────────
+
 export const createBooking = async (req, res) => {
   try {
     const {
@@ -26,25 +21,26 @@ export const createBooking = async (req, res) => {
       travelDate,
       packageName,
       packagePrice,
+      paymentMethod, 
     } = req.body;
 
     // 1. Fetch trip
     const trip = await Trip.findById(tripId);
     if (!trip) return res.status(404).json({ message: "Trip not found" });
 
-    // 2. Match travel date (compare YYYY-MM-DD strings to avoid TZ drift)
+    
     const inputDate = new Date(travelDate);
     const inputDateStr = inputDate.toISOString().split("T")[0];
 
     const selectedDate = trip.availableDates.find(
-      (d) => new Date(d.date).toISOString().split("T")[0] === inputDateStr
+      (d) => new Date(d.date).toISOString().split("T")[0] === inputDateStr,
     );
 
     if (!selectedDate) {
       return res.status(400).json({ message: "Selected date is unavailable" });
     }
 
-    // 3. Seat availability check
+   
     const seatsRemaining = selectedDate.totalSeats - selectedDate.bookedSeats;
     if (numberOfPeople > seatsRemaining) {
       return res.status(400).json({
@@ -52,7 +48,7 @@ export const createBooking = async (req, res) => {
       });
     }
 
-    // 4. Reserve seats immediately (prevent double-booking under concurrent requests)
+  
     selectedDate.bookedSeats += numberOfPeople;
     if (selectedDate.bookedSeats >= selectedDate.totalSeats) {
       selectedDate.status = "full";
@@ -61,20 +57,33 @@ export const createBooking = async (req, res) => {
     }
     await trip.save();
 
-    // 5. Create booking with a unique invoice number
+   
     const booking = await Booking.create({
       trip: tripId,
       buyer,
       participants,
       numberOfPeople,
       travelDate: inputDate,
-      packageName, 
-      packagePrice, 
+      packageName,
+      packagePrice,
+      paymentMethod: paymentMethod ?? "card",
       totalAmount: (packagePrice || trip.price) * numberOfPeople,
       bookingStatus: "pending",
       invoiceNumber: generateInvoiceNumber(),
-      // packageName stored via custom field — add to schema if needed
     });
+
+   
+    sendBookingEmail({
+      to: buyer.email,
+      type: "pending",
+      booking: {
+        ...booking.toObject(),
+        trip: { title: trip.title },
+        paymentMethod: paymentMethod ?? "card",
+      },
+    }).catch((emailErr) =>
+      console.error("Pending booking email failed:", emailErr.message),
+    );
 
     res.status(201).json(booking);
   } catch (err) {
@@ -83,38 +92,35 @@ export const createBooking = async (req, res) => {
   }
 };
 
-// ─────────────────────────────────────────────
-// UPLOAD BANK SLIP
-// POST /api/bookings/:id/slip
-// Middleware: upload.single("slip")
-// ─────────────────────────────────────────────
+
 export const uploadSlip = async (req, res) => {
   try {
     const booking = await Booking.findById(req.params.id);
     if (!booking) return res.status(404).json({ message: "Booking not found" });
 
-    // Ensure the authenticated user owns this booking
+   
     if (booking.buyer.email !== req.user?.email && req.user?.role !== "admin") {
-      return res.status(403).json({ message: "Not authorised to update this booking" });
+      return res
+        .status(403)
+        .json({ message: "Not authorised to update this booking" });
     }
 
     if (!req.file) {
       return res.status(400).json({ message: "No slip file provided" });
     }
 
-    // Upload to Cloudinary (multer-storage-cloudinary populates req.file.path/filename,
-    // OR plain multer populates req.file.buffer — handle both below)
     let uploadResult;
 
     if (req.file.path) {
-      // multer-storage-cloudinary: file already on cloud, path = secure_url
-      uploadResult = { secure_url: req.file.path, public_id: req.file.filename };
+      uploadResult = {
+        secure_url: req.file.path,
+        public_id: req.file.filename,
+      };
     } else if (req.file.buffer) {
-      // plain memoryStorage multer: upload buffer manually
       uploadResult = await new Promise((resolve, reject) => {
         const stream = cloudinary.uploader.upload_stream(
           { folder: "bank_slips", resource_type: "auto" },
-          (error, result) => (error ? reject(error) : resolve(result))
+          (error, result) => (error ? reject(error) : resolve(result)),
         );
         stream.end(req.file.buffer);
       });
@@ -122,13 +128,10 @@ export const uploadSlip = async (req, res) => {
       return res.status(500).json({ message: "File storage misconfiguration" });
     }
 
-    // Persist slip URL on booking
     booking.bankSlip = {
       url: uploadResult.secure_url,
       public_id: uploadResult.public_id,
     };
-    // Also expose bankSlipUrl as a top-level shortcut used by the admin frontend
-    booking.set("bankSlipUrl", uploadResult.secure_url, { strict: false });
 
     await booking.save();
 
@@ -143,29 +146,27 @@ export const uploadSlip = async (req, res) => {
   }
 };
 
-// ─────────────────────────────────────────────
-// VERIFY BOOKING (admin manual verification)
-// PUT /api/bookings/:id/verify
-// ─────────────────────────────────────────────
+
 export const verifyBooking = async (req, res) => {
   try {
-    const booking = await Booking.findById(req.params.id).populate("trip", "title");
+    const booking = await Booking.findById(req.params.id).populate(
+      "trip",
+      "title",
+    );
     if (!booking) return res.status(404).json({ message: "Booking not found" });
 
-    // Mark as confirmed and record who verified & when
     booking.bookingStatus = "confirmed";
     booking.verifiedAt = new Date();
     booking.verifiedBy = req.user?._id ?? null;
 
     await booking.save();
 
-    // Fire confirmation email (non-blocking — don't fail the response if email fails)
     sendBookingEmail({
       to: booking.buyer.email,
       type: "confirmed",
       booking,
     }).catch((emailErr) =>
-      console.error("Confirmation email failed:", emailErr.message)
+      console.error("Confirmation email failed:", emailErr.message),
     );
 
     res.json({ message: "Booking verified and confirmed", booking });
@@ -175,13 +176,9 @@ export const verifyBooking = async (req, res) => {
   }
 };
 
-// ─────────────────────────────────────────────
-// GET ALL BOOKINGS (admin)
-// GET /api/bookings/all
-// ─────────────────────────────────────────────
+
 export const getAllBookings = async (req, res) => {
   try {
-    // Optional query filters: ?status=pending&page=1&limit=20
     const { status, page = 1, limit = 50 } = req.query;
 
     const filter = {};
@@ -212,11 +209,7 @@ export const getAllBookings = async (req, res) => {
   }
 };
 
-// ─────────────────────────────────────────────
-// UPDATE BOOKING STATUS (admin)
-// PUT /api/bookings/:id/status
-// Body: { status: "confirmed" | "pending" | "cancelled" }
-// ─────────────────────────────────────────────
+
 export const updateBookingStatus = async (req, res) => {
   try {
     const { status } = req.body;
@@ -228,27 +221,29 @@ export const updateBookingStatus = async (req, res) => {
       });
     }
 
-    const booking = await Booking.findById(req.params.id).populate("trip", "title");
+    const booking = await Booking.findById(req.params.id).populate(
+      "trip",
+      "title",
+    );
     if (!booking) return res.status(404).json({ message: "Booking not found" });
 
     const previousStatus = booking.bookingStatus;
     booking.bookingStatus = status;
 
-    // If cancelling, release the reserved seats back to the trip
+   
     if (status === "cancelled" && previousStatus !== "cancelled") {
       const trip = await Trip.findById(booking.trip._id ?? booking.trip);
       if (trip) {
         const dateEntry = trip.availableDates.find(
           (d) =>
             new Date(d.date).toISOString().split("T")[0] ===
-            new Date(booking.travelDate).toISOString().split("T")[0]
+            new Date(booking.travelDate).toISOString().split("T")[0],
         );
         if (dateEntry) {
           dateEntry.bookedSeats = Math.max(
             0,
-            dateEntry.bookedSeats - booking.numberOfPeople
+            dateEntry.bookedSeats - booking.numberOfPeople,
           );
-          // Reopen date if it was full/limited
           if (dateEntry.status === "full" || dateEntry.status === "limited") {
             dateEntry.status = "available";
           }
@@ -259,13 +254,12 @@ export const updateBookingStatus = async (req, res) => {
 
     await booking.save();
 
-    // Non-blocking status-change email
     sendBookingEmail({
       to: booking.buyer.email,
       type: status,
       booking,
     }).catch((err) =>
-      console.error(`Status email (${status}) failed:`, err.message)
+      console.error(`Status email (${status}) failed:`, err.message),
     );
 
     res.json({ message: `Booking status updated to "${status}"`, booking });
@@ -275,13 +269,12 @@ export const updateBookingStatus = async (req, res) => {
   }
 };
 
-// ─────────────────────────────────────────────
-// GET BOOKED DATES FOR A TRIP
-// GET /api/bookings/trip/:tripId
-// ─────────────────────────────────────────────
+
 export const getBookedDates = async (req, res) => {
   try {
-    const trip = await Trip.findById(req.params.tripId).select("availableDates");
+    const trip = await Trip.findById(req.params.tripId).select(
+      "availableDates",
+    );
     if (!trip) return res.status(404).json({ message: "Trip not found" });
 
     res.json(trip.availableDates);
@@ -291,19 +284,18 @@ export const getBookedDates = async (req, res) => {
   }
 };
 
-// ─────────────────────────────────────────────
-// RESEND PENDING CONFIRMATION EMAILS (admin utility)
-// POST /api/bookings/resend-emails
-// Body: { bookingId? } — omit to resend all pending
-// ─────────────────────────────────────────────
+
 export const resendPendingEmails = async (req, res) => {
   try {
     const { bookingId } = req.body;
 
-    // If a specific bookingId provided, resend just that one
     if (bookingId) {
-      const booking = await Booking.findById(bookingId).populate("trip", "title");
-      if (!booking) return res.status(404).json({ message: "Booking not found" });
+      const booking = await Booking.findById(bookingId).populate(
+        "trip",
+        "title",
+      );
+      if (!booking)
+        return res.status(404).json({ message: "Booking not found" });
 
       await sendBookingEmail({
         to: booking.buyer.email,
@@ -314,7 +306,6 @@ export const resendPendingEmails = async (req, res) => {
       return res.json({ message: "Email resent", sent: 1 });
     }
 
-    // Otherwise resend to all pending bookings (batch with delay to respect rate limits)
     const pendingBookings = await Booking.find({ bookingStatus: "pending" })
       .populate("trip", "title")
       .lean();
@@ -330,10 +321,12 @@ export const resendPendingEmails = async (req, res) => {
           booking,
         });
         sent++;
-        // Small delay to avoid hitting email provider rate limits
         await new Promise((r) => setTimeout(r, 200));
       } catch (emailErr) {
-        console.error(`Email failed for booking ${booking._id}:`, emailErr.message);
+        console.error(
+          `Email failed for booking ${booking._id}:`,
+          emailErr.message,
+        );
         failed.push(booking._id);
       }
     }

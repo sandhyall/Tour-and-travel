@@ -88,7 +88,7 @@ export const createKhaltiPayment = async (req, res) => {
       {
         amount: booking.totalAmount,
         method: "khalti",
-        transactionId: pidx, // Enforced as your lookup reference pointer
+        transactionId: pidx, 
         status: "pending",
       },
       { upsert: true, new: true, setDefaultsOnInsert: true }

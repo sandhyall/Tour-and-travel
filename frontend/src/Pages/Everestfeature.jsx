@@ -65,7 +65,7 @@ const fonts = {
 function SectionHeading({ children, sub }) {
   return (
     <div className="mb-8">
-      <p className="text-[10px] font-bold tracking-[0.3em] uppercase text-amber-500 mb-2">
+      <p className="text-[10px] font-bold tracking-[0.3em] uppercase text-emerald-500 mb-2">
         {sub || "\u00A0"}
       </p>
       <h2
@@ -131,14 +131,14 @@ function AccordionFAQ({ faqs }) {
             onClick={() => setOpen(open === idx ? null : idx)}
             className="w-full flex items-center justify-between gap-4 py-4 text-left group"
           >
-            <span className="text-sm font-semibold text-gray-800 group-hover:text-amber-600 transition-colors leading-snug">
+            <span className="text-sm font-semibold text-gray-800 group-hover:text-emerald-500 transition-colors leading-snug">
               {faq.question}
             </span>
             <span
               className={`shrink-0 w-6 h-6 rounded-full flex items-center justify-center border transition-all ${
                 open === idx
-                  ? "bg-amber-500 border-amber-500 text-white"
-                  : "border-gray-200 text-gray-400 group-hover:border-amber-300"
+                  ? "bg-emerald-500 border-emerald-500 text-white"
+                  : "border-gray-200 text-gray-400 group-hover:border-emerald-300"
               }`}
             >
               {open === idx ? (
@@ -150,7 +150,7 @@ function AccordionFAQ({ faqs }) {
           </button>
           {open === idx && (
             <div className="pb-4">
-              <p className="text-sm text-gray-600 leading-relaxed whitespace-pre-line pl-4 border-l-2 border-amber-300 italic">
+              <p className="text-sm text-gray-600 leading-relaxed whitespace-pre-line pl-4 border-l-2 border-emerald-300 italic">
                 {faq.answer}
               </p>
             </div>
@@ -169,11 +169,11 @@ function PackageCard({ pkg }) {
       : null;
 
   return (
-    <div className="rounded-2xl border border-gray-100 overflow-hidden hover:border-amber-200 hover:shadow-sm transition-all duration-200">
+    <div className="rounded-2xl border border-gray-100 overflow-hidden hover:border-emerald-200 hover:shadow-sm transition-all duration-200">
       <div className="px-5 py-4 bg-white flex items-start justify-between gap-4">
         <div className="flex items-center gap-3">
-          <div className="w-8 h-8 rounded-xl bg-amber-50 border border-amber-100 flex items-center justify-center shrink-0">
-            <Tag size={14} className="text-amber-500" />
+          <div className="w-8 h-8 rounded-xl bg-emerald-50 border border-emerald-100 flex items-center justify-center shrink-0">
+            <Tag size={14} className="text-emerald-500" />
           </div>
           <div>
             <p className="text-sm font-bold text-gray-900">
@@ -218,10 +218,10 @@ function PackageCard({ pkg }) {
         <div className="border-t border-gray-100">
           <button
             onClick={() => setOpen((p) => !p)}
-            className="w-full flex items-center justify-between px-5 py-3 bg-gray-50 hover:bg-amber-50/40 transition-colors text-left"
+            className="w-full flex items-center justify-between px-5 py-3 bg-gray-50 hover:bg-emerald-50/40 transition-colors text-left"
           >
             <span className="text-[11px] font-bold text-gray-600 flex items-center gap-1.5">
-              <Users size={12} className="text-amber-500" />
+              <Users size={12} className="text-emerald-500" />
               Group Pricing ({pkg.groupPricing.length} tiers)
             </span>
             {open ? (
@@ -273,7 +273,7 @@ const dateStatusStyle = (status) => {
   if (status === "available")
     return "bg-emerald-50 text-emerald-700 border border-emerald-200";
   if (status === "limited")
-    return "bg-amber-50 text-amber-700 border border-amber-200";
+    return "bg-emerald-50 text-emerald-700 border border-emerald-200";
   return "bg-red-50 text-red-500 border border-red-200";
 };
 
@@ -341,8 +341,8 @@ const Everestfeature = () => {
       <div className="min-h-screen bg-white flex items-center justify-center">
         <div className="text-center space-y-5">
           <div className="relative mx-auto w-14 h-14">
-            <Loader2 className="w-14 h-14 animate-spin text-amber-300 absolute inset-0" />
-            <Mountain className="w-6 h-6 text-amber-600 absolute inset-0 m-auto" />
+            <Loader2 className="w-14 h-14 animate-spin text-emerald-300 absolute inset-0" />
+            <Mountain className="w-6 h-6 text-emerald-600 absolute inset-0 m-auto" />
           </div>
           <p
             className="text-[10px] font-bold tracking-[0.35em] uppercase text-gray-400"
@@ -372,7 +372,7 @@ const Everestfeature = () => {
         </div>
         <button
           onClick={() => navigate(-1)}
-          className="flex items-center gap-2 px-6 py-3 rounded-full bg-amber-500 hover:bg-amber-400 text-white font-semibold text-sm transition-colors"
+          className="flex items-center gap-2 px-6 py-3 rounded-full bg-emerald-500 hover:bg-emerald-400 text-white font-semibold text-sm transition-colors"
         >
           <ArrowLeft size={14} /> Go Back
         </button>
@@ -473,7 +473,7 @@ const Everestfeature = () => {
               {trip.badge && <TripBadge label="Popular" variant="popular" />}
             </div>
 
-            <p className="text-amber-400 text-[10px] font-bold tracking-[0.35em] uppercase mb-3">
+            <p className="text-emerald-400 text-[10px] font-bold tracking-[0.35em] uppercase mb-3">
               {categoryLabel} &nbsp;·&nbsp; {trip.country || "Nepal"}
             </p>
 
@@ -509,7 +509,7 @@ const Everestfeature = () => {
         <div className="space-y-16 min-w-0">
           <section>
             <div className="bg-white border border-gray-100 rounded-2xl overflow-hidden shadow-sm">
-              <div className="h-1 bg-gradient-to-r from-amber-400 via-amber-300 to-transparent" />
+              <div className="h-1 bg-gradient-to-r from-emerald-400 via-emerald-300 to-transparent" />
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
                 {[
                   {
@@ -571,12 +571,12 @@ const Everestfeature = () => {
                 ].map(({ icon: Icon, label, value }, i) => (
                   <div
                     key={i}
-                    className="flex items-center gap-4 px-5 py-5 hover:bg-amber-50/30 transition-colors border-b border-r border-gray-100"
+                    className="flex items-center gap-4 px-5 py-5 hover:bg-emerald-50/30 transition-colors border-b border-r border-gray-100"
                   >
                     <div className="w-9 h-9 rounded-xl bg-gray-50 border border-gray-100 flex items-center justify-center shrink-0">
                       <Icon
                         size={15}
-                        className="text-amber-500 stroke-[1.75]"
+                        className="text-emerald-500 stroke-[1.75]"
                       />
                     </div>
                     <div className="min-w-0">
@@ -642,7 +642,7 @@ const Everestfeature = () => {
                     <button
                       key={i}
                       onClick={() => openLightboxAt(resolvedUrl)}
-                      className="relative rounded-xl overflow-hidden bg-gray-100 group aspect-square focus:outline-none focus:ring-2 focus:ring-amber-400"
+                      className="relative rounded-xl overflow-hidden bg-gray-100 group aspect-square focus:outline-none focus:ring-2 focus:ring-emerald-400"
                     >
                       <img
                         src={resolvedUrl}
@@ -687,10 +687,10 @@ const Everestfeature = () => {
                 {highlights.map((item, idx) => (
                   <div
                     key={idx}
-                    className="flex items-start gap-3.5 p-4 rounded-xl bg-white border border-gray-100 hover:border-amber-200 hover:shadow-sm transition-all duration-200 group"
+                    className="flex items-start gap-3.5 p-4 rounded-xl bg-white border border-gray-100 hover:border-emerald-200 hover:shadow-sm transition-all duration-200 group"
                   >
-                    <div className="mt-1 w-5 h-5 rounded-full bg-amber-50 border border-amber-200 flex items-center justify-center shrink-0 group-hover:bg-amber-100 transition-colors">
-                      <div className="w-1.5 h-1.5 rounded-full bg-amber-500" />
+                    <div className="mt-1 w-5 h-5 rounded-full bg-emerald-50 border border-emerald-200 flex items-center justify-center shrink-0 group-hover:bg-emerald-100 transition-colors">
+                      <div className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
                     </div>
                     <span className="text-sm text-gray-700 leading-relaxed">
                       {typeof item === "string" ? item : item.text}
@@ -714,7 +714,7 @@ const Everestfeature = () => {
                       key={idx}
                       className={`rounded-xl border overflow-hidden transition-all duration-200 ${
                         isOpen
-                          ? "border-amber-200 shadow-sm shadow-amber-50"
+                          ? "border-emerald-200 shadow-sm shadow-emerald-50"
                           : "border-gray-100 hover:border-gray-200"
                       }`}
                     >
@@ -722,14 +722,14 @@ const Everestfeature = () => {
                         onClick={() => setActiveDay(isOpen ? -1 : idx)}
                         className={`w-full flex items-center gap-4 px-5 py-4 text-left transition-colors ${
                           isOpen
-                            ? "bg-amber-50/40"
+                            ? "bg-emerald-50/40"
                             : "bg-white hover:bg-gray-50"
                         }`}
                       >
                         <div
                           className={`shrink-0 w-10 h-10 rounded-xl flex flex-col items-center justify-center transition-all ${
                             isOpen
-                              ? "bg-amber-500 text-white"
+                              ? "bg-emerald-500 text-white"
                               : "bg-gray-50 border border-gray-200 text-gray-500"
                           }`}
                         >
@@ -766,7 +766,7 @@ const Everestfeature = () => {
                         <span
                           className={`shrink-0 w-6 h-6 rounded-full flex items-center justify-center transition-all ${
                             isOpen
-                              ? "bg-amber-500 text-white"
+                              ? "bg-emerald-500 text-white"
                               : "bg-gray-100 text-gray-400"
                           }`}
                         >
@@ -779,7 +779,7 @@ const Everestfeature = () => {
                       </button>
                       {isOpen &&
                         (day.description || day.details || day.content) && (
-                          <div className="px-6 py-5 bg-white border-t border-amber-100 text-sm text-gray-600 leading-[1.85] whitespace-pre-line">
+                          <div className="px-6 py-5 bg-white border-t border-emerald-100 text-sm text-gray-600 leading-[1.85] whitespace-pre-line">
                             {day.description || day.details || day.content}
                           </div>
                         )}
@@ -879,7 +879,7 @@ const Everestfeature = () => {
                 Departure Dates &amp; Availability
               </SectionHeading>
               <div className="bg-white border border-gray-100 rounded-2xl overflow-hidden shadow-sm">
-                <div className="h-1 bg-gradient-to-r from-amber-400 via-amber-300 to-transparent" />
+                <div className="h-1 bg-gradient-to-r from-emerald-400 via-emerald-300 to-transparent" />
 
                 <div className="grid grid-cols-[1fr_auto_auto_auto] gap-4 px-5 py-3 border-b border-gray-100 bg-gray-50/60">
                   <span className="text-[10px] font-black uppercase tracking-widest text-gray-400">
@@ -903,13 +903,13 @@ const Everestfeature = () => {
                       <div
                         key={idx}
                         className={`grid grid-cols-[1fr_auto_auto_auto] gap-4 items-center px-5 py-4 transition-colors ${
-                          soldOut ? "opacity-50" : "hover:bg-amber-50/30"
+                          soldOut ? "opacity-50" : "hover:bg-emerald-50/30"
                         }`}
                       >
                         <div className="flex items-center gap-3">
                           {dateObj && (
                             <div className="shrink-0 w-11 h-11 rounded-xl bg-gray-50 border border-gray-100 flex flex-col items-center justify-center">
-                              <span className="text-[9px] font-bold uppercase tracking-wider text-amber-500 leading-none">
+                              <span className="text-[9px] font-bold uppercase tracking-wider text-emerald-500 leading-none">
                                 {dateObj.toLocaleString("default", {
                                   month: "short",
                                 })}
@@ -976,7 +976,7 @@ const Everestfeature = () => {
                           {!soldOut && (
                             <button
                               onClick={() => setBookingOpen(true)}
-                              className="text-[10px] font-bold bg-amber-500 hover:bg-amber-400 text-white px-3 py-1 rounded-lg transition-colors"
+                              className="text-[10px] font-bold bg-emerald-500 hover:bg-emerald-400 text-white px-3 py-1 rounded-lg transition-colors"
                             >
                               Book
                             </button>
@@ -1041,7 +1041,7 @@ const Everestfeature = () => {
                 >
                   Book This Expedition
                 </button>
-                <button className="w-full flex items-center justify-center gap-2 border border-amber-200 bg-amber-50 hover:bg-amber-100 text-amber-700 font-semibold py-3 rounded-xl transition-colors text-sm">
+                <button className="w-full flex items-center justify-center gap-2 border border-emerald-200 bg-emerald-50 hover:bg-emerald-100 text-emerald-700 font-semibold py-3 rounded-xl transition-colors text-sm">
                   <Download size={14} /> Download Brochure
                 </button>
               </div>
@@ -1065,8 +1065,8 @@ const Everestfeature = () => {
             </div>
 
             {nextDate && (
-              <div className="bg-white border border-amber-200 rounded-2xl px-5 py-4">
-                <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-amber-500 mb-2 flex items-center gap-1.5">
+              <div className="bg-white border border-emerald-200 rounded-2xl px-5 py-4">
+                <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-emerald-500 mb-2 flex items-center gap-1.5">
                   <Calendar size={11} /> Next Departure
                 </p>
                 <p className="font-bold text-gray-900 text-sm">
@@ -1164,7 +1164,7 @@ const Everestfeature = () => {
             )}
 
             <div className="bg-gray-950 rounded-2xl p-5 text-center space-y-3">
-              <PhoneCall size={18} className="text-amber-400 mx-auto" />
+              <PhoneCall size={18} className="text-emerald-400 mx-auto" />
               <div>
                 <p className="text-sm font-semibold text-white">
                   Need a custom booking?
@@ -1175,7 +1175,7 @@ const Everestfeature = () => {
               </div>
               <Link
                 to="/contact-us"
-                className="block w-full text-xs font-bold bg-amber-500 hover:bg-amber-400 text-black py-2.5 rounded-xl transition-colors text-center"
+                className="block w-full text-xs font-bold bg-emerald-500 hover:bg-emerald-400 text-black py-2.5 rounded-xl transition-colors text-center"
               >
                 Contact Our Team →
               </Link>

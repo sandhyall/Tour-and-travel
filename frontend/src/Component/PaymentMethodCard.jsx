@@ -6,12 +6,12 @@ export default function PaymentMethodCard({ paymentMethod, setPaymentMethod }) {
     <div className="grid md:grid-cols-2 gap-4">
 
       {/* ONLINE PAYMENT */}
-      <button
+      {/* <button
         type="button"
         onClick={() => setPaymentMethod("card")}
         className={`border rounded-2xl p-5 text-left transition-all group ${
           paymentMethod === "card"
-            ? "border-amber-500 bg-amber-50/70 shadow-sm"
+            ? "border-emerald-500 bg-emerald-50/70 shadow-sm"
             : "border-gray-200 hover:bg-gray-50/80"
         }`}
       >
@@ -19,7 +19,7 @@ export default function PaymentMethodCard({ paymentMethod, setPaymentMethod }) {
           size={24}
           className={`mb-3 transition-colors ${
             paymentMethod === "card"
-              ? "text-amber-600"
+              ? "text-emerald-600"
               : "text-gray-400 group-hover:text-gray-600"
           }`}
         />
@@ -27,7 +27,7 @@ export default function PaymentMethodCard({ paymentMethod, setPaymentMethod }) {
         <h4
           className={`font-bold transition-colors ${
             paymentMethod === "card"
-              ? "text-amber-900"
+              ? "text-emerald-900"
               : "text-slate-800"
           }`}
         >
@@ -37,7 +37,7 @@ export default function PaymentMethodCard({ paymentMethod, setPaymentMethod }) {
         <p className="text-xs text-gray-500 mt-1.5 leading-relaxed">
           Pay securely using Khalti, eSewa, or International Cards.
         </p>
-      </button>
+      </button> */}
 
     
       <button
@@ -45,7 +45,7 @@ export default function PaymentMethodCard({ paymentMethod, setPaymentMethod }) {
         onClick={() => setPaymentMethod("swift_bank_transfer")}
         className={`border rounded-2xl p-5 text-left transition-all group ${
           paymentMethod === "swift_bank_transfer"
-            ? "border-amber-500 bg-amber-50/70 shadow-sm"
+            ? "border-emerald-500 bg-emerald-50/70 shadow-sm"
             : "border-gray-200 hover:bg-gray-50/80"
         }`}
       >
@@ -54,7 +54,7 @@ export default function PaymentMethodCard({ paymentMethod, setPaymentMethod }) {
           size={24}
           className={`mb-3 transition-colors ${
             paymentMethod === "swift_bank_transfer"
-              ? "text-amber-600"
+              ? "text-emerald-600"
               : "text-gray-400 group-hover:text-gray-600"
           }`}
         />
@@ -62,7 +62,7 @@ export default function PaymentMethodCard({ paymentMethod, setPaymentMethod }) {
         <h4
           className={`font-bold transition-colors ${
             paymentMethod === "swift_bank_transfer"
-              ? "text-amber-900"
+              ? "text-emerald-900"
               : "text-slate-800"
           }`}
         >

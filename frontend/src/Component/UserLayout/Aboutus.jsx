@@ -17,7 +17,7 @@ const Aboutus = () => {
           <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent"></div>
 
           <div className="absolute bottom-10 left-10 max-w-2xl">
-            <p className="uppercase tracking-[0.3em] text-sm text-[#f1b400] font-semibold mb-4">
+            <p className="uppercase tracking-[0.3em] text-sm text-emerald-500 font-semibold mb-4">
               Explore The Himalayas
             </p>
 
@@ -35,7 +35,7 @@ const Aboutus = () => {
         {/* INTRO */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-start mb-20">
           <div>
-            <p className="uppercase tracking-[0.25em] text-sm text-[#f1b400] font-bold mb-4">
+            <p className="uppercase tracking-[0.25em] text-sm text-emerald-500 font-bold mb-4">
               Who We Are
             </p>
 
@@ -43,7 +43,7 @@ const Aboutus = () => {
               Nepal’s Trusted Himalayan Adventure Company
             </h2>
 
-            <div className="w-24 h-1 bg-[#f1b400] rounded-full mb-8"></div>
+            <div className="w-24 h-1 bg-emerald-500 rounded-full mb-8"></div>
 
             <p className="text-lg leading-9 text-gray-700 mb-6">
               <span className="font-bold text-black">
@@ -77,7 +77,7 @@ const Aboutus = () => {
           {/* RIGHT STATS */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
             <div className="bg-white rounded-3xl p-8 shadow-lg border border-gray-100">
-              <h3 className="text-5xl font-black text-[#f1b400] mb-3">
+              <h3 className="text-5xl font-black text-emerald-500 mb-3">
                 15+
               </h3>
               <p className="text-xl font-bold text-gray-900 mb-2">
@@ -90,7 +90,7 @@ const Aboutus = () => {
             </div>
 
             <div className="bg-white rounded-3xl p-8 shadow-lg border border-gray-100">
-              <h3 className="text-5xl font-black text-[#f1b400] mb-3">
+              <h3 className="text-5xl font-black text-emerald-500 mb-3">
                 5000+
               </h3>
               <p className="text-xl font-bold text-gray-900 mb-2">
@@ -103,7 +103,7 @@ const Aboutus = () => {
             </div>
 
             <div className="bg-white rounded-3xl p-8 shadow-lg border border-gray-100">
-              <h3 className="text-5xl font-black text-[#f1b400] mb-3">
+              <h3 className="text-5xl font-black text-emerald-500 mb-3">
                 97%
               </h3>
               <p className="text-xl font-bold text-gray-900 mb-2">
@@ -116,7 +116,7 @@ const Aboutus = () => {
             </div>
 
             <div className="bg-white rounded-3xl p-8 shadow-lg border border-gray-100">
-              <h3 className="text-5xl font-black text-[#f1b400] mb-3">
+              <h3 className="text-5xl font-black text-emerald-500 mb-3">
                 24/7
               </h3>
               <p className="text-xl font-bold text-gray-900 mb-2">
@@ -133,7 +133,7 @@ const Aboutus = () => {
         {/* STORY */}
         <div className="bg-white rounded-3xl shadow-xl p-10 md:p-16 mb-20 border border-gray-100">
           <div className="max-w-5xl">
-            <p className="uppercase tracking-[0.25em] text-sm text-[#f1b400] font-bold mb-4">
+            <p className="uppercase tracking-[0.25em] text-sm text-emerald-500 font-bold mb-4">
               Our Story
             </p>
 
@@ -180,7 +180,7 @@ const Aboutus = () => {
         {/* VISION & MISSION */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 mb-20">
           <div className="bg-[#1f2937] text-white rounded-3xl p-10 shadow-2xl">
-            <p className="uppercase tracking-[0.2em] text-[#f1b400] text-sm font-bold mb-4">
+            <p className="uppercase tracking-[0.2em] text-emerald-500 text-sm font-bold mb-4">
               Our Vision
             </p>
 
@@ -203,22 +203,22 @@ const Aboutus = () => {
             </p>
           </div>
 
-          <div className="bg-[#f1b400] rounded-3xl p-10 shadow-2xl">
-            <p className="uppercase tracking-[0.2em] text-black text-sm font-bold mb-4">
+          <div className="bg-emerald-500 rounded-3xl p-10 shadow-2xl">
+            <p className="uppercase tracking-[0.2em] text--[#1f2937] text-sm font-bold mb-4">
               Our Mission
             </p>
 
-            <h2 className="text-4xl font-black text-black mb-6">
+            <h2 className="text-4xl font-black text-white mb-6">
               Delivering Extraordinary Adventures
             </h2>
 
-            <p className="text-lg leading-9 text-gray-900">
+            <p className="text-lg leading-9 text-gray-300">
               Our mission is to provide world-class trekking and travel
               experiences with the highest standards of safety, service,
               professionalism, and sustainability.
             </p>
 
-            <p className="text-lg leading-9 text-gray-900 mt-6">
+            <p className="text-lg leading-9 text-gray-300 mt-6">
               We are committed to offering personalized journeys,
               supporting local economies, promoting eco-friendly
               tourism, and ensuring every traveler leaves the Himalayas

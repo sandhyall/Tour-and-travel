@@ -14,19 +14,51 @@ import Everestfeature from "./Pages/Everestfeature";
 import Nepal from "./Pages/Nepal";
 import Bhutan from "./Pages/Bhutan";
 import Tibet from "./Pages/Tibet";
+import Trips from "./Pages/Trips";
 import PaymentSuccess from "./pages/PaymentSuccess";
 import { BookingCancel, BookingSuccess } from "./Pages/BookingStatus.jsx";
 import { Toaster } from 'react-hot-toast';
 import GalleryPage from "./Pages/GalleryPage .jsx";
+import ScrollToTop from "./Component/Common/ScrollToTop.jsx";
+import { useState } from "react";
+import ChatbotModal
+  from "./Component/ChatbotModal.jsx";
+import { MessageCircle } from "lucide-react";
 
 const App = () => {
+  const [openChat, setOpenChat] =
+    useState(false);
   return (
     <div>
       <BrowserRouter>
-      <Toaster
-        position="top-center"
-        reverseOrder={false}
-      />
+      <ScrollToTop />
+
+  <Toaster
+    position="top-center"
+    reverseOrder={false}
+  />
+    {/* CHAT BUTTON */}
+
+        <button
+          onClick={() =>
+            setOpenChat(true)
+          }
+          className="fixed bottom-6 right-6 z-50 w-16 h-16 rounded-full bg-amber-500 shadow-2xl flex items-center justify-center hover:scale-110 transition"
+        >
+          <MessageCircle
+            size={28}
+            className="text-black"
+          />
+        </button>
+
+        {/* CHATBOT MODAL */}
+
+        <ChatbotModal
+          open={openChat}
+          onClose={() =>
+            setOpenChat(false)
+          }
+        />
         <Routes>
           <Route path="/" element={<Layout />} >
             <Route index element={<Landing />} />
@@ -42,6 +74,7 @@ const App = () => {
             <Route path="/nepal" element={<Nepal/>}/>
             <Route path="/bhutan" element={<Bhutan/>}/>
             <Route path="/tibet" element={<Tibet/>}/>
+            <Route path="/trips" element={<Trips/>}/>
             <Route path="/payment-success" element={<PaymentSuccess />}/>
             <Route path="/booking-success" element={<BookingSuccess />} />
             <Route path="/booking-cancel" element={<BookingCancel />} />

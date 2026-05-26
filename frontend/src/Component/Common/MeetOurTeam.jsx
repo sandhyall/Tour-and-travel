@@ -36,7 +36,7 @@ const MeetOurTeam = () => {
         <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/30 to-transparent"></div>
 
         <div className="absolute bottom-12 left-6 md:left-16 max-w-3xl">
-          <p className="uppercase tracking-[0.3em] text-[#f1b400] text-sm font-bold mb-4">
+          <p className="uppercase tracking-[0.3em] text-emerald-500 text-sm font-bold mb-4">
             Meet The Experts
           </p>
 
@@ -62,14 +62,14 @@ const MeetOurTeam = () => {
 
           <span className="mx-3 text-gray-300">{">"}</span>
 
-          <span className="text-[#f1b400] font-semibold">
+          <span className="text-emerald-500 font-semibold">
             Meet Our Team
           </span>
         </nav>
 
         {/* TITLE */}
         <div className="max-w-4xl mb-16">
-          <p className="uppercase tracking-[0.25em] text-sm text-[#f1b400] font-bold mb-4">
+          <p className="uppercase tracking-[0.25em] text-sm text-emerald-500 font-bold mb-4">
             Wales Trek and Travel
           </p>
 
@@ -77,7 +77,7 @@ const MeetOurTeam = () => {
             The People Behind Your Himalayan Journey
           </h2>
 
-          <div className="w-24 h-1 bg-[#f1b400] rounded-full mb-8"></div>
+          <div className="w-24 h-1 bg-emerald-500 rounded-full mb-8"></div>
 
           <div className="space-y-7 text-lg leading-9 text-gray-700">
             <p>
@@ -180,7 +180,7 @@ const MeetOurTeam = () => {
 
         {/* TEAM SECTION */}
         <div className="text-center mb-14">
-          <p className="uppercase tracking-[0.25em] text-sm text-[#f1b400] font-bold mb-4">
+          <p className="uppercase tracking-[0.25em] text-sm text-emerald-500 font-bold mb-4">
             Our Professionals
           </p>
 
@@ -215,7 +215,7 @@ const MeetOurTeam = () => {
                   {member.name}
                 </h3>
 
-                <div className="w-16 h-1 bg-[#f1b400] rounded-full mx-auto my-4"></div>
+                <div className="w-16 h-1 bg-emerald-500 rounded-full mx-auto my-4"></div>
 
                 <p className="text-gray-600 text-lg">
                   {member.role}
@@ -229,7 +229,7 @@ const MeetOurTeam = () => {
 
         {/* BOTTOM CTA */}
         <div className="mt-24 bg-[#2c3338] rounded-3xl p-10 md:p-16 text-center text-white shadow-2xl">
-          <p className="uppercase tracking-[0.25em] text-sm text-[#f1b400] font-bold mb-4">
+          <p className="uppercase tracking-[0.25em] text-sm text-emerald-500 font-bold mb-4">
             Start Your Adventure
           </p>
 
@@ -243,7 +243,7 @@ const MeetOurTeam = () => {
             wonders of Nepal, Bhutan, and Tibet.
           </p>
 
-          <button className="bg-[#f1b400] hover:bg-[#d9a200] text-black font-bold px-10 py-4 rounded-2xl transition-all duration-300 shadow-lg hover:scale-105">
+          <button onClick={() => window.location.href = "/contact-us"} className="bg-emerald-500 hover:bg-emerald-600 text-white font-bold px-10 py-4 rounded-2xl transition-all duration-300 shadow-lg hover:scale-105">
             Contact Our Team
           </button>
         </div>

@@ -28,7 +28,7 @@ export function BookingSuccess() {
 
         <button
           onClick={() => navigate("/")}
-          className="w-full bg-amber-500 hover:bg-amber-600 transition-colors py-3.5 rounded-xl font-bold text-black flex items-center justify-center gap-2"
+          className="w-full bg-amber-500 hover:bg-emerald-600 transition-colors py-3.5 rounded-xl font-bold text-black flex items-center justify-center gap-2"
         >
           Explore More Trips <ArrowRight size={18} />
         </button>

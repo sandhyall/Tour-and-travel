@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import axios from "../../api/axios";
+
 import { Mail, Phone, MapPin, Clock, Send } from "lucide-react";
 
 const Contactus = () => {
@@ -11,12 +12,15 @@ const Contactus = () => {
   });
 
   const [loading, setLoading] = useState(false);
+
   const [success, setSuccess] = useState("");
+
   const [error, setError] = useState("");
 
   const handleChange = (e) => {
     setFormData({
       ...formData,
+
       [e.target.name]: e.target.value,
     });
   };
@@ -26,12 +30,14 @@ const Contactus = () => {
 
     try {
       setLoading(true);
+
       setError("");
+
       setSuccess("");
 
       const res = await axios.post("/contact", formData);
 
-      setSuccess(res.data.message || "Message sent successfully!");
+      setSuccess(res.data.message);
 
       setFormData({
         name: "",
@@ -40,8 +46,9 @@ const Contactus = () => {
         message: "",
       });
     } catch (err) {
-      setError("Failed to send message. Please try again.");
-      console.error(err);
+      console.log(err);
+
+      setError(err.response?.data?.message || "Failed to send message");
     } finally {
       setLoading(false);
     }
@@ -57,56 +64,94 @@ const Contactus = () => {
               "url('https://images.unsplash.com/photo-1506461883276-594a12b11cf3?auto=format&fit=crop&q=80')",
           }}
         />
+
         <h1 className="relative text-4xl md:text-5xl font-bold text-white uppercase tracking-wider">
           Contact Us
         </h1>
       </div>
 
       <div className="max-w-7xl mx-auto px-6 py-16 grid grid-cols-1 lg:grid-cols-3 gap-12">
+        <div className="space-y-8">
+          <div>
+            <h2 className="text-3xl font-bold text-gray-900 mb-4">
+              Get in Touch
+            </h2>
 
-        {/* LEFT SIDE (unchanged) */}
-        <div className="lg:col-span-1 space-y-8">
-          <h2 className="text-2xl font-bold text-gray-900">
-            Get in Touch
-          </h2>
-          <p className="text-gray-600">
-            Planning your next adventure in Nepal? We are here to help.
-          </p>
+            <p className="text-gray-600 leading-relaxed">
+              Planning your next adventure in Nepal? Contact Wales Travel today.
+            </p>
+          </div>
+
+          <div className="space-y-6">
+            <div className="flex gap-4">
+              <Mail className="text-blue-600" />
+
+              <div>
+                <h4 className="font-semibold">Email</h4>
+                <p className="text-gray-600">info@walestravel.com</p>
+              </div>
+            </div>
+
+            <div className="flex gap-4">
+              <Phone className="text-blue-600" />
+
+              <div>
+                <h4 className="font-semibold">Phone</h4>
+                <p className="text-gray-600">+977 9800000000</p>
+              </div>
+            </div>
+
+            <div className="flex gap-4">
+              <MapPin className="text-blue-600" />
+
+              <div>
+                <h4 className="font-semibold">Location</h4>
+                <p className="text-gray-600">Kathmandu, Nepal</p>
+              </div>
+            </div>
+
+            <div className="flex gap-4">
+              <Clock className="text-blue-600" />
+
+              <div>
+                <h4 className="font-semibold">Working Hours</h4>
+                <p className="text-gray-600">Sun - Fri : 9AM - 6PM</p>
+              </div>
+            </div>
+          </div>
         </div>
 
-        {/* FORM */}
         <div className="lg:col-span-2 bg-white rounded-2xl shadow-xl p-8 md:p-12">
-
-          <form className="space-y-6" onSubmit={handleSubmit}>
-
+          <form onSubmit={handleSubmit} className="space-y-6">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-
               <input
+                type="text"
                 name="name"
                 value={formData.name}
                 onChange={handleChange}
                 placeholder="Full Name"
-                className="w-full px-4 py-3 border rounded-lg"
+                className="w-full px-4 py-3 border rounded-lg outline-none focus:ring-2 focus:ring-blue-500"
                 required
               />
 
               <input
+                type="email"
                 name="email"
                 value={formData.email}
                 onChange={handleChange}
                 placeholder="Email Address"
-                className="w-full px-4 py-3 border rounded-lg"
+                className="w-full px-4 py-3 border rounded-lg outline-none focus:ring-2 focus:ring-blue-500"
                 required
               />
-
             </div>
 
             <input
+              type="text"
               name="subject"
               value={formData.subject}
               onChange={handleChange}
               placeholder="Subject"
-              className="w-full px-4 py-3 border rounded-lg"
+              className="w-full px-4 py-3 border rounded-lg outline-none focus:ring-2 focus:ring-blue-500"
               required
             />
 
@@ -115,28 +160,32 @@ const Contactus = () => {
               value={formData.message}
               onChange={handleChange}
               placeholder="Message"
-              rows="5"
-              className="w-full px-4 py-3 border rounded-lg"
+              rows="6"
+              className="w-full px-4 py-3 border rounded-lg outline-none focus:ring-2 focus:ring-blue-500"
               required
             />
 
-            {/* STATUS */}
             {success && (
-              <p className="text-green-600 font-medium">{success}</p>
+              <div className="bg-green-100 text-green-700 px-4 py-3 rounded-lg">
+                {success}
+              </div>
             )}
+
             {error && (
-              <p className="text-red-600 font-medium">{error}</p>
+              <div className="bg-red-100 text-red-700 px-4 py-3 rounded-lg">
+                {error}
+              </div>
             )}
 
             <button
               type="submit"
               disabled={loading}
-              className="w-full md:w-max px-8 py-4 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-lg flex items-center gap-2"
+              className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-4 rounded-lg font-semibold flex items-center gap-2 transition-all"
             >
               <Send size={18} />
+
               {loading ? "Sending..." : "Send Message"}
             </button>
-
           </form>
         </div>
       </div>

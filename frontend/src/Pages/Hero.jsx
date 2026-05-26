@@ -1,10 +1,11 @@
 import React from "react";
 import { Search, Users, Star, DollarSign, Leaf } from "lucide-react";
-import video from "../assets/video.mp4";
+import video from "../assets/video1.mp4";
 
 const Hero = () => {
   return (
     <div className="relative h-screen w-full overflow-hidden">
+    
       <div className="absolute inset-0">
         <video
           autoPlay
@@ -15,65 +16,54 @@ const Hero = () => {
         >
           <source src={video} type="video/mp4" />
         </video>
-
-        <div className="absolute inset-0 bg-black/40"></div>
+        <div className="absolute inset-0 bg-black/50"></div> 
       </div>
 
+    
       <div className="relative z-10 flex h-full flex-col items-center justify-center px-4 text-center text-white">
-        <h2 className="mb-2 text-2xl font-semibold md:text-4xl drop-shadow-lg">
-          Experience the Difference!
-        </h2>
-
-        <h1 className="mb-8 text-5xl font-bold md:text-8xl drop-shadow-2xl">
-          Discover
+        <span className="mb-4 inline-block rounded-full border border-white/30 px-6 py-2 text-sm font-medium tracking-widest uppercase backdrop-blur-sm">
+          Wales Trek and Travel
+        </span>
+        
+        <h1 className="mb-6 text-2xl font-bold leading-tight md:text-7xl">
+          Discover the Majesty of <br />
+          <span className="text-emerald-400">The Himalayas</span>
         </h1>
 
-        <div className="relative w-full max-w-3xl">
+        <p className="mb-10 text-lg md:text-xl text-gray-200 max-w-2xl">
+          Experience authentic adventures, sustainable journeys, and professional guidance.
+        </p>
+
+       
+        <div className="relative w-full max-w-2xl group">
           <input
             type="text"
-            placeholder="Search Trips"
-            className="w-full rounded-md py-4 pl-6 pr-14 text-lg text-black outline-none shadow-2xl"
+            placeholder="Where do you want to go?"
+            className="w-full rounded-full py-5 pl-8 pr-16 text-lg text-gray-900 outline-none shadow-2xl focus:ring-4 focus:ring-emerald-500/50 transition-all duration-300"
           />
-          <Search
-            className="absolute right-5 top-1/2 -translate-y-1/2 text-gray-400 cursor-pointer"
-            size={24}
-          />
+          <button className="absolute right-2 top-2 bottom-2 bg-emerald-600 hover:bg-emerald-700 text-white p-3 rounded-full transition-colors">
+            <Search size={24} />
+          </button>
         </div>
       </div>
 
-      <div className="absolute bottom-10 z-10 w-full px-6">
-        <div className="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-6 text-white">
-          <div className="flex items-center gap-3">
-            <Users size={30} />
-            <div>
-              <p className="font-bold">19 Years+</p>
-              <p className="text-xs uppercase opacity-80">Experience</p>
+      {/* Stats Section */}
+      <div className="absolute bottom-0 z-10 w-full bg-white/10 backdrop-blur-md py-8 border-t border-white/10">
+        <div className="mx-auto flex max-w-6xl flex-wrap items-center justify-around gap-8 text-white px-6">
+          {[
+            { icon: Users, title: "19 Years+", desc: "Experience" },
+            { icon: Star, title: "3350+", desc: "Reviews" },
+            { icon: DollarSign, title: "Best Price", desc: "Guaranteed" },
+            { icon: Leaf, title: "Eco Friendly", desc: "Travel" },
+          ].map((item, index) => (
+            <div key={index} className="flex items-center gap-4">
+              <item.icon size={32} className="text-emerald-400" />
+              <div>
+                <p className="font-bold text-lg">{item.title}</p>
+                <p className="text-xs uppercase tracking-wider opacity-80">{item.desc}</p>
+              </div>
             </div>
-          </div>
-
-          <div className="flex items-center gap-3">
-            <Star size={30} />
-            <div>
-              <p className="font-bold">3350+</p>
-              <p className="text-xs uppercase opacity-80">Reviews</p>
-            </div>
-          </div>
-
-          <div className="flex items-center gap-3">
-            <DollarSign size={30} />
-            <div>
-              <p className="font-bold">Best Price</p>
-              <p className="text-xs uppercase opacity-80">Guaranteed</p>
-            </div>
-          </div>
-
-          <div className="flex items-center gap-3">
-            <Leaf size={30} />
-            <div>
-              <p className="font-bold">Eco Friendly</p>
-              <p className="text-xs uppercase opacity-80">Travel</p>
-            </div>
-          </div>
+          ))}
         </div>
       </div>
     </div>

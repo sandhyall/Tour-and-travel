@@ -1,62 +1,60 @@
 import React from "react";
 import { Link } from "react-router-dom";
+import trekImage from "../../assets/trekImage.png";
+import travel from "../../assets/Travel.png";
+import tek from "../../assets/trek.png";
 
 const TrustedPartner = () => {
   return (
-    <section className="max-w-7xl mx-auto px-6 py-16">
-      <h1 className="text-3xl md:text-4xl text-center justify-between font-bold text-gray-800 mb-10">
-        Your Trusted Partner for Himalayan Treks & Tours
-      </h1>
+    <section className="bg-stone-50 py-20 px-6">
+      <div className="max-w-7xl mx-auto">
+        <h2 className="text-3xl md:text-5xl font-extrabold text-gray-900 mb-16 text-center">
+          Your Trusted Partner for <br />
+          <span className="text-emerald-700">Himalayan Treks & Tours</span>
+        </h2>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-12 items-start">
-        <div className="relative group cursor-pointer overflow-hidden rounded-xl shadow-lg aspect-[4/3]">
-          <div className="relative overflow-hidden rounded-xl shadow-lg aspect-[4/3]">
-            <iframe
-              className="w-full h-full"
-              src="https://www.youtube.com/embed/HTDPh7nj9PE"
-              title="YouTube video"
-              frameBorder="0"
-              allow="autoplay; encrypted-media"
-              allowFullScreen
-            ></iframe>
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
+          {/* Image Gallery */}
+          <div className="grid grid-cols-2 gap-4">
+            <img src={trekImage} alt="Himalayan Trek" className="col-span-2 w-full h-64 object-cover rounded-2xl shadow-lg" />
+            <img src={tek} alt="Mountain View" className="w-full h-48 object-cover rounded-2xl shadow-lg" />
+            <img src={travel} alt="Travel Experience" className="w-full h-48 object-cover rounded-2xl shadow-lg" />
           </div>
-        </div>
 
-        <div className="flex flex-col space-y-6 text-gray-700 leading-relaxed text-lg">
-          <p>
-            <span className="font-semibold text-gray-900">
-              Ace the Himalaya
-            </span>{" "}
-            is a premier trekking and adventure travel company in Nepal, founded
-            by a former mountain guide with a passion for creating safe,
-            authentic, and unforgettable Himalayan journeys. Renowned for
-            top-notch service, highly experienced guides, and exceptional safety
-            standards, we proudly maintain an impressive 97.4% trek success
-            rate.
-          </p>
+          {/* Content */}
+          <div className="space-y-6 text-gray-700">
+            <h3 className="text-2xl font-bold text-gray-900">
+              Welcome to Wales Trek and Travel
+            </h3>
+            <p className="leading-relaxed text-lg">
+              <strong className="text-gray-900">Wales Trek and Travel</strong> is a 
+              premier adventure travel company in Nepal. Founded by seasoned mountaineers, 
+              we are dedicated to creating authentic, safe, and unforgettable 
+              Himalayan journeys for travelers from across the globe.
+            </p>
 
-          <p>
-            As a Travelife Certified company, we meet internationally recognized
-            sustainability standards through independent assessment, reflecting
-            our commitment to responsible tourism, environmental protection, and
-            supporting local communities in line with GSTC Criteria.
-          </p>
+            <p className="leading-relaxed text-lg">
+              We take pride in our <span className="font-bold text-gray-900">high success rate</span> and 
+              exceptional safety standards. Whether you are seeking a challenging peak climb, 
+              a cultural tour, or a luxury holiday, our expert guides ensure every step 
+              of your journey is handled with professional care.
+            </p>
 
-          <p>
-            With the highest number of positive TripAdvisor reviews, Ace the
-            Himalaya proudly stands as one of Nepal’s leading trekking and tour
-            operators. We specialize in guided Himalayan treks, peak climbing,
-            cultural tours, luxury holidays, and tailor-made adventure travel
-            experiences across Nepal, Bhutan and Tibet.
-          </p>
+            <p className="leading-relaxed text-lg">
+              Committed to responsible tourism, we actively support local mountain 
+              communities and ensure that our treks leave a positive impact on the 
+              environment. Join us at Wales Trek and Travel to explore the majestic 
+              landscapes of Nepal, Bhutan, and Tibet.
+            </p>
 
-          <div className="pt-4">
-            <Link
-              to="/About-us"
-              className="inline-block bg-[#f1b400] hover:bg-[#d49f00] text-black font-bold py-3 px-8 rounded-sm transition-colors shadow-md"
-            >
-              Read more about us
-            </Link>
+            <div className="pt-4">
+              <Link
+                to="/about-us"
+                className="inline-block bg-emerald-700 hover:bg-emerald-800 text-white font-bold py-4 px-10 rounded-lg shadow-md transition duration-300"
+              >
+                Read more about us
+              </Link>
+            </div>
           </div>
         </div>
       </div>

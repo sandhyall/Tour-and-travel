@@ -13,54 +13,66 @@ export const sendContactEmail = async (req, res) => {
   try {
     const { name, email, subject, message } = req.body;
 
-    // Email to company
+    // Validation
+    if (!name || !email || !subject || !message) {
+      return res.status(400).json({
+        success: false,
+        message: "All fields are required",
+      });
+    }
+
     await transporter.sendMail({
-      from: process.env.EMAIL_USER,
+      from: `"Wales Travel" <${process.env.EMAIL_USER}>`,
 
       to: process.env.RECEIVER_EMAIL,
+
+      replyTo: email,
 
       subject: `New Contact Request - ${subject}`,
 
       html: `
-        <h2>New Client Request</h2>
+        <div style="font-family:Arial;padding:20px;">
+          <h2>New Client Request</h2>
 
-        <p><strong>Client Name:</strong> ${name}</p>
+          <p><strong>Client Name:</strong> ${name}</p>
 
-        <p><strong>Client Email:</strong> ${email}</p>
+          <p><strong>Client Email:</strong> ${email}</p>
 
-        <p><strong>Subject:</strong> ${subject}</p>
+          <p><strong>Subject:</strong> ${subject}</p>
 
-        <p><strong>Message:</strong></p>
+          <p><strong>Message:</strong></p>
 
-        <div style="padding:10px;border:1px solid gray;">
-          ${message}
+          <div style="padding:15px;border:1px solid #ddd;border-radius:8px;">
+            ${message}
+          </div>
         </div>
       `,
     });
 
-    // Auto reply to client
     await transporter.sendMail({
-      from: process.env.EMAIL_USER,
+      from: `"Wales Travel" <${process.env.EMAIL_USER}>`,
 
       to: email,
 
       subject: "We Received Your Request",
 
       html: `
-        <h2>Hello ${name}</h2>
+        <div style="font-family:Arial;padding:20px;">
+          <h2>Hello ${name},</h2>
 
-        <p>Thank you for contacting us.</p>
+          <p>Thank you for contacting Wales Travel.</p>
 
-        <p>
-          We have successfully received your request.
-          Our team will contact you soon.
-        </p>
+          <p>
+            We have successfully received your request.
+            Our team will contact you soon.
+          </p>
 
-        <br/>
+          <br/>
 
-        <p>Regards,</p>
+          <p>Regards,</p>
 
-        <h3>Wales Travel</h3>
+          <h3>Wales Travel Team</h3>
+        </div>
       `,
     });
 
@@ -69,11 +81,12 @@ export const sendContactEmail = async (req, res) => {
       message: "Emails sent successfully",
     });
   } catch (error) {
-    console.log(error);
+    console.log("EMAIL ERROR:", error);
 
     res.status(500).json({
       success: false,
       message: "Email sending failed",
+      error: error.message,
     });
   }
 };

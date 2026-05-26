@@ -17,6 +17,7 @@ import Tibet from "./Pages/Tibet";
 import PaymentSuccess from "./pages/PaymentSuccess";
 import { BookingCancel, BookingSuccess } from "./Pages/BookingStatus.jsx";
 import { Toaster } from 'react-hot-toast';
+import GalleryPage from "./Pages/GalleryPage .jsx";
 
 const App = () => {
   return (
@@ -36,14 +37,15 @@ const App = () => {
             <Route path="/legal-documents" element={<LegalDocuments/>}/>
             <Route path="/terms-and-conditions" element={<TermsAndCondition/>}/>
             <Route path="/sign-up-for-newsletter" element={<Newsletter/>}/>
-            <Route path="/contact" element={<Contactus/>}/>
+            <Route path="/contact-us" element={<Contactus/>}/>
             <Route path="feature/:id" element={<Everestfeature/>}/>
             <Route path="/nepal" element={<Nepal/>}/>
-            <Route path="/butan" element={<Bhutan/>}/>
+            <Route path="/bhutan" element={<Bhutan/>}/>
             <Route path="/tibet" element={<Tibet/>}/>
             <Route path="/payment-success" element={<PaymentSuccess />}/>
             <Route path="/booking-success" element={<BookingSuccess />} />
             <Route path="/booking-cancel" element={<BookingCancel />} />
+            <Route path="/gallery" element={<GalleryPage />} />
            
           </Route>
         

@@ -1,104 +1,132 @@
 import React, { useState } from "react";
 import { ChevronDown, Play, X } from "lucide-react";
+import ace from "../../assets/Ace.png";
 
 const WhyAce = () => {
-  const [openIndex, setOpenIndex] = useState(null);
+  const [openIndex, setOpenIndex] = useState(0);
   const [isVideoModalOpen, setIsVideoModalOpen] = useState(false);
+
+  const videoData = {
+    embedUrl: "",
+  };
 
   const toggleAccordion = (index) => {
     setOpenIndex(openIndex === index ? null : index);
-  };
-
-  const videoData = {
-    embedUrl: "https://www.youtube.com/embed/bFy6jTEHlzQ?autoplay=1",
-    thumbnail: "https://i.ytimg.com/vi/bFy6jTEHlzQ/maxresdefault.jpg",
   };
 
   const reasons = [
     {
       title: "Local Himalayan Experts",
       content:
-        "Our team consists of locals who have spent their lives exploring the peaks. We offer insider knowledge that only a native expert can provide.",
+        "At Wales Trek and Travel, our guides and travel experts are born and raised in the Himalayan region. Their deep knowledge of local culture, mountain trails, and traditions allows us to create truly authentic travel experiences.",
     },
     {
-      title: "High Standard of Safety prioritized",
+      title: "Safety Always Comes First",
       content:
-        "Safety is our number one priority. We provide high-quality gear, satellite phones, and oxygen cylinders on every high-altitude trek.",
+        "Your safety is our highest priority. We follow strict safety procedures, provide professional guides, first aid support, and maintain high standards throughout every trek and expedition.",
     },
     {
-      title: "Unbeatable Value",
+      title: "Best Value for Your Adventure",
       content:
-        "We offer premium services at competitive prices, ensuring you get the best experience for every dollar spent.",
+        "We offer premium trekking and tour experiences at fair and competitive prices, ensuring travelers receive exceptional value without compromising quality or comfort.",
     },
     {
-      title: "Top Notch Service",
+      title: "Professional & Personalized Service",
       content:
-        "From arrival to departure, our staff ensures every detail of your trip is handled with professional care.",
+        "From the moment you contact us until your departure, our dedicated team ensures personalized care, smooth logistics, and excellent customer service throughout your journey.",
     },
     {
-      title: "Fast response time",
+      title: "Fast & Reliable Communication",
       content:
-        "Our support team is available 24/7 to answer your queries within minutes, not days.",
+        "Our support team responds quickly to inquiries and provides clear information to help travelers plan their Himalayan adventures with confidence.",
     },
     {
-      title: "Award-Winning Company",
+      title: "Experienced & Trusted Company",
       content:
-        "Recognized globally for our excellence in travel and sustainability in the Himalayan region.",
+        "Wales Trek and Travel has built a strong reputation among travelers worldwide for professionalism, reliability, and unforgettable Himalayan experiences.",
     },
     {
-      title: "Group Discounts",
+      title: "Special Discounts for Groups",
       content:
-        "Traveling with friends? We offer special pricing for groups of 4 or more.",
+        "Traveling with friends, family, or a group? We provide attractive group discounts and customized itineraries designed to fit your travel needs.",
     },
     {
-      title: "Pre-booked Domestic Flights",
+      title: "Hassle-Free Travel Arrangements",
       content:
-        "No more waiting in line. We handle all domestic flight logistics to make your travel seamless.",
+        "We organize transportation, accommodations, domestic flights, permits, and logistics so you can focus entirely on enjoying your adventure.",
+    },
+    {
+      title: "Sustainable Tourism Practices",
+      content:
+        "We are committed to responsible tourism by supporting local communities, reducing environmental impact, and promoting eco-friendly travel practices.",
+    },
+    {
+      title: "Tailor-Made Travel Experiences",
+      content:
+        "Every traveler is unique. We create customized trekking, cultural, luxury, and adventure itineraries based on your interests, travel style, and schedule.",
     },
   ];
 
   return (
-    <div className="font-sans bg-white">
-      <div className="relative h-[70vh] w-full flex items-center justify-center overflow-hidden bg-black">
-        <img
-          src={videoData.thumbnail}
-          className="absolute inset-0 w-full h-full object-cover opacity-60"
-          alt="Video Background"
-        />
-        <div className="absolute inset-0 bg-gradient-to-b from-black/40 via-transparent to-black/60 z-10" />
+    <div className="font-sans bg-[#faf8f3] text-gray-900">
 
-        <div className="relative z-20 text-center px-6 max-w-4xl">
-          <p className="text-white text-xl md:text-3xl font-light italic leading-relaxed mb-10 drop-shadow-lg">
-            "Ace the Himalaya is an idea, that aims to share with the world the
-            passion of travel in the Himalayan region and assist visitors in
-            achieving their desire to create everlasting memories."
+      {/* HERO SECTION */}
+      <div className="relative h-[75vh] min-h-[600px] w-full flex items-center justify-center overflow-hidden bg-black">
+
+        <img
+          src={ace}
+          className="absolute inset-0 w-full h-full object-cover opacity-60"
+          alt="Wales Trek and Travel"
+        />
+
+        <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-black/20"></div>
+
+        <div className="relative z-20 text-center px-6 max-w-5xl">
+
+          <p className="uppercase tracking-[0.35em] text-[#f1b400] text-sm font-bold mb-6">
+            Why Choose Wales Trek and Travel
+          </p>
+
+          <h1 className="text-5xl md:text-7xl font-black text-white leading-tight mb-8">
+            Explore The Himalayas <br />
+            With Confidence
+          </h1>
+
+          <p className="text-lg md:text-2xl text-gray-200 font-light leading-relaxed mb-12 max-w-4xl mx-auto">
+            “Wales Trek and Travel was founded with a passion for sharing
+            the beauty, culture, and adventure of the Himalayas while
+            creating meaningful and unforgettable travel experiences.”
           </p>
 
           <button
             onClick={() => setIsVideoModalOpen(true)}
-            className="group relative inline-flex items-center justify-center"
+            className="group inline-flex items-center gap-4 bg-[#f1b400] hover:bg-[#dca400] text-black px-8 py-4 rounded-2xl font-bold text-sm uppercase tracking-[0.2em] transition-all duration-300 shadow-2xl hover:scale-105"
           >
-            <div className="absolute inset-0 bg-white/20 rounded-full animate-ping group-hover:bg-white/40" />
-            <div className="relative w-20 h-20 bg-white rounded-full flex items-center justify-center transition-transform group-hover:scale-110 shadow-2xl">
-              <Play fill="black" size={28} className="ml-1" />
-            </div>
+            <span className="w-12 h-12 rounded-full bg-black text-white flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
+              <Play size={18} fill="white" />
+            </span>
+
+            Watch Our Story
           </button>
         </div>
       </div>
 
+      {/* VIDEO MODAL */}
       {isVideoModalOpen && (
         <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/95 p-4">
+
           <button
             onClick={() => setIsVideoModalOpen(false)}
             className="absolute top-6 right-6 text-white hover:text-gray-400 transition-colors"
           >
             <X size={40} />
           </button>
-          <div className="w-full max-w-5xl aspect-video shadow-2xl">
+
+          <div className="w-full max-w-6xl aspect-video shadow-2xl">
             <iframe
-              className="w-full h-full rounded-lg"
+              className="w-full h-full rounded-2xl"
               src={videoData.embedUrl}
-              title="YouTube video player"
+              title="Wales Trek and Travel Video"
               frameBorder="0"
               allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
               allowFullScreen
@@ -107,64 +135,128 @@ const WhyAce = () => {
         </div>
       )}
 
-      <div className="max-w-5xl mx-auto py-20 px-6">
-        <div className="flex flex-col md:flex-row justify-between items-start md:items-end mb-16 gap-4">
-          <div>
-            <h1 className="text-6xl font-black mb-4 tracking-tighter uppercase">
-              Why Ace?
-            </h1>
-            <p className="text-gray-500 text-xl font-medium">
-              17 reasons why you should choose Ace for your next adventure!
+      {/* CONTENT SECTION */}
+      <div className="max-w-6xl mx-auto py-24 px-6">
+
+        {/* HEADER */}
+        <div className="flex flex-col lg:flex-row justify-between items-start lg:items-end gap-8 mb-20">
+
+          <div className="max-w-3xl">
+
+            <p className="uppercase tracking-[0.25em] text-sm text-[#f1b400] font-bold mb-5">
+              Trusted Himalayan Specialists
+            </p>
+
+            <h2 className="text-5xl md:text-6xl font-black tracking-tight leading-none mb-6">
+              Why Travelers <br />
+              Choose Us
+            </h2>
+
+            <div className="w-24 h-1 bg-[#f1b400] rounded-full mb-8"></div>
+
+            <p className="text-xl text-gray-600 leading-relaxed">
+              Discover why thousands of travelers from around the world
+              trust Wales Trek and Travel for unforgettable Himalayan
+              trekking and adventure experiences.
             </p>
           </div>
+
           <button
             onClick={() => setOpenIndex(null)}
-            className="border-2 border-black px-8 py-2 font-bold uppercase tracking-widest hover:bg-black hover:text-white transition-all duration-300 text-xs"
+            className="border-2 border-black px-8 py-4 rounded-2xl font-bold uppercase tracking-[0.2em] hover:bg-black hover:text-white transition-all duration-300 text-xs"
           >
-            Expand / Collapse All
+            Collapse All
           </button>
         </div>
 
-        <div className="divide-y divide-gray-200 border-t border-gray-200">
+        {/* ACCORDION */}
+        <div className="bg-white rounded-3xl border border-gray-100 shadow-xl overflow-hidden">
+
           {reasons.map((reason, index) => (
-            <div key={index} className="overflow-hidden">
+            <div
+              key={index}
+              className="border-b border-gray-100 last:border-b-0"
+            >
+
+              {/* BUTTON */}
               <button
                 onClick={() => toggleAccordion(index)}
-                className="w-full flex items-center justify-between py-10 text-left group transition-all"
+                className="w-full flex items-center justify-between px-8 md:px-12 py-8 text-left group transition-all"
               >
-                <div className="flex items-center">
-                  <span className="text-5xl font-light text-gray-200 mr-10 transition-colors group-hover:text-gray-400">
+
+                <div className="flex items-center gap-6 md:gap-10">
+
+                  <span className="text-4xl md:text-5xl font-black text-gray-200 group-hover:text-[#f1b400] transition-colors duration-300">
                     {String(index + 1).padStart(2, "0")}
                   </span>
+
                   <span
-                    className={`text-3xl font-normal transition-all duration-300 ${openIndex === index ? "text-green-700 translate-x-2" : "text-gray-800"}`}
+                    className={`text-xl md:text-3xl font-semibold transition-all duration-300 ${
+                      openIndex === index
+                        ? "text-[#b8860b] translate-x-2"
+                        : "text-gray-800"
+                    }`}
                   >
                     {reason.title}
                   </span>
                 </div>
+
                 <div
-                  className={`transition-transform duration-500 ${openIndex === index ? "rotate-180" : ""}`}
+                  className={`transition-transform duration-500 ${
+                    openIndex === index ? "rotate-180" : ""
+                  }`}
                 >
                   <ChevronDown
-                    size={28}
-                    strokeWidth={1.5}
+                    size={30}
+                    strokeWidth={1.8}
                     className={
-                      openIndex === index ? "text-green-700" : "text-gray-400"
+                      openIndex === index
+                        ? "text-[#b8860b]"
+                        : "text-gray-400"
                     }
                   />
                 </div>
               </button>
 
+              {/* CONTENT */}
               <div
-                className={`transition-all duration-500 ease-in-out ${openIndex === index ? "max-h-96 opacity-100 mb-10" : "max-h-0 opacity-0"}`}
+                className={`transition-all duration-500 ease-in-out overflow-hidden ${
+                  openIndex === index
+                    ? "max-h-96 opacity-100"
+                    : "max-h-0 opacity-0"
+                }`}
               >
-                <div className="pl-24 pr-12 text-gray-600 text-xl leading-relaxed">
+                <div className="pl-24 md:pl-36 pr-10 md:pr-16 pb-10 text-gray-600 text-lg leading-9">
                   {reason.content}
                 </div>
               </div>
             </div>
           ))}
         </div>
+
+        {/* BOTTOM CTA */}
+        <div className="mt-24 bg-[#2c3338] rounded-3xl p-10 md:p-16 text-center text-white shadow-2xl">
+
+          <p className="uppercase tracking-[0.25em] text-sm text-[#f1b400] font-bold mb-5">
+            Begin Your Adventure
+          </p>
+
+          <h2 className="text-4xl md:text-5xl font-black mb-8">
+            Discover The Magic Of The Himalayas
+          </h2>
+
+          <p className="max-w-3xl mx-auto text-lg text-gray-300 leading-9 mb-10">
+            Whether you dream of trekking to Everest Base Camp,
+            exploring ancient Himalayan cultures, or experiencing luxury
+            mountain adventures, Wales Trek and Travel is here to make
+            your journey extraordinary.
+          </p>
+
+          <button className="bg-[#f1b400] hover:bg-[#dca400] text-black font-black px-10 py-5 rounded-2xl transition-all duration-300 shadow-lg hover:scale-105 uppercase tracking-[0.15em] text-sm">
+            Plan Your Trip
+          </button>
+        </div>
+
       </div>
     </div>
   );

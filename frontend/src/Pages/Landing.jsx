@@ -6,6 +6,7 @@ import WhyAce from '../Component/Common/WhyAce'
 import FAQ from '../Component/Common/Frequent'
 import Everest from '../Component/Feature/Everest'
 import PopularTreks from '../Component/Feature/PopularTreks'
+import GalleryPage from './GalleryPage '
 
 const Landing=()=> {
   return (
@@ -16,6 +17,7 @@ const Landing=()=> {
       <Aced/>
       <WhyAce/>
       <PopularTreks/>
+      <GalleryPage/>
       <FAQ/>
     </div>
   )

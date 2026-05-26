@@ -26,9 +26,18 @@ import {
   Users,
   Shield,
   PhoneCall,
+  Package,
+  Tag,
+  ArrowRight,
+  Gem,
+  Flame,
+  Zap,
+  Globe,
+  DollarSign,
+  AlertCircle,
+  BadgeCheck,
 } from "lucide-react";
 
-/* ─────────────────────────── HELPERS ─────────────────────────── */
 const BASE_URL = "http://localhost:8000";
 
 const resolveImage = (raw) => {
@@ -38,11 +47,9 @@ const resolveImage = (raw) => {
   if (raw?.url)
     return raw.url.startsWith("http") ? raw.url : `${BASE_URL}/${raw.url}`;
   if (typeof raw === "object" && raw !== null) {
-    const fallbackProp = raw.src || raw.path || raw.image;
-    if (typeof fallbackProp === "string")
-      return fallbackProp.startsWith("http")
-        ? fallbackProp
-        : `${BASE_URL}/${fallbackProp}`;
+    const fp = raw.src || raw.path || raw.image;
+    if (typeof fp === "string")
+      return fp.startsWith("http") ? fp : `${BASE_URL}/${fp}`;
   }
   return null;
 };
@@ -50,13 +57,10 @@ const resolveImage = (raw) => {
 const FALLBACK_BANNER =
   "https://images.unsplash.com/photo-1544735716-392fe2489ffa?q=80&w=1600";
 
-/* ─────────────────────────── DESIGN TOKENS ─────────────────────────── */
 const fonts = {
   display: "'Cormorant Garamond', 'Playfair Display', Georgia, serif",
   body: "'Outfit', 'DM Sans', 'Segoe UI', system-ui, sans-serif",
 };
-
-/* ─────────────────────────── SUB-COMPONENTS ─────────────────────────── */
 
 function SectionHeading({ children, sub }) {
   return (
@@ -85,6 +89,8 @@ function TripBadge({ label, variant = "default" }) {
     peak: "bg-rose-600 text-white",
     short: "bg-emerald-600 text-white",
     bhutan: "bg-teal-700 text-white",
+    tibet: "bg-blue-700 text-white",
+    popular: "bg-violet-600 text-white",
     default: "bg-gray-800 text-white",
   };
   return (
@@ -100,8 +106,8 @@ function DifficultyPill({ label }) {
   const map = {
     Easy: "bg-emerald-50 text-emerald-700 border border-emerald-200",
     Moderate: "bg-sky-50 text-sky-700 border border-sky-200",
-    Strenuous: "bg-orange-50 text-orange-700 border border-orange-200",
-    Extreme: "bg-red-50 text-red-700 border border-red-200",
+    Difficult: "bg-orange-50 text-orange-700 border border-orange-200",
+    Strenuous: "bg-red-50 text-red-700 border border-red-200",
   };
   return (
     <span
@@ -155,7 +161,122 @@ function AccordionFAQ({ faqs }) {
   );
 }
 
-/* ─────────────────────────── MAIN COMPONENT ─────────────────────────── */
+function PackageCard({ pkg }) {
+  const [open, setOpen] = useState(false);
+  const discount =
+    pkg.oldPrice && pkg.price
+      ? Math.round(((pkg.oldPrice - pkg.price) / pkg.oldPrice) * 100)
+      : null;
+
+  return (
+    <div className="rounded-2xl border border-gray-100 overflow-hidden hover:border-amber-200 hover:shadow-sm transition-all duration-200">
+      <div className="px-5 py-4 bg-white flex items-start justify-between gap-4">
+        <div className="flex items-center gap-3">
+          <div className="w-8 h-8 rounded-xl bg-amber-50 border border-amber-100 flex items-center justify-center shrink-0">
+            <Tag size={14} className="text-amber-500" />
+          </div>
+          <div>
+            <p className="text-sm font-bold text-gray-900">
+              {pkg.name || "Package"}
+            </p>
+            {pkg.description && (
+              <p className="text-xs text-gray-500 mt-0.5 leading-snug line-clamp-1">
+                {pkg.description}
+              </p>
+            )}
+          </div>
+        </div>
+        <div className="text-right shrink-0">
+          {pkg.oldPrice && (
+            <p className="text-xs text-gray-400 line-through font-medium">
+              USD {Number(pkg.oldPrice).toLocaleString()}
+            </p>
+          )}
+          <p
+            className="text-lg font-bold text-gray-950 leading-tight"
+            style={{ fontFamily: fonts.display }}
+          >
+            {pkg.price ? `USD ${Number(pkg.price).toLocaleString()}` : "—"}
+          </p>
+          {discount && (
+            <span className="text-[9px] bg-emerald-100 text-emerald-700 font-black px-1.5 py-0.5 rounded-full uppercase tracking-wide">
+              -{discount}%
+            </span>
+          )}
+        </div>
+      </div>
+
+      {pkg.description && (
+        <div className="px-5 pb-3 bg-white">
+          <p className="text-xs text-gray-500 leading-relaxed">
+            {pkg.description}
+          </p>
+        </div>
+      )}
+
+      {pkg.groupPricing?.length > 0 && (
+        <div className="border-t border-gray-100">
+          <button
+            onClick={() => setOpen((p) => !p)}
+            className="w-full flex items-center justify-between px-5 py-3 bg-gray-50 hover:bg-amber-50/40 transition-colors text-left"
+          >
+            <span className="text-[11px] font-bold text-gray-600 flex items-center gap-1.5">
+              <Users size={12} className="text-amber-500" />
+              Group Pricing ({pkg.groupPricing.length} tiers)
+            </span>
+            {open ? (
+              <ChevronUp size={13} className="text-gray-400" />
+            ) : (
+              <ChevronDown size={13} className="text-gray-400" />
+            )}
+          </button>
+          {open && (
+            <div className="px-5 pb-4 bg-white space-y-2 pt-3">
+              <div className="grid grid-cols-3 gap-2 mb-1">
+                <span className="text-[9px] font-black uppercase tracking-widest text-gray-400">
+                  Min Pax
+                </span>
+                <span className="text-[9px] font-black uppercase tracking-widest text-gray-400">
+                  Max Pax
+                </span>
+                <span className="text-[9px] font-black uppercase tracking-widest text-gray-400">
+                  Price / Person
+                </span>
+              </div>
+              {pkg.groupPricing.map((tier, i) => (
+                <div
+                  key={i}
+                  className="grid grid-cols-3 gap-2 items-center px-3 py-2.5 rounded-xl bg-gray-50 border border-gray-100"
+                >
+                  <span className="text-sm font-semibold text-gray-700">
+                    {tier.minPax || "—"}
+                  </span>
+                  <span className="text-sm font-semibold text-gray-700">
+                    {tier.maxPax || "—"}
+                  </span>
+                  <span className="text-sm font-bold text-emerald-700">
+                    {tier.pricePerPax
+                      ? `USD ${Number(tier.pricePerPax).toLocaleString()}`
+                      : "—"}
+                  </span>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      )}
+    </div>
+  );
+}
+
+const dateStatusStyle = (status) => {
+  if (status === "available")
+    return "bg-emerald-50 text-emerald-700 border border-emerald-200";
+  if (status === "limited")
+    return "bg-amber-50 text-amber-700 border border-amber-200";
+  return "bg-red-50 text-red-500 border border-red-200";
+};
+
 const Everestfeature = () => {
   const { id } = useParams();
   const navigate = useNavigate();
@@ -167,10 +288,8 @@ const Everestfeature = () => {
   const [lightboxImages, setLightboxImages] = useState([]);
   const [galleryOpen, setGalleryOpen] = useState(false);
   const [galleryIndex, setGalleryIndex] = useState(0);
+  const [bookingOpen, setBookingOpen] = useState(false);
   const sidebarRef = useRef(null);
-
-  const [bookingOpen, setBookingOpen] =
-  useState(false);
 
   useEffect(() => {
     const fetchTripDetail = async () => {
@@ -179,13 +298,14 @@ const Everestfeature = () => {
         const { data } = await axios.get(`/trips/${id}`);
         setTrip(data);
         const banner =
-          resolveImage(data.bannerImage || data.featuredImage) ||
-          FALLBACK_BANNER;
+          resolveImage(
+            data.bannerImage || data.featuredImage || data.heroImage,
+          ) || FALLBACK_BANNER;
         const galleryArr = (data.galleryImages || data.gallery || [])
           .map(resolveImage)
           .filter(Boolean);
         setLightboxImages(Array.from(new Set([banner, ...galleryArr])));
-      } catch (err) {
+      } catch {
         setError("Failed to load trip details.");
       } finally {
         setLoading(false);
@@ -216,7 +336,6 @@ const Everestfeature = () => {
     setGalleryOpen(true);
   };
 
-  /* ── LOADING ── */
   if (loading) {
     return (
       <div className="min-h-screen bg-white flex items-center justify-center">
@@ -236,7 +355,6 @@ const Everestfeature = () => {
     );
   }
 
-  /* ── ERROR ── */
   if (error || !trip) {
     return (
       <div className="min-h-screen bg-white flex flex-col items-center justify-center p-8 gap-6">
@@ -263,15 +381,35 @@ const Everestfeature = () => {
   }
 
   const bannerImage =
-    resolveImage(trip.bannerImage || trip.featuredImage) || FALLBACK_BANNER;
+    resolveImage(trip.bannerImage || trip.featuredImage || trip.heroImage) ||
+    FALLBACK_BANNER;
   const rawGallery = trip.galleryImages || trip.gallery || [];
+  const packages = trip.packages || [];
+  const availableDates = trip.availableDates || [];
+  const itinerary = trip.itinerary || [];
+  const includes = trip.includes || [];
+  const excludes = trip.excludes || [];
+  const highlights = trip.highlights || [];
+  const faqs = trip.faqs || [];
+
+  const categoryLabel =
+    {
+      standard: "Standard Trek",
+      comfort: "Comfort Trek",
+      luxury: "Luxury Trek",
+    }[trip.categoryType] ||
+    trip.categoryType ||
+    "Classic";
+
+  const nextDate = availableDates
+    .filter((d) => d.status !== "sold-out" && d.date)
+    .sort((a, b) => new Date(a.date) - new Date(b.date))[0];
 
   return (
     <div
       className="min-h-screen bg-white antialiased"
       style={{ fontFamily: fonts.body }}
     >
-      {/* ════════════════════════ HERO ════════════════════════ */}
       <div className="relative h-[72vh] min-h-[540px] overflow-hidden">
         <img
           src={bannerImage}
@@ -290,7 +428,6 @@ const Everestfeature = () => {
           }}
         />
 
-        {/* Top bar */}
         <div className="absolute top-0 inset-x-0 flex items-center justify-between px-6 md:px-14 pt-7 z-20">
           <button
             onClick={() => navigate(-1)}
@@ -312,7 +449,6 @@ const Everestfeature = () => {
           </button>
         </div>
 
-        {/* Hero content */}
         <div className="absolute bottom-0 inset-x-0 px-6 md:px-14 pb-14 z-10">
           <div className="max-w-[1400px] mx-auto">
             <div className="flex flex-wrap gap-2 mb-5">
@@ -331,11 +467,14 @@ const Everestfeature = () => {
               {trip.isBhutanTour && (
                 <TripBadge label="Bhutan Tour" variant="bhutan" />
               )}
+              {trip.isTibetTour && (
+                <TripBadge label="Tibet Tour" variant="tibet" />
+              )}
+              {trip.badge && <TripBadge label="Popular" variant="popular" />}
             </div>
 
             <p className="text-amber-400 text-[10px] font-bold tracking-[0.35em] uppercase mb-3">
-              {trip.categoryType || "Classic"} Trek &nbsp;·&nbsp;{" "}
-              {trip.country || "Nepal"}
+              {categoryLabel} &nbsp;·&nbsp; {trip.country || "Nepal"}
             </p>
 
             <h1
@@ -366,11 +505,8 @@ const Everestfeature = () => {
         </div>
       </div>
 
-      {/* ════════════════════════ BODY ════════════════════════ */}
       <div className="max-w-[1400px] mx-auto px-4 md:px-14 py-16 grid grid-cols-1 lg:grid-cols-[1fr_360px] gap-16">
-        {/* ══ MAIN CONTENT ══ */}
         <div className="space-y-16 min-w-0">
-          {/* STATS GRID */}
           <section>
             <div className="bg-white border border-gray-100 rounded-2xl overflow-hidden shadow-sm">
               <div className="h-1 bg-gradient-to-r from-amber-400 via-amber-300 to-transparent" />
@@ -384,12 +520,12 @@ const Everestfeature = () => {
                   {
                     icon: Clock,
                     label: "Duration",
-                    value: `${trip.duration || "12"} Days`,
+                    value: `${trip.duration || "—"} Days`,
                   },
                   {
                     icon: Mountain,
                     label: "Difficulty",
-                    value: trip.difficulty || "Strenuous",
+                    value: trip.difficulty || "—",
                   },
                   {
                     icon: Wind,
@@ -399,37 +535,43 @@ const Everestfeature = () => {
                   {
                     icon: Mountain,
                     label: "Max. Altitude",
-                    value: trip.maxAltitude || "5,555 m",
+                    value: trip.maxAltitude || "—",
                   },
                   {
                     icon: Calendar,
                     label: "Best Season",
-                    value: trip.bestSeason || "Mar–May, Sep–Nov",
+                    value: trip.bestSeason || "—",
                   },
                   {
                     icon: Star,
                     label: "Accommodation",
-                    value: trip.accommodation || "Lodge / Hotels",
+                    value: trip.accommodation || "—",
                   },
                   {
                     icon: Thermometer,
                     label: "Meals",
-                    value: trip.meals || "Included",
+                    value: trip.meals || "—",
                   },
                   {
                     icon: MapPin,
-                    label: "Start / End Point",
-                    value: trip.startPoint || "Kathmandu",
+                    label: "Start Point",
+                    value: trip.startPoint || "—",
+                  },
+                  {
+                    icon: MapPin,
+                    label: "End Point",
+                    value: trip.endPoint || "—",
+                  },
+                  { icon: BadgeCheck, label: "Category", value: categoryLabel },
+                  {
+                    icon: Globe,
+                    label: "Activity Type",
+                    value: trip.activity || "Trekking",
                   },
                 ].map(({ icon: Icon, label, value }, i) => (
                   <div
                     key={i}
-                    className="flex items-center gap-4 px-5 py-5 hover:bg-amber-50/30 transition-colors border-b border-r border-gray-100 last:border-r-0"
-                    style={{
-                      borderRight:
-                        (i + 1) % 3 !== 0 ? "1px solid #f3f4f6" : "none",
-                      borderBottom: i < 6 ? "1px solid #f3f4f6" : "none",
-                    }}
+                    className="flex items-center gap-4 px-5 py-5 hover:bg-amber-50/30 transition-colors border-b border-r border-gray-100"
                   >
                     <div className="w-9 h-9 rounded-xl bg-gray-50 border border-gray-100 flex items-center justify-center shrink-0">
                       <Icon
@@ -451,7 +593,6 @@ const Everestfeature = () => {
             </div>
           </section>
 
-          {/* OVERVIEW */}
           <section>
             <SectionHeading sub="About This Journey">
               Expedition Overview
@@ -462,7 +603,6 @@ const Everestfeature = () => {
             </div>
           </section>
 
-          {/* GALLERY */}
           {rawGallery.length > 0 && (
             <section>
               <SectionHeading sub="Moments From The Trail">
@@ -474,9 +614,7 @@ const Everestfeature = () => {
                   ({rawGallery.length})
                 </span>
               </SectionHeading>
-
               <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
-                {/* Large feature image */}
                 {(() => {
                   const first = resolveImage(rawGallery[0]);
                   return first ? (
@@ -497,8 +635,6 @@ const Everestfeature = () => {
                     </button>
                   ) : null;
                 })()}
-
-                {/* Thumbnail grid */}
                 {rawGallery.slice(1, 5).map((rawImg, i) => {
                   const resolvedUrl = resolveImage(rawImg);
                   if (!resolvedUrl) return null;
@@ -542,14 +678,13 @@ const Everestfeature = () => {
             </section>
           )}
 
-          {/* HIGHLIGHTS */}
-          {trip.highlights?.length > 0 && (
+          {highlights.length > 0 && (
             <section>
               <SectionHeading sub="What Makes This Special">
                 Key Highlights
               </SectionHeading>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                {trip.highlights.map((item, idx) => (
+                {highlights.map((item, idx) => (
                   <div
                     key={idx}
                     className="flex items-start gap-3.5 p-4 rounded-xl bg-white border border-gray-100 hover:border-amber-200 hover:shadow-sm transition-all duration-200 group"
@@ -566,14 +701,13 @@ const Everestfeature = () => {
             </section>
           )}
 
-          {/* ITINERARY */}
-          {trip.itinerary?.length > 0 && (
+          {itinerary.length > 0 && (
             <section>
               <SectionHeading sub="Complete Day-by-Day Breakdown">
                 Detailed Itinerary
               </SectionHeading>
               <div className="space-y-2">
-                {trip.itinerary.map((day, idx) => {
+                {itinerary.map((day, idx) => {
                   const isOpen = activeDay === idx;
                   return (
                     <div
@@ -606,9 +740,29 @@ const Everestfeature = () => {
                             {day.day || idx + 1}
                           </span>
                         </div>
-                        <span className="flex-1 text-sm font-semibold text-gray-900 leading-snug">
-                          {day.title}
-                        </span>
+                        <div className="flex-1 min-w-0">
+                          <span className="text-sm font-semibold text-gray-900 leading-snug block">
+                            {day.title || day.heading}
+                          </span>
+
+                          <div className="flex flex-wrap gap-3 mt-1">
+                            {day.meals && (
+                              <span className="text-[10px] text-gray-400 font-medium">
+                                🍽 {day.meals}
+                              </span>
+                            )}
+                            {day.accommodation && (
+                              <span className="text-[10px] text-gray-400 font-medium">
+                                🏨 {day.accommodation}
+                              </span>
+                            )}
+                            {day.altitude && (
+                              <span className="text-[10px] text-gray-400 font-medium">
+                                ⛰ {day.altitude}
+                              </span>
+                            )}
+                          </div>
+                        </div>
                         <span
                           className={`shrink-0 w-6 h-6 rounded-full flex items-center justify-center transition-all ${
                             isOpen
@@ -623,11 +777,12 @@ const Everestfeature = () => {
                           )}
                         </span>
                       </button>
-                      {isOpen && day.description && (
-                        <div className="px-6 py-5 bg-white border-t border-amber-100 text-sm text-gray-600 leading-[1.85] whitespace-pre-line">
-                          {day.description}
-                        </div>
-                      )}
+                      {isOpen &&
+                        (day.description || day.details || day.content) && (
+                          <div className="px-6 py-5 bg-white border-t border-amber-100 text-sm text-gray-600 leading-[1.85] whitespace-pre-line">
+                            {day.description || day.details || day.content}
+                          </div>
+                        )}
                     </div>
                   );
                 })}
@@ -635,10 +790,9 @@ const Everestfeature = () => {
             </section>
           )}
 
-          {/* INCLUDES / EXCLUDES */}
           <section>
             <SectionHeading sub="Package Scope">
-              What's Included & Excluded
+              What's Included &amp; Excluded
             </SectionHeading>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="rounded-2xl border border-gray-100 overflow-hidden">
@@ -651,26 +805,27 @@ const Everestfeature = () => {
                   </h3>
                 </div>
                 <div className="p-5 bg-white space-y-3">
-                  {trip.includes?.map((inc, i) => (
-                    <div
-                      key={i}
-                      className="flex items-start gap-3 text-sm text-gray-600"
-                    >
-                      <span className="text-emerald-500 font-bold text-base leading-none mt-0.5 shrink-0">
-                        ✓
-                      </span>
-                      <span className="leading-snug">
-                        {typeof inc === "string" ? inc : inc.text}
-                      </span>
-                    </div>
-                  )) ?? (
+                  {includes.length > 0 ? (
+                    includes.map((inc, i) => (
+                      <div
+                        key={i}
+                        className="flex items-start gap-3 text-sm text-gray-600"
+                      >
+                        <span className="text-emerald-500 font-bold text-base leading-none mt-0.5 shrink-0">
+                          ✓
+                        </span>
+                        <span className="leading-snug">
+                          {typeof inc === "string" ? inc : inc.text}
+                        </span>
+                      </div>
+                    ))
+                  ) : (
                     <p className="text-sm text-gray-400 italic">
                       Standard logistics included.
                     </p>
                   )}
                 </div>
               </div>
-
               <div className="rounded-2xl border border-gray-100 overflow-hidden">
                 <div className="px-5 py-4 flex items-center gap-3 border-b border-gray-100 bg-white">
                   <div className="w-7 h-7 rounded-lg bg-rose-50 border border-rose-100 flex items-center justify-center">
@@ -681,19 +836,21 @@ const Everestfeature = () => {
                   </h3>
                 </div>
                 <div className="p-5 bg-white space-y-3">
-                  {trip.excludes?.map((exc, i) => (
-                    <div
-                      key={i}
-                      className="flex items-start gap-3 text-sm text-gray-600"
-                    >
-                      <span className="text-rose-400 font-bold text-base leading-none mt-0.5 shrink-0">
-                        ✕
-                      </span>
-                      <span className="leading-snug">
-                        {typeof exc === "string" ? exc : exc.text}
-                      </span>
-                    </div>
-                  )) ?? (
+                  {excludes.length > 0 ? (
+                    excludes.map((exc, i) => (
+                      <div
+                        key={i}
+                        className="flex items-start gap-3 text-sm text-gray-600"
+                      >
+                        <span className="text-rose-400 font-bold text-base leading-none mt-0.5 shrink-0">
+                          ✕
+                        </span>
+                        <span className="leading-snug">
+                          {typeof exc === "string" ? exc : exc.text}
+                        </span>
+                      </div>
+                    ))
+                  ) : (
                     <p className="text-sm text-gray-400 italic">
                       Personal gear excluded.
                     </p>
@@ -703,14 +860,143 @@ const Everestfeature = () => {
             </div>
           </section>
 
-          {/* FAQ */}
-          {trip.faqs?.length > 0 && (
+          {packages.length > 0 && (
+            <section>
+              <SectionHeading sub="Budget Tier Configurations">
+                Pricing Packages
+              </SectionHeading>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {packages.map((pkg, i) => (
+                  <PackageCard key={i} pkg={pkg} />
+                ))}
+              </div>
+            </section>
+          )}
+
+          {availableDates.length > 0 && (
+            <section>
+              <SectionHeading sub="Operational Fixed Dates Matrix">
+                Departure Dates &amp; Availability
+              </SectionHeading>
+              <div className="bg-white border border-gray-100 rounded-2xl overflow-hidden shadow-sm">
+                <div className="h-1 bg-gradient-to-r from-amber-400 via-amber-300 to-transparent" />
+
+                <div className="grid grid-cols-[1fr_auto_auto_auto] gap-4 px-5 py-3 border-b border-gray-100 bg-gray-50/60">
+                  <span className="text-[10px] font-black uppercase tracking-widest text-gray-400">
+                    Departure Date
+                  </span>
+                  <span className="text-[10px] font-black uppercase tracking-widest text-gray-400 text-center min-w-[64px]">
+                    Seats
+                  </span>
+                  <span className="text-[10px] font-black uppercase tracking-widest text-gray-400 text-right min-w-[80px]">
+                    Price
+                  </span>
+                  <span className="text-[10px] font-black uppercase tracking-widest text-gray-400 text-center min-w-[80px]">
+                    Status
+                  </span>
+                </div>
+                <div className="divide-y divide-gray-50">
+                  {availableDates.map((d, idx) => {
+                    const dateObj = d.date ? new Date(d.date) : null;
+                    const soldOut = d.status === "sold-out";
+                    return (
+                      <div
+                        key={idx}
+                        className={`grid grid-cols-[1fr_auto_auto_auto] gap-4 items-center px-5 py-4 transition-colors ${
+                          soldOut ? "opacity-50" : "hover:bg-amber-50/30"
+                        }`}
+                      >
+                        <div className="flex items-center gap-3">
+                          {dateObj && (
+                            <div className="shrink-0 w-11 h-11 rounded-xl bg-gray-50 border border-gray-100 flex flex-col items-center justify-center">
+                              <span className="text-[9px] font-bold uppercase tracking-wider text-amber-500 leading-none">
+                                {dateObj.toLocaleString("default", {
+                                  month: "short",
+                                })}
+                              </span>
+                              <span className="text-base font-black text-gray-900 leading-tight">
+                                {dateObj.getDate()}
+                              </span>
+                            </div>
+                          )}
+                          <div>
+                            <p className="text-sm font-semibold text-gray-900">
+                              {dateObj
+                                ? dateObj.toLocaleDateString("en-US", {
+                                    weekday: "short",
+                                    year: "numeric",
+                                    month: "long",
+                                    day: "numeric",
+                                  })
+                                : d.date || "TBA"}
+                            </p>
+                            {trip.duration && (
+                              <p className="text-[11px] text-gray-400 font-medium mt-0.5">
+                                {trip.duration}-day expedition
+                              </p>
+                            )}
+                          </div>
+                        </div>
+
+                        <div className="min-w-[64px] text-center">
+                          {d.totalSeats ? (
+                            <div className="flex flex-col items-center">
+                              <Users
+                                size={13}
+                                className="text-gray-400 mb-0.5"
+                              />
+                              <span className="text-sm font-bold text-gray-700">
+                                {d.totalSeats}
+                              </span>
+                            </div>
+                          ) : (
+                            <span className="text-xs text-gray-400">Open</span>
+                          )}
+                        </div>
+
+                        <div className="min-w-[80px] text-right">
+                          {d.price ? (
+                            <p
+                              className="text-sm font-bold text-gray-900"
+                              style={{ fontFamily: fonts.display }}
+                            >
+                              USD {Number(d.price).toLocaleString()}
+                            </p>
+                          ) : (
+                            <p className="text-xs text-gray-400">Standard</p>
+                          )}
+                        </div>
+
+                        <div className="min-w-[80px] flex flex-col items-center gap-2">
+                          <span
+                            className={`text-[9px] font-black px-2.5 py-1 rounded-full uppercase tracking-wide capitalize ${dateStatusStyle(d.status)}`}
+                          >
+                            {d.status || "available"}
+                          </span>
+                          {!soldOut && (
+                            <button
+                              onClick={() => setBookingOpen(true)}
+                              className="text-[10px] font-bold bg-amber-500 hover:bg-amber-400 text-white px-3 py-1 rounded-lg transition-colors"
+                            >
+                              Book
+                            </button>
+                          )}
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            </section>
+          )}
+
+          {faqs.length > 0 && (
             <section>
               <SectionHeading sub="Common Questions">
                 Frequently Asked Questions
               </SectionHeading>
               <div className="bg-white border border-gray-100 rounded-2xl px-6 py-2">
-                <AccordionFAQ faqs={trip.faqs} />
+                <AccordionFAQ faqs={faqs} />
               </div>
             </section>
           )}
@@ -724,7 +1010,7 @@ const Everestfeature = () => {
                 {trip.oldPrice > 0 && (
                   <div className="flex items-center gap-2 mb-2">
                     <span className="text-sm line-through text-gray-300">
-                      USD {trip.oldPrice.toLocaleString()}
+                      USD {Number(trip.oldPrice).toLocaleString()}
                     </span>
                     {trip.oldPrice - trip.price > 0 && (
                       <span className="text-[10px] bg-emerald-100 text-emerald-700 font-bold px-2.5 py-1 rounded-full">
@@ -739,7 +1025,7 @@ const Everestfeature = () => {
                     style={{ fontFamily: fonts.display }}
                   >
                     {trip.price
-                      ? `USD ${trip.price.toLocaleString()}`
+                      ? `USD ${Number(trip.price).toLocaleString()}`
                       : "Contact Us"}
                   </span>
                 </div>
@@ -750,16 +1036,13 @@ const Everestfeature = () => {
 
               <div className="px-6 pb-5 space-y-2.5">
                 <button
-  onClick={() =>
-    setBookingOpen(true)
-  }
-  className="w-full bg-gray-950 hover:bg-gray-800 text-white font-semibold py-3.5 rounded-xl transition-colors text-sm tracking-wide"
->
-  Book This Expedition
-</button>
+                  onClick={() => setBookingOpen(true)}
+                  className="w-full bg-gray-950 hover:bg-gray-800 text-white font-semibold py-3.5 rounded-xl transition-colors text-sm tracking-wide"
+                >
+                  Book This Expedition
+                </button>
                 <button className="w-full flex items-center justify-center gap-2 border border-amber-200 bg-amber-50 hover:bg-amber-100 text-amber-700 font-semibold py-3 rounded-xl transition-colors text-sm">
-                  <Download size={14} />
-                  Download Brochure
+                  <Download size={14} /> Download Brochure
                 </button>
               </div>
 
@@ -774,14 +1057,41 @@ const Everestfeature = () => {
                     key={i}
                     className="flex items-center gap-2 text-[11px] text-gray-500 font-medium"
                   >
-                    <Icon size={12} className="text-amber-400 shrink-0" />
+                    <Icon size={12} className="text-amber-400 shrink-0" />{" "}
                     {text}
                   </div>
                 ))}
               </div>
             </div>
 
-            {trip.availableDates?.length > 0 && (
+            {nextDate && (
+              <div className="bg-white border border-amber-200 rounded-2xl px-5 py-4">
+                <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-amber-500 mb-2 flex items-center gap-1.5">
+                  <Calendar size={11} /> Next Departure
+                </p>
+                <p className="font-bold text-gray-900 text-sm">
+                  {new Date(nextDate.date).toLocaleDateString("en-US", {
+                    month: "long",
+                    day: "numeric",
+                    year: "numeric",
+                  })}
+                </p>
+                <div className="flex items-center justify-between mt-2">
+                  {nextDate.totalSeats && (
+                    <span className="text-[11px] text-gray-500 font-medium flex items-center gap-1">
+                      <Users size={11} /> {nextDate.totalSeats} seats
+                    </span>
+                  )}
+                  <span
+                    className={`text-[9px] font-black px-2 py-0.5 rounded-full uppercase tracking-wide capitalize ${dateStatusStyle(nextDate.status)}`}
+                  >
+                    {nextDate.status || "available"}
+                  </span>
+                </div>
+              </div>
+            )}
+
+            {availableDates.length > 0 && (
               <div className="bg-white border border-gray-200 rounded-2xl overflow-hidden shadow-sm">
                 <div className="px-5 py-4 border-b border-gray-100 flex items-center justify-between">
                   <div className="flex items-center gap-2">
@@ -791,31 +1101,61 @@ const Everestfeature = () => {
                     </span>
                   </div>
                   <span className="text-[10px] text-gray-400 font-medium">
-                    {trip.availableDates.length} dates
+                    {availableDates.length} dates
                   </span>
                 </div>
                 <div className="p-3 space-y-2 max-h-64 overflow-y-auto">
-                  {trip.availableDates.map((date, idx) => (
+                  {availableDates.map((date, idx) => (
                     <div
                       key={idx}
                       className="flex items-center justify-between px-3.5 py-3 rounded-xl bg-gray-50 hover:bg-white border border-transparent hover:border-gray-200 hover:shadow-sm transition-all cursor-pointer"
+                      onClick={() => setBookingOpen(true)}
                     >
                       <div>
                         <p className="text-sm font-semibold text-gray-800">
                           {date.date}
                         </p>
                         <p className="text-[10px] text-gray-400 mt-0.5 font-medium">
-                          {date.totalSeats || "Open"} seats
+                          {date.totalSeats
+                            ? `${date.totalSeats} seats`
+                            : "Open"}
+                          {date.price
+                            ? ` · USD ${Number(date.price).toLocaleString()}`
+                            : ""}
                         </p>
                       </div>
                       <span
-                        className={`text-[10px] font-bold px-2.5 py-1 rounded-full uppercase tracking-wide ${
-                          date.status === "available"
-                            ? "bg-emerald-50 text-emerald-700 border border-emerald-200"
-                            : "bg-amber-50 text-amber-700 border border-amber-200"
-                        }`}
+                        className={`text-[10px] font-bold px-2.5 py-1 rounded-full uppercase tracking-wide ${dateStatusStyle(date.status)}`}
                       >
-                        {date.status}
+                        {date.status || "available"}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {packages.length > 0 && (
+              <div className="bg-white border border-gray-200 rounded-2xl overflow-hidden shadow-sm">
+                <div className="px-5 py-4 border-b border-gray-100 flex items-center gap-2">
+                  <Package size={13} className="text-amber-500" />
+                  <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-gray-500">
+                    Available Packages
+                  </span>
+                </div>
+                <div className="p-3 space-y-2">
+                  {packages.map((pkg, i) => (
+                    <div
+                      key={i}
+                      className="flex items-center justify-between px-3.5 py-2.5 rounded-xl bg-gray-50"
+                    >
+                      <span className="text-xs font-semibold text-gray-700">
+                        {pkg.name || `Package ${i + 1}`}
+                      </span>
+                      <span className="text-xs font-bold text-gray-900">
+                        {pkg.price
+                          ? `USD ${Number(pkg.price).toLocaleString()}`
+                          : "—"}
                       </span>
                     </div>
                   ))}
@@ -825,16 +1165,14 @@ const Everestfeature = () => {
 
             <div className="bg-gray-950 rounded-2xl p-5 text-center space-y-3">
               <PhoneCall size={18} className="text-amber-400 mx-auto" />
-
               <div>
                 <p className="text-sm font-semibold text-white">
                   Need a custom booking?
                 </p>
                 <p className="text-xs text-gray-400 mt-0.5">
-                  Group rates & private departures available
+                  Group rates &amp; private departures available
                 </p>
               </div>
-
               <Link
                 to="/contact-us"
                 className="block w-full text-xs font-bold bg-amber-500 hover:bg-amber-400 text-black py-2.5 rounded-xl transition-colors text-center"
@@ -844,15 +1182,13 @@ const Everestfeature = () => {
             </div>
           </div>
         </aside>
-
-        <BookingModal
-  trip={trip}
-  open={bookingOpen}
-  onClose={() =>
-    setBookingOpen(false)
-  }
-/>
       </div>
+
+      <BookingModal
+        trip={trip}
+        open={bookingOpen}
+        onClose={() => setBookingOpen(false)}
+      />
 
       {galleryOpen && lightboxImages.length > 0 && (
         <div
@@ -866,7 +1202,7 @@ const Everestfeature = () => {
             </span>
             <button
               onClick={() => setGalleryOpen(false)}
-              className="w-10 h-10 rounded-full bg-white/8 hover:bg-white/15 text-white flex items-center justify-center transition-colors border border-white/10 focus:outline-none"
+              className="w-10 h-10 rounded-full bg-white/8 hover:bg-white/15 text-white flex items-center justify-center transition-colors border border-white/10"
             >
               <X size={18} />
             </button>
@@ -881,7 +1217,7 @@ const Everestfeature = () => {
                     (p - 1 + lightboxImages.length) % lightboxImages.length,
                 );
               }}
-              className="absolute left-4 w-11 h-11 rounded-full bg-white/8 hover:bg-white/18 text-white flex items-center justify-center border border-white/10 transition-all focus:outline-none"
+              className="absolute left-4 w-11 h-11 rounded-full bg-white/8 hover:bg-white/18 text-white flex items-center justify-center border border-white/10 transition-all"
             >
               <ChevronLeft size={20} />
             </button>
@@ -902,7 +1238,7 @@ const Everestfeature = () => {
                 e.stopPropagation();
                 setGalleryIndex((p) => (p + 1) % lightboxImages.length);
               }}
-              className="absolute right-4 w-11 h-11 rounded-full bg-white/8 hover:bg-white/18 text-white flex items-center justify-center border border-white/10 transition-all focus:outline-none"
+              className="absolute right-4 w-11 h-11 rounded-full bg-white/8 hover:bg-white/18 text-white flex items-center justify-center border border-white/10 transition-all"
             >
               <ChevronRight size={20} />
             </button>
@@ -917,7 +1253,7 @@ const Everestfeature = () => {
                 <button
                   key={i}
                   onClick={() => setGalleryIndex(i)}
-                  className={`shrink-0 w-14 h-10 rounded-lg overflow-hidden border-[1.5px] transition-all focus:outline-none ${
+                  className={`shrink-0 w-14 h-10 rounded-lg overflow-hidden border-[1.5px] transition-all ${
                     i === galleryIndex
                       ? "border-amber-400 opacity-100 scale-105"
                       : "border-transparent opacity-35 hover:opacity-60"

@@ -83,7 +83,7 @@ const WhyAce = () => {
 
         <div className="relative z-20 text-center px-6 max-w-5xl">
 
-          <p className="uppercase tracking-[0.35em] text-[#f1b400] text-sm font-bold mb-6">
+          <p className="uppercase tracking-[0.35em] text-emerald-500 text-sm font-bold mb-6">
             Why Choose Wales Trek and Travel
           </p>
 
@@ -100,7 +100,7 @@ const WhyAce = () => {
 
           <button
             onClick={() => setIsVideoModalOpen(true)}
-            className="group inline-flex items-center gap-4 bg-[#f1b400] hover:bg-[#dca400] text-black px-8 py-4 rounded-2xl font-bold text-sm uppercase tracking-[0.2em] transition-all duration-300 shadow-2xl hover:scale-105"
+            className="group inline-flex items-center gap-4 bg-emerald-500 hover:bg-emerald-600 text-black px-8 py-4 rounded-2xl font-bold text-sm uppercase tracking-[0.2em] transition-all duration-300 shadow-2xl hover:scale-105"
           >
             <span className="w-12 h-12 rounded-full bg-black text-white flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
               <Play size={18} fill="white" />
@@ -143,7 +143,7 @@ const WhyAce = () => {
 
           <div className="max-w-3xl">
 
-            <p className="uppercase tracking-[0.25em] text-sm text-[#f1b400] font-bold mb-5">
+            <p className="uppercase tracking-[0.25em] text-sm text-emerald-500 font-bold mb-5">
               Trusted Himalayan Specialists
             </p>
 
@@ -152,7 +152,7 @@ const WhyAce = () => {
               Choose Us
             </h2>
 
-            <div className="w-24 h-1 bg-[#f1b400] rounded-full mb-8"></div>
+            <div className="w-24 h-1 bg-emerald-500 rounded-full mb-8"></div>
 
             <p className="text-xl text-gray-600 leading-relaxed">
               Discover why thousands of travelers from around the world
@@ -186,14 +186,14 @@ const WhyAce = () => {
 
                 <div className="flex items-center gap-6 md:gap-10">
 
-                  <span className="text-4xl md:text-5xl font-black text-gray-200 group-hover:text-[#f1b400] transition-colors duration-300">
+                  <span className="text-4xl md:text-5xl font-black text-gray-200 group-hover:text-emerald-500 transition-colors duration-300">
                     {String(index + 1).padStart(2, "0")}
                   </span>
 
                   <span
                     className={`text-xl md:text-3xl font-semibold transition-all duration-300 ${
                       openIndex === index
-                        ? "text-[#b8860b] translate-x-2"
+                        ? "text-emerald-600 translate-x-2"
                         : "text-gray-800"
                     }`}
                   >
@@ -211,7 +211,7 @@ const WhyAce = () => {
                     strokeWidth={1.8}
                     className={
                       openIndex === index
-                        ? "text-[#b8860b]"
+                        ? "text-emerald-600"
                         : "text-gray-400"
                     }
                   />
@@ -237,7 +237,7 @@ const WhyAce = () => {
         {/* BOTTOM CTA */}
         <div className="mt-24 bg-[#2c3338] rounded-3xl p-10 md:p-16 text-center text-white shadow-2xl">
 
-          <p className="uppercase tracking-[0.25em] text-sm text-[#f1b400] font-bold mb-5">
+          <p className="uppercase tracking-[0.25em] text-sm text-emerald-500 font-bold mb-5">
             Begin Your Adventure
           </p>
 
@@ -252,7 +252,7 @@ const WhyAce = () => {
             your journey extraordinary.
           </p>
 
-          <button className="bg-[#f1b400] hover:bg-[#dca400] text-black font-black px-10 py-5 rounded-2xl transition-all duration-300 shadow-lg hover:scale-105 uppercase tracking-[0.15em] text-sm">
+          <button className="bg-emerald-500 hover:bg-emerald-600 text-white font-black px-10 py-5 rounded-2xl transition-all duration-300 shadow-lg hover:scale-105 uppercase tracking-[0.15em] text-sm">
             Plan Your Trip
           </button>
         </div>

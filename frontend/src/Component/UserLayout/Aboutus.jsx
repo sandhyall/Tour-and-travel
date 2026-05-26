@@ -230,7 +230,7 @@ const Aboutus = () => {
         {/* VALUES */}
         <div className="bg-[#2c3338] rounded-3xl p-10 md:p-16 text-white shadow-2xl">
           <div className="text-center mb-14">
-            <p className="uppercase tracking-[0.25em] text-sm text-[#f1b400] font-bold mb-4">
+            <p className="uppercase tracking-[0.25em] text-sm text-emeral font-bold mb-4">
               Our Core Values
             </p>
 
@@ -242,7 +242,7 @@ const Aboutus = () => {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-10">
 
             <div className="bg-white/5 border border-white/10 rounded-2xl p-8 backdrop-blur-sm">
-              <h3 className="text-2xl font-bold text-[#f1b400] mb-5">
+              <h3 className="text-2xl font-bold text-emerald-500 mb-5">
                 Customer Satisfaction
               </h3>
 
@@ -255,7 +255,7 @@ const Aboutus = () => {
             </div>
 
             <div className="bg-white/5 border border-white/10 rounded-2xl p-8 backdrop-blur-sm">
-              <h3 className="text-2xl font-bold text-[#f1b400] mb-5">
+              <h3 className="text-2xl font-bold text-emerald-500 mb-5">
                 Sustainable Tourism
               </h3>
 
@@ -268,7 +268,7 @@ const Aboutus = () => {
             </div>
 
             <div className="bg-white/5 border border-white/10 rounded-2xl p-8 backdrop-blur-sm">
-              <h3 className="text-2xl font-bold text-[#f1b400] mb-5">
+              <h3 className="text-2xl font-bold text-emerald-500 mb-5">
                 Trust & Professionalism
               </h3>
 

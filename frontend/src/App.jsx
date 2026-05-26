@@ -43,7 +43,7 @@ const App = () => {
           onClick={() =>
             setOpenChat(true)
           }
-          className="fixed bottom-6 right-6 z-50 w-16 h-16 rounded-full bg-amber-500 shadow-2xl flex items-center justify-center hover:scale-110 transition"
+          className="fixed bottom-6 right-6 z-50 w-16 h-16 rounded-full bg-emerald-500 shadow-2xl flex items-center justify-center hover:scale-110 transition"
         >
           <MessageCircle
             size={28}

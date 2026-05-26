@@ -158,7 +158,6 @@
 
 // export default mongoose.model("Trip", tripSchema);
 
-
 import mongoose from "mongoose";
 
 const availableDateSchema = new mongoose.Schema({
@@ -283,8 +282,9 @@ const tripSchema = new mongoose.Schema(
 
         groupPricing: [
           {
-            people: String,
-            price: Number,
+            minPax: { type: Number, default: 1 },
+            maxPax: { type: Number, default: 1 },
+            pricePerPax: { type: Number, default: 0 },
           },
         ],
       },
@@ -308,7 +308,7 @@ const tripSchema = new mongoose.Schema(
       },
     ],
   },
-  { timestamps: true }
+  { timestamps: true },
 );
 
 export default mongoose.model("Trip", tripSchema);

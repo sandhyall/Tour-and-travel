@@ -1,9 +1,13 @@
-// routes/chatRoutes.js
 import express from "express";
-import { chatBot } from "../controllers/chatbotController.js";
+import {
+  sendMessage,
+  getChatHistory,
+} from "../controllers/chatbotController.js";
 
 const router = express.Router();
 
-router.post("/", chatBot);
+// 👇 PUBLIC CHATBOT (NO LOGIN REQUIRED)
+router.post("/send", sendMessage);
+router.get("/history", getChatHistory);
 
 export default router;

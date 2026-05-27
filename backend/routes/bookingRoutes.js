@@ -56,6 +56,7 @@ import {
   updateBookingStatus,
   getBookedDates,
   resendPendingEmails,
+  confirmBookingAndPayment
 } from "../controllers/bookingController.js";
 
 import { upload } from "../middleware/uploadMiddleware.js";
@@ -72,6 +73,7 @@ router.post("/:id/slip", protect, upload.single("slip"), uploadSlip);
 router.get("/all", protect, adminOnly, getAllBookings);
 router.put("/:id/verify", protect, adminOnly, verifyBooking);
 router.put("/:id/status", protect, adminOnly, updateBookingStatus);
+router.put("/:id/confirm-all", protect, adminOnly, confirmBookingAndPayment);
 
 router.post("/resend-emails", protect, adminOnly, resendPendingEmails);
 

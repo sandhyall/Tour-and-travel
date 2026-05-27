@@ -720,3 +720,60 @@ export const resendPendingEmails = async (req, res) => {
     res.status(500).json({ message: err.message });
   }
 };
+// ─────────────────────────────────────────────
+// CONFIRM BOOKING + PAYMENT TOGETHER
+// PUT /api/bookings/:id/confirm-all
+// ─────────────────────────────────────────────
+
+
+export const confirmBookingAndPayment = async (req, res) => {
+  try {
+    const booking = await Booking.findById(req.params.id);
+
+    if (!booking) {
+      return res.status(404).json({
+        message: "Booking not found",
+      });
+    }
+
+    // Confirm booking
+    booking.bookingStatus = "confirmed";
+
+    // Find existing payment
+    let payment = await Payment.findOne({
+      bookingId: booking._id,
+    });
+
+    // Create payment if not exists
+    if (!payment) {
+      payment = await Payment.create({
+        bookingId: booking._id,
+        amount: booking.totalAmount,
+        method: "swift_bank_transfer",
+        status: "success",
+        transactionId: `MANUAL-${Date.now()}`,
+      });
+    } else {
+      payment.status = "success";
+      await payment.save();
+    }
+
+    // Attach successful payment
+    booking.successfulPaymentId = payment._id;
+
+    await booking.save();
+
+    res.json({
+      message: "Booking and payment confirmed",
+      booking,
+      payment,
+    });
+  } catch (err) {
+    console.error("CONFIRM ALL ERROR:");
+    console.error(err);
+
+    res.status(500).json({
+      message: err.message,
+    });
+  }
+};

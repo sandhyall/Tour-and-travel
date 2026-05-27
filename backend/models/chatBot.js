@@ -1,9 +1,26 @@
-// models/Chat.js
 import mongoose from "mongoose";
 
-const chatSchema = new mongoose.Schema({
-  userMessage: String,
-  botReply: String
-}, { timestamps: true });
+const chatMessageSchema =
+  new mongoose.Schema(
+    {
+      userId: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "User",
+      },
 
-export default mongoose.model("Chat", chatSchema);
+      role: {
+        type: String,
+        enum: ["user", "assistant"],
+      },
+
+      content: String,
+    },
+    {
+      timestamps: true,
+    }
+  );
+
+export default mongoose.model(
+  "ChatMessage",
+  chatMessageSchema
+);

@@ -23,6 +23,14 @@ const INITIAL_FORM_TEMPLATE = {
   travelDate: "",
 };
 
+const BANK_DETAILS = {
+  bankName: "Himalayan Bank Ltd.",
+  accountName: "Ace Travel Pvt. Ltd.",
+  accountNumber: "0123456789012345",
+  swiftCode: "HIMANPKA",
+  branch: "Thamel Branch, Kathmandu",
+};
+
 // FIX 4: Format ISO date string to a readable label for display
 const formatDate = (isoString) => {
   if (!isoString) return "";
@@ -184,7 +192,7 @@ useEffect(() => {
                       onClick={() => setSelectedPackage(pkg)}
                       className={`border rounded-2xl p-5 text-left transition-all ${
                         selectedPackage?.name === pkg.name
-                          ? "border-amber-500 bg-amber-50/70 shadow-sm"
+                          ? "border-emerald-500 bg-emerald-50/70 shadow-sm"
                           : "hover:bg-gray-50 border-gray-200"
                       }`}
                     >
@@ -233,7 +241,7 @@ useEffect(() => {
                   <button
                     type="button"
                     onClick={addParticipant}
-                    className="flex items-center gap-1 text-sm font-bold bg-amber-500 text-black px-4 py-2 rounded-xl hover:bg-amber-600 transition"
+                    className="flex items-center gap-1 text-sm font-bold bg-emerald-500 text-white px-4 py-2 rounded-xl hover:bg-emerald-600 transition"
                   >
                     <Plus size={16} /> Add Traveler
                   </button>
@@ -266,7 +274,7 @@ useEffect(() => {
                         onChange={(e) =>
                           updateParticipant(index, "firstName", e.target.value)
                         }
-                        className="border border-gray-200 bg-white rounded-xl px-4 py-2.5 outline-none focus:border-amber-500 transition-colors"
+                        className="border border-gray-200 bg-white rounded-xl px-4 py-2.5 outline-none focus:border-emerald-500 transition-colors"
                       />
                       <input
                         placeholder="Last Name"
@@ -274,7 +282,7 @@ useEffect(() => {
                         onChange={(e) =>
                           updateParticipant(index, "lastName", e.target.value)
                         }
-                        className="border border-gray-200 bg-white rounded-xl px-4 py-2.5 outline-none focus:border-amber-500 transition-colors"
+                        className="border border-gray-200 bg-white rounded-xl px-4 py-2.5 outline-none focus:border-emerald-500 transition-colors"
                       />
                       <input
                         placeholder="Email"
@@ -283,7 +291,7 @@ useEffect(() => {
                         onChange={(e) =>
                           updateParticipant(index, "email", e.target.value)
                         }
-                        className="border border-gray-200 bg-white rounded-xl px-4 py-2.5 outline-none focus:border-amber-500 transition-colors"
+                        className="border border-gray-200 bg-white rounded-xl px-4 py-2.5 outline-none focus:border-emerald-500 transition-colors"
                       />
                       <input
                         placeholder="Phone Number"
@@ -291,7 +299,7 @@ useEffect(() => {
                         onChange={(e) =>
                           updateParticipant(index, "phone", e.target.value)
                         }
-                        className="border border-gray-200 bg-white rounded-xl px-4 py-2.5 outline-none focus:border-amber-500 transition-colors"
+                        className="border border-gray-200 bg-white rounded-xl px-4 py-2.5 outline-none focus:border-emerald-500 transition-colors"
                       />
                     </div>
 
@@ -301,7 +309,7 @@ useEffect(() => {
                         onChange={(e) =>
                           updateParticipant(index, "gender", e.target.value)
                         }
-                        className="border border-gray-200 bg-white rounded-xl px-4 py-2.5 outline-none focus:border-amber-500 text-gray-600 transition-colors"
+                        className="border border-gray-200 bg-white rounded-xl px-4 py-2.5 outline-none focus:border-emerald-500 text-gray-600 transition-colors"
                       >
                         <option value="">Select Gender</option>
                         <option value="male">Male</option>
@@ -314,7 +322,7 @@ useEffect(() => {
                         onChange={(e) =>
                           updateParticipant(index, "dob", e.target.value)
                         }
-                        className="border border-gray-200 bg-white rounded-xl px-4 py-2.5 w-full outline-none focus:border-amber-500 text-gray-600 transition-colors"
+                        className="border border-gray-200 bg-white rounded-xl px-4 py-2.5 w-full outline-none focus:border-emerald-500 text-gray-600 transition-colors"
                       />
                       <input
                         placeholder="Nationality"
@@ -322,7 +330,7 @@ useEffect(() => {
                         onChange={(e) =>
                           updateParticipant(index, "nationality", e.target.value)
                         }
-                        className="border border-gray-200 bg-white rounded-xl px-4 py-2.5 outline-none focus:border-amber-500 transition-colors"
+                        className="border border-gray-200 bg-white rounded-xl px-4 py-2.5 outline-none focus:border-emerald-500 transition-colors"
                       />
                     </div>
                     <input
@@ -331,7 +339,7 @@ useEffect(() => {
                       onChange={(e) =>
                         updateParticipant(index, "passportNumber", e.target.value)
                       }
-                      className="border border-gray-200 bg-white rounded-xl px-4 py-2.5 w-full outline-none focus:border-amber-500 transition-colors"
+                      className="border border-gray-200 bg-white rounded-xl px-4 py-2.5 w-full outline-none focus:border-emerald-500 transition-colors"
                     />
                   </div>
                 ))}
@@ -359,7 +367,7 @@ useEffect(() => {
                           isFull
                             ? "opacity-40 cursor-not-allowed border-gray-100 bg-gray-50"
                             : isSelected
-                            ? "border-amber-500 bg-amber-50 shadow-sm"
+                            ? "border-emerald-500 bg-emerald-50 shadow-sm"
                             : "hover:bg-gray-50 border-gray-200"
                         }`}
                       >
@@ -372,7 +380,7 @@ useEffect(() => {
                             isFull
                               ? "text-red-400 font-semibold"
                               : seatsLeft <= 5
-                              ? "text-amber-500 font-semibold"
+                              ? "text-emerald-500 font-semibold"
                               : "text-gray-400"
                           }`}
                         >
@@ -395,7 +403,7 @@ useEffect(() => {
                 />
 
                 {paymentMethod === "card" && (
-                  <div className="mt-4 border border-amber-200 bg-amber-50/40 rounded-xl p-5 text-sm text-amber-900 flex flex-col gap-1.5">
+                  <div className="mt-4 border border-emerald-200 bg-emerald-50/40 rounded-xl p-5 text-sm text-emerald-900 flex flex-col gap-1.5">
                     <p className="font-semibold">✓ Online Gateway Checkout Selected</p>
                     <p className="text-xs text-gray-600 leading-relaxed">
                       Clicking <strong>"Confirm & Book Now"</strong> will open a
@@ -407,27 +415,62 @@ useEffect(() => {
 
                 {/* FIX 1: Single bank slip block (was duplicated) */}
                 {paymentMethod === "swift_bank_transfer" && (
-                  <div className="mt-4 border border-dashed border-gray-300 rounded-xl p-5 bg-gray-50/50">
-                    <label className="block text-sm font-semibold text-gray-700 mb-2">
-                      Upload Bank Transfer Slip / Receipt
-                    </label>
-                    <input
-                      type="file"
-                      accept="image/*,application/pdf"
-                      onChange={(e) => setBankSlip(e.target.files?.[0] || null)}
-                      className="w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-bold file:bg-amber-100 file:text-amber-800 hover:file:bg-amber-200 cursor-pointer"
-                    />
-                    {bankSlip ? (
-                      <p className="text-xs text-emerald-600 mt-2 font-medium">
-                        ✓ Selected: {bankSlip.name}
-                      </p>
-                    ) : (
-                      <p className="text-xs text-gray-400 mt-2">
-                        Accepted formats: JPG, PNG, PDF
-                      </p>
-                    )}
-                  </div>
-                )}
+  <div className="mt-4 space-y-4">
+    
+    {/* BANK DETAILS CARD */}
+    <div className="border border-emerald-200 bg-emerald-50/40 rounded-xl p-5">
+      <h4 className="font-bold text-emerald-900 mb-3">
+        Bank Transfer Details
+      </h4>
+
+      <div className="text-sm text-gray-700 space-y-2">
+        <p>
+          <span className="font-semibold">Bank Name:</span> {BANK_DETAILS.bankName}
+        </p>
+        <p>
+          <span className="font-semibold">Account Name:</span> {BANK_DETAILS.accountName}
+        </p>
+        <p>
+          <span className="font-semibold">Account Number:</span> {BANK_DETAILS.accountNumber}
+        </p>
+        <p>
+          <span className="font-semibold">SWIFT Code:</span> {BANK_DETAILS.swiftCode}
+        </p>
+        <p>
+          <span className="font-semibold">Branch:</span> {BANK_DETAILS.branch}
+        </p>
+      </div>
+
+      <p className="text-xs text-gray-500 mt-3">
+        Please upload your payment receipt after completing the transfer.
+      </p>
+    </div>
+
+    {/* UPLOAD SLIP */}
+    <div className="border border-dashed border-gray-300 rounded-xl p-5 bg-gray-50/50">
+      <label className="block text-sm font-semibold text-gray-700 mb-2">
+        Upload Bank Transfer Slip / Receipt
+      </label>
+
+      <input
+        type="file"
+        accept="image/*,application/pdf"
+        onChange={(e) => setBankSlip(e.target.files?.[0] || null)}
+        className="w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-bold file:bg-emerald-100 file:text-emerald-800 hover:file:bg-emerald-200 cursor-pointer"
+      />
+
+      {bankSlip ? (
+        <p className="text-xs text-emerald-600 mt-2 font-medium">
+          ✓ Selected: {bankSlip.name}
+        </p>
+      ) : (
+        <p className="text-xs text-gray-400 mt-2">
+          Accepted formats: JPG, PNG, PDF
+        </p>
+      )}
+    </div>
+  </div>
+)}
               </div>
             </div>
 
@@ -475,7 +518,7 @@ useEffect(() => {
                 <button
                   onClick={createBooking}
                   disabled={loading}
-                  className="w-full bg-amber-500 hover:bg-amber-600 disabled:bg-slate-200 disabled:text-slate-400 transition-all py-3.5 mt-6 rounded-xl font-bold text-black shadow-sm flex items-center justify-center gap-2"
+                  className="w-full bg-emerald-500 hover:bg-emerald-600 disabled:bg-slate-200 disabled:text-slate-400 transition-all py-3.5 mt-6 rounded-xl font-bold text-white shadow-sm flex items-center justify-center gap-2"
                 >
                   {loading ? "Processing transaction..." : "Confirm & Book Now"}
                 </button>

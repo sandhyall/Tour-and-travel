@@ -65,7 +65,9 @@ const fonts = {
 function SectionHeading({ children, sub }) {
   return (
     <div className="mb-8">
+
       <p className="text-[10px] font-bold tracking-[0.3em] uppercase text-green-500 mb-2">
+
         {sub || "\u00A0"}
       </p>
       <h2

@@ -14,7 +14,7 @@ const TrustedPartner = () => {
         </h2>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
-          {/* Image Gallery */}
+       
           <div className="grid grid-cols-2 gap-4">
             <img src={trekImage} alt="Himalayan Trek" className="col-span-2 w-full h-64 object-cover rounded-2xl shadow-lg" />
             <img src={tek} alt="Mountain View" className="w-full h-48 object-cover rounded-2xl shadow-lg" />

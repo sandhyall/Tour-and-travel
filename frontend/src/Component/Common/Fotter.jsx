@@ -19,9 +19,6 @@ import footer from "../../assets/footer.png";
 
 const Footer = () => {
 
-  // ==============================
-  // NEWSLETTER STATE
-  // ==============================
 
   const [newsletter, setNewsletter] = useState({
     name: "",
@@ -34,9 +31,6 @@ const Footer = () => {
 
   const [error, setError] = useState("");
 
-  // ==============================
-  // HANDLE CHANGE
-  // ==============================
 
   const handleChange = (e) => {
     setNewsletter({
@@ -45,9 +39,7 @@ const Footer = () => {
     });
   };
 
-  // ==============================
-  // HANDLE SUBMIT
-  // ==============================
+  
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -87,9 +79,7 @@ const Footer = () => {
   return (
     <footer className="w-full font-sans bg-[#f9fafb]">
 
-      {/* ==============================
-          NEWSLETTER SECTION
-      ============================== */}
+    
 
       <div className="bg-[#0b2545] py-12 px-6">
 
@@ -109,7 +99,7 @@ const Footer = () => {
 
           </div>
 
-          {/* FORM */}
+        
           <form
             onSubmit={handleSubmit}
             className="flex flex-col sm:flex-row w-full md:w-auto gap-0 bg-white rounded-sm shadow-lg overflow-hidden"
@@ -162,7 +152,7 @@ const Footer = () => {
           </form>
         </div>
 
-        {/* STATUS */}
+     
         <div className="max-w-6xl mx-auto mt-4">
 
           {success && (
@@ -180,9 +170,7 @@ const Footer = () => {
         </div>
       </div>
 
-      {/* ==============================
-          FOOTER IMAGE
-      ============================== */}
+     
 
       <img
         src={footer}
@@ -190,9 +178,7 @@ const Footer = () => {
         className="w-full h-auto block"
       />
 
-      {/* ==============================
-          MAIN FOOTER
-      ============================== */}
+    
 
       <div className="bg-white text-gray-600 py-16 px-10">
 
@@ -216,7 +202,7 @@ const Footer = () => {
             </p>
           </div>
 
-          {/* DESTINATIONS */}
+        
           <div>
 
             <h4 className="text-gray-900 font-bold mb-6 uppercase tracking-wider text-sm">
@@ -300,7 +286,6 @@ const Footer = () => {
             All rights reserved.
           </p>
 
-          {/* SOCIALS */}
           <div className="flex gap-4">
 
             {[
@@ -324,12 +309,7 @@ const Footer = () => {
       </div>
 
    
-      <button
-        className="fixed bottom-6 right-6 bg-[#00a8e8] text-white p-4 rounded-full shadow-xl hover:scale-105 transition-transform z-50"
-        aria-label="Contact Support"
-      >
-        <MessageCircle size={28} />
-      </button>
+      
 
     </footer>
   );

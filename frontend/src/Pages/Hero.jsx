@@ -5,7 +5,6 @@ import video from "../assets/video1.mp4";
 const Hero = () => {
   return (
     <div className="relative h-screen w-full overflow-hidden">
-    
       <div className="absolute inset-0">
         <video
           autoPlay
@@ -16,25 +15,24 @@ const Hero = () => {
         >
           <source src={video} type="video/mp4" />
         </video>
-        <div className="absolute inset-0 bg-black/50"></div> 
+        <div className="absolute inset-0 bg-black/50"></div>
       </div>
 
-    
       <div className="relative z-10 flex h-full flex-col items-center justify-center px-4 text-center text-white">
         <span className="mb-4 inline-block rounded-full border border-white/30 px-6 py-2 text-sm font-medium tracking-widest uppercase backdrop-blur-sm">
           Wales Trek and Travel
         </span>
-        
+
         <h1 className="mb-6 text-2xl font-bold leading-tight md:text-7xl">
           Discover the Majesty of <br />
           <span className="text-emerald-400">The Himalayas</span>
         </h1>
 
         <p className="mb-10 text-lg md:text-xl text-gray-200 max-w-2xl">
-          Experience authentic adventures, sustainable journeys, and professional guidance.
+          Experience authentic adventures, sustainable journeys, and
+          professional guidance.
         </p>
 
-       
         <div className="relative w-full max-w-2xl group">
           <input
             type="text"
@@ -60,7 +58,9 @@ const Hero = () => {
               <item.icon size={32} className="text-emerald-400" />
               <div>
                 <p className="font-bold text-lg">{item.title}</p>
-                <p className="text-xs uppercase tracking-wider opacity-80">{item.desc}</p>
+                <p className="text-xs uppercase tracking-wider opacity-80">
+                  {item.desc}
+                </p>
               </div>
             </div>
           ))}

@@ -1,13 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import axios from "../api/axios";
-import {
-  Calendar,
-  MapPin,
-  ArrowRight,
-  Loader2,
-  Mountain,
-} from "lucide-react";
+import { Calendar, MapPin, ArrowRight, Loader2, Mountain } from "lucide-react";
 
 const FALLBACK_IMG =
   "https://images.unsplash.com/photo-1544735716-392fe2489ffa?auto=format&fit=crop&q=80";
@@ -25,10 +19,11 @@ const Trips = () => {
         setLoading(true);
         setError(null);
         const { data } = await axios.get("/trips");
-        if (!cancelled) setTrips(data || []);
+        if (!cancelled) setTrips(Array.isArray(data) ? data : data.trips || []);
       } catch (err) {
         console.error("Error fetching trips:", err);
-        if (!cancelled) setError("Unable to load trips. Please try again later.");
+        if (!cancelled)
+          setError("Unable to load trips. Please try again later.");
       } finally {
         if (!cancelled) setLoading(false);
       }
@@ -68,29 +63,34 @@ const Trips = () => {
           <span className="text-xs font-black tracking-[0.25em] text-amber-500 uppercase block mb-3">
             Explore Trips
           </span>
-
-          <h1 className="text-4xl md:text-5xl font-black text-stone-900 tracking-tight mb-4" style={{ fontFamily: "'Georgia', serif" }}>
+          <h1
+            className="text-4xl md:text-5xl font-black text-stone-900 tracking-tight mb-4"
+            style={{ fontFamily: "'Georgia', serif" }}
+          >
             All Available Trips
           </h1>
-
           <div className="w-16 h-1 bg-amber-400 mx-auto mb-6 rounded-full" />
-
-          <p className="text-stone-600 max-w-2xl mx-auto text-sm md:text-base leading-relaxed">
-            Browse our complete list of trips. Click a card to view full details and booking options.
-          </p>
         </div>
 
         {trips.length === 0 ? (
           <div className="text-center py-12 bg-white rounded-3xl border border-stone-200/60 p-8 max-w-md mx-auto">
             <Mountain className="w-12 h-12 text-stone-300 mx-auto mb-4" />
-            <p className="text-stone-500 font-medium text-sm">No trips are currently available.</p>
+            <p className="text-stone-500 font-medium text-sm">
+              No trips are currently available.
+            </p>
           </div>
         ) : (
           <>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
               {visible.map((trip) => {
                 const id = trip._id || trip.id;
-                const imageUrl = trip.featuredImage?.url || trip.featuredImage || trip.bannerImage || FALLBACK_IMG;
+
+                const imageUrl =
+                  trip.featuredImage?.url ||
+                  trip.featuredImage ||
+                  trip.bannerImage ||
+                  trip.heroImage?.url ||
+                  FALLBACK_IMG;
 
                 return (
                   <Link
@@ -105,48 +105,29 @@ const Trips = () => {
                         className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-103"
                         onError={(e) => (e.currentTarget.src = FALLBACK_IMG)}
                       />
-
                       {trip.categoryType && (
                         <span className="absolute top-4 right-4 bg-stone-900/80 text-white font-bold text-[10px] tracking-wider uppercase px-2.5 py-1 rounded-md shadow-sm backdrop-blur-xs">
                           {trip.categoryType}
                         </span>
                       )}
-
-                      {trip.startPoint && (
-                        <div className="absolute bottom-4 left-4 bg-white/90 backdrop-blur-xs px-2.5 py-1 rounded-lg text-stone-800 text-[11px] font-bold flex items-center gap-1 shadow-sm border border-stone-100">
-                          <MapPin size={12} className="text-amber-500" />
-                          {trip.startPoint}
-                        </div>
-                      )}
                     </div>
 
-                    <div className="p-6 flex flex-col flex-grow justify-between">
-                      <div>
-                        <div className="flex items-center gap-4 text-stone-500 text-xs font-bold uppercase tracking-wider mb-3">
-                          <span className="flex items-center gap-1">
-                            <Calendar size={14} className="text-stone-400" />
-                            {trip.duration || "N/A"} Days
-                          </span>
-                          <span className="flex items-center gap-1">
-                            <MapPin size={14} className="text-stone-400" />
-                            {trip.startPoint || "Kathmandu"}
-                          </span>
-                        </div>
-
-                        <h3 className="text-lg font-bold text-stone-900 mb-3 leading-snug group-hover:text-amber-600 transition-colors line-clamp-2 min-h-[3rem]">
-                          {trip.title}
-                        </h3>
+                    <div className="p-6 flex flex-col flex-grow">
+                      <h3 className="text-lg font-bold text-stone-900 mb-3 leading-snug group-hover:text-amber-600 transition-colors line-clamp-2">
+                        {trip.title}
+                      </h3>
+                      <div className="flex items-center gap-4 text-stone-500 text-xs font-bold uppercase tracking-wider mt-auto">
+                        <span className="flex items-center gap-1">
+                          <Calendar size={14} /> {trip.duration || "N/A"} Days
+                        </span>
                       </div>
-
                       <div className="mt-4 pt-4 border-t border-stone-100 flex items-center justify-between">
-                        <div>
-                          <span className="text-[10px] text-stone-400 block font-bold tracking-wide uppercase">Price from</span>
-                          <span className="text-base font-black text-stone-900">
-                            {trip.price ? `USD ${trip.price.toLocaleString()}` : "Contact Us"}
-                          </span>
-                        </div>
-
-                        <div className="w-8 h-8 rounded-full bg-stone-50 text-stone-700 hover:bg-amber-500 hover:text-stone-950 flex items-center justify-center transition-all">
+                        <span className="text-base font-black text-stone-900">
+                          {trip.price
+                            ? `USD ${trip.price.toLocaleString()}`
+                            : "Contact Us"}
+                        </span>
+                        <div className="w-8 h-8 rounded-full bg-stone-50 flex items-center justify-center hover:bg-amber-500 transition-colors">
                           <ArrowRight size={15} />
                         </div>
                       </div>
@@ -157,9 +138,12 @@ const Trips = () => {
             </div>
 
             {visibleCount < trips.length && (
-              <div className="mt-8 flex justify-center">
-                <button onClick={showMore} className="px-6 py-3 bg-amber-500 text-stone-900 font-bold rounded-full shadow hover:scale-105 transition">
-                  Show more
+              <div className="mt-12 flex justify-center">
+                <button
+                  onClick={showMore}
+                  className="px-8 py-3 bg-stone-900 text-white font-bold rounded-full hover:bg-amber-500 transition-all"
+                >
+                  Show more trips
                 </button>
               </div>
             )}

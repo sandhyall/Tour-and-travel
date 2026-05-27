@@ -7,6 +7,7 @@ import FAQ from '../Component/Common/Frequent'
 import Everest from '../Component/Feature/Everest'
 import PopularTreks from '../Component/Feature/PopularTreks'
 import GalleryPage from './GalleryPage '
+import PopularBhutan from './PopularBhutan'
 
 const Landing=()=> {
   return (
@@ -14,6 +15,7 @@ const Landing=()=> {
       <Hero/>
       <Everest/>
       <TrustedPartner/>
+      <PopularBhutan/>
       <Aced/>
       <WhyAce/>
       <PopularTreks/>

@@ -17,71 +17,55 @@ import Tibet from "./Pages/Tibet";
 import Trips from "./Pages/Trips";
 import PaymentSuccess from "./pages/PaymentSuccess";
 import { BookingCancel, BookingSuccess } from "./Pages/BookingStatus.jsx";
-import { Toaster } from 'react-hot-toast';
+import { Toaster } from "react-hot-toast";
 import GalleryPage from "./Pages/GalleryPage .jsx";
 import ScrollToTop from "./Component/Common/ScrollToTop.jsx";
 import { useState } from "react";
-import ChatbotModal
-  from "./Component/ChatbotModal.jsx";
+import ChatbotModal from "./Component/ChatbotModal.jsx";
 import { MessageCircle } from "lucide-react";
 
 const App = () => {
-  const [openChat, setOpenChat] =
-    useState(false);
+  const [openChat, setOpenChat] = useState(false);
   return (
     <div>
       <BrowserRouter>
-      <ScrollToTop />
+        <ScrollToTop />
 
-  <Toaster
-    position="top-center"
-    reverseOrder={false}
-  />
-    {/* CHAT BUTTON */}
+        <Toaster position="top-center" reverseOrder={false} />
 
         <button
-          onClick={() =>
-            setOpenChat(true)
-          }
+          onClick={() => setOpenChat(true)}
           className="fixed bottom-6 right-6 z-50 w-16 h-16 rounded-full bg-emerald-500 shadow-2xl flex items-center justify-center hover:scale-110 transition"
         >
-          <MessageCircle
-            size={28}
-            className="text-black"
-          />
+          <MessageCircle size={28} className="text-black" />
         </button>
 
-        {/* CHATBOT MODAL */}
-
-        <ChatbotModal
-          open={openChat}
-          onClose={() =>
-            setOpenChat(false)
-          }
-        />
+        <ChatbotModal open={openChat} onClose={() => setOpenChat(false)} />
         <Routes>
-          <Route path="/" element={<Layout />} >
+          <Route path="/" element={<Layout />}>
             <Route index element={<Landing />} />
-            <Route path="/About-us" element={<Aboutus/>}/>
-            <Route path="/meet-our-team" element={<MeetOurTeam/>}/>
-            <Route path="/why-ace" element={<WhyAce/>}/>
-            <Route path="/csi" element={<CorporateSocialInitiative/>}/>
-            <Route path="/legal-documents" element={<LegalDocuments/>}/>
-            <Route path="/terms-and-conditions" element={<TermsAndCondition/>}/>
-            <Route path="/sign-up-for-newsletter" element={<Newsletter/>}/>
-            <Route path="/contact-us" element={<Contactus/>}/>
-            <Route path="feature/:id" element={<Everestfeature/>}/>
-            <Route path="/nepal" element={<Nepal/>}/>
-            <Route path="/bhutan" element={<Bhutan/>}/>
-            <Route path="/tibet" element={<Tibet/>}/>
-            <Route path="/trips" element={<Trips/>}/>
-            <Route path="/payment-success" element={<PaymentSuccess />}/>
+            <Route path="/About-us" element={<Aboutus />} />
+            <Route path="/meet-our-team" element={<MeetOurTeam />} />
+            <Route path="/why-ace" element={<WhyAce />} />
+            <Route path="/csi" element={<CorporateSocialInitiative />} />
+            <Route path="/legal-documents" element={<LegalDocuments />} />
+            <Route
+              path="/terms-and-conditions"
+              element={<TermsAndCondition />}
+            />
+            <Route path="/sign-up-for-newsletter" element={<Newsletter />} />
+            <Route path="/contact-us" element={<Contactus />} />
+            <Route path="feature/:id" element={<Everestfeature />} />
+            <Route path="/nepal" element={<Nepal />} />
+            <Route path="/bhutan" element={<Bhutan />} />
+            <Route path="/tibet" element={<Tibet />} />
+            <Route path="/trips" element={<Trips />} />
+            <Route path="/payment-success" element={<PaymentSuccess />} />
             <Route path="/booking-success" element={<BookingSuccess />} />
             <Route path="/booking-cancel" element={<BookingCancel />} />
             <Route path="/gallery" element={<GalleryPage />} />
            
           </Route>
-        
         </Routes>
       </BrowserRouter>
     </div>

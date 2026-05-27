@@ -12,7 +12,7 @@ import {
   Compass,
 } from "lucide-react";
 
-// ─── Fallback image ────────────────────────────────────────────────────────────
+
 const FALLBACK_IMG =
   "https://images.unsplash.com/photo-1544735716-392fe2489ffa?auto=format&fit=crop&q=80";
 

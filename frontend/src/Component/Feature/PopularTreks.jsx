@@ -183,7 +183,7 @@ const PopularTreks = () => {
               Curated Packages
             </p>
             <h2 className="text-[30px] md:text-[40px] font-black text-gray-950 tracking-tight leading-none">
-              Popular {dynamicCountry} Treks
+              Popular  Treks
             </h2>
           </div>
           <p className="text-[14px] text-gray-500 max-w-md leading-relaxed md:text-right">

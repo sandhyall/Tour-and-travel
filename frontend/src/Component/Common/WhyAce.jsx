@@ -1,4 +1,5 @@
 import React from "react";
+import { motion } from "framer-motion";
 
 const features = [
   {
@@ -137,39 +138,68 @@ const features = [
   },
 ];
 
+const cardVariants = {
+  hidden: { opacity: 0, y: 20 },
+  visible: { opacity: 1, y: 0 },
+};
+
 const WhyAce = () => {
   return (
-    <section className="py-16 bg-gray-50 px-4">
+    <motion.section
+      className="py-16 bg-gray-50 px-4"
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={{ duration: 0.7, ease: "easeOut" }}
+    >
       <div className="max-w-6xl mx-auto text-center">
-        <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-2 relative inline-block">
+        <motion.h2
+          className="text-3xl md:text-4xl font-bold text-gray-900 mb-2 relative inline-block"
+          initial={{ opacity: 0, y: 15 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6, ease: "easeOut" }}
+        >
           Why Wales Trek & Travel?
-          <span className="block w-12 h-1 bg-yellow-500 mx-auto mt-2"></span>
-        </h2>
+          <span className="block w-12 h-1 bg-green-500 mx-auto mt-2 rounded-full"></span>
+        </motion.h2>
 
-        <p className="text-gray-600 max-w-3xl mx-auto mt-6 mb-16 text-lg leading-relaxed">
+        <motion.p
+          className="text-gray-600 max-w-3xl mx-auto mt-6 mb-16 text-lg leading-relaxed"
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.1, duration: 0.6, ease: "easeOut" }}
+        >
           We have been helping you to explore the Himalayas since 2006. With
           local experts in Nepal, Bhutan & Tibet, we are dedicated to promoting
           eco-friendly and responsible tourism for your unforgettable Himalayan
           adventure.
-        </p>
+        </motion.p>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-y-12 gap-x-8">
           {features.map((feature, index) => (
-            <div key={index} className="flex flex-col items-center">
-              <div className="mb-6 h-16 flex items-center justify-center">
+            <motion.div
+              key={index}
+              className="flex flex-col items-center rounded-[28px] border border-slate-200 bg-white p-8 shadow-xl shadow-slate-200/70 transition hover:-translate-y-1 hover:shadow-2xl"
+              variants={cardVariants}
+              initial="hidden"
+              whileInView="visible"
+              viewport={{ once: true, amount: 0.2 }}
+              transition={{ delay: index * 0.08, duration: 0.55, ease: "easeOut" }}
+              whileHover={{ y: -6 }}
+            >
+              <div className="mb-6 h-16 w-16 flex items-center justify-center rounded-3xl bg-emerald-50">
                 {feature.icon}
               </div>
-              <h3 className="text-xl font-bold text-gray-900 mb-3">
+              <h3 className="text-xl font-semibold text-gray-900 mb-3">
                 {feature.title}
               </h3>
               <p className="text-gray-600 leading-relaxed text-sm md:text-base">
                 {feature.description}
               </p>
-            </div>
+            </motion.div>
           ))}
         </div>
       </div>
-    </section>
+    </motion.section>
   );
 };
 

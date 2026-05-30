@@ -57,18 +57,22 @@ const Newsletter = () => {
             "url('https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?auto=format&fit=crop&q=80')",
         }}
       >
-        <div className="absolute inset-0 bg-black/60"></div>
+        <div className="absolute inset-0 bg-gradient-to-br from-black/80 via-transparent to-black/80"></div>
       </div>
 
-      <div className="relative z-10 max-w-6xl mx-auto">
-        <h2 className="text-3xl md:text-4xl font-bold text-white mb-4 tracking-tight uppercase">
-          Sign Up For Newsletter
-        </h2>
-
-        <p className="text-gray-200 text-lg mb-8 max-w-3xl">
-          Sign up today and subscribe to our newsletter for monthly giveaways,
-          engaging stories, special offers & more!
-        </p>
+      <div className="relative z-10 max-w-5xl mx-auto bg-white/10 backdrop-blur-xl border border-white/10 rounded-3xl p-8 shadow-2xl shadow-black/30">
+        <div className="mb-8 text-center">
+          <p className="text-sm uppercase tracking-[0.3em] text-blue-300 mb-3">
+            Exclusive travel updates
+          </p>
+          <h2 className="text-3xl md:text-4xl font-semibold text-white mb-4 tracking-tight">
+            Join our travel newsletter
+          </h2>
+          <p className="text-gray-200 text-base md:text-lg max-w-2xl mx-auto">
+            Get curated trip ideas, insider discounts, and destination stories
+            delivered straight to your inbox every month.
+          </p>
+        </div>
 
         <form className="flex flex-col space-y-4" onSubmit={handleSubmit}>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -77,8 +81,8 @@ const Newsletter = () => {
               name="name"
               value={formData.name}
               onChange={handleChange}
-              placeholder="Full Name"
-              className="w-full px-4 py-3 bg-white text-gray-900 border-none focus:ring-2 focus:ring-blue-500 outline-none transition-all"
+              placeholder="Your name"
+              className="w-full px-5 py-4 bg-white/95 text-gray-900 border border-white/20 rounded-2xl focus:ring-2 focus:ring-blue-400 outline-none transition"
               required
             />
 
@@ -87,25 +91,28 @@ const Newsletter = () => {
               name="email"
               value={formData.email}
               onChange={handleChange}
-              placeholder="Email Address"
-              className="w-full px-4 py-3 bg-white text-gray-900 border-none focus:ring-2 focus:ring-blue-500 outline-none transition-all"
+              placeholder="Your email address"
+              className="w-full px-5 py-4 bg-white/95 text-gray-900 border border-white/20 rounded-2xl focus:ring-2 focus:ring-blue-400 outline-none transition"
               required
             />
           </div>
 
-          {success && <p className="text-green-400 text-sm">{success}</p>}
+          <div className="flex flex-col gap-2 md:flex-row md:items-center md:justify-between">
+            <p className="text-sm text-gray-300">
+              No spam. Only curated travel inspiration and exclusive offers.
+            </p>
+            <button
+              type="submit"
+              disabled={loading}
+              className="inline-flex items-center justify-center gap-2 rounded-2xl bg-gradient-to-r from-blue-500 to-cyan-400 text-white font-semibold px-7 py-3 shadow-lg shadow-cyan-500/20 transition hover:scale-[1.01] disabled:cursor-not-allowed disabled:opacity-70"
+            >
+              <Mail size={18} />
+              {loading ? "Sending..." : "Subscribe Now"}
+            </button>
+          </div>
 
-          {error && <p className="text-red-400 text-sm">{error}</p>}
-
-          {/* BUTTON */}
-          <button
-            type="submit"
-            disabled={loading}
-            className="w-full md:w-40 bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-6 transition-colors duration-300 uppercase tracking-wide flex items-center justify-center gap-2"
-          >
-            <Mail size={18} />
-            {loading ? "Sending..." : "Subscribe"}
-          </button>
+          {success && <p className="text-green-300 text-sm">{success}</p>}
+          {error && <p className="text-red-300 text-sm">{error}</p>}
         </form>
       </div>
     </section>

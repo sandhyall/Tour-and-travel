@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from "react";
 import { Link, NavLink } from "react-router-dom";
 import axios from "../../api/axios";
 import logo from "../../assets/logo.png";
+import newlogo from "../../assets/logo-removebg-preview.png"
 
 // ── Data ────────────────────────────────────────────────────────────────────
 
@@ -587,7 +588,7 @@ const Navbar = () => {
         </div>
 
         <nav className="wtt-navbar">
-          <img src={logo} alt="Company Logo" className="h-[46px] w-auto" />
+          <img src={newlogo} alt="Company Logo" className="h-[46px] w-auto" />
 
           <Link to="/" className="wtt-brand">
             <div>

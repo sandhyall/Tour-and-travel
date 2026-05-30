@@ -354,10 +354,15 @@ function Lightbox({ images, index, onClose, onPrev, onNext, onGoToTrip }) {
         </div>
         <div className="lb-strip">
           {images.map((thumb, i) => (
-            <button key={i} className={`lb-thumb${i === index ? " active" : ""}`}>
-              <img src={thumb.url} alt="" />
-            </button>
-          ))}
+  <button
+    key={i}
+    className={`lb-thumb${i === index ? " active" : ""}`}
+    type="button"
+    onClick={() => onGoToIndex(i)}
+  >
+    <img src={thumb.url} alt="" />
+  </button>
+))}
         </div>
       </div>
     </div>
@@ -440,7 +445,9 @@ export default function GalleryPage() {
   const [lightboxOpen, setLightboxOpen] = useState(false);
   const [lightboxIndex, setLightboxIndex] = useState(0);
 
-  const goToTrip = useCallback((tripId) => { if (tripId) navigate(`/feature/${allImages._id || allImages.id}`); }, [navigate]);
+const goToTrip = useCallback((tripId) => {
+  if (tripId) navigate(`/feature/${tripId}`);
+}, [navigate]);
 
   useEffect(() => {
     (async () => {

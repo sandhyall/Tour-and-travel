@@ -76,103 +76,168 @@ const PopularTreks = () => {
   return (
     <section className="bg-white py-20 px-5 md:px-10 overflow-hidden">
       <style>{`
-        /* ── Card ── */
-        .pt-card {
-          display: flex;
-          flex-direction: column;
-          height: 100%;
-          transition: transform 0.35s cubic-bezier(0.25, 0.46, 0.45, 0.94),
-                      box-shadow 0.35s cubic-bezier(0.25, 0.46, 0.45, 0.94);
-          will-change: transform;
-        }
-        .pt-card:hover {
-          transform: translateY(-8px);
-          box-shadow: 0 24px 48px rgba(0,0,0,0.10), 0 6px 16px rgba(0,0,0,0.06);
-        }
+/* =========================
+   PREMIUM DESIGN SYSTEM
+========================= */
 
-        /* ── Image zoom ── */
-        .pt-img {
-          transition: transform 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94);
-          will-change: transform;
-        }
-        .pt-card:hover .pt-img {
-          transform: scale(1.08);
-        }
+.pt-card {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  background: #ffffff;
+  border: 1px solid rgba(0,0,0,0.06);
+  border-radius: 22px;
+  overflow: hidden;
+  transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
+  will-change: transform;
+  position: relative;
+}
 
-        /* ── Book button ── */
-        .pt-book-btn {
-          transition: background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease;
-        }
-        .pt-card:hover .pt-book-btn {
-          background-color: #111827;
-          color: #ffffff;
-          border-color: #111827;
-        }
+.pt-card::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle at top, rgba(0,0,0,0.04), transparent 60%);
+  opacity: 0;
+  transition: opacity 0.4s ease;
+  pointer-events: none;
+}
 
-        /* ── Title colour shift ── */
-        .pt-title {
-          transition: color 0.2s ease;
-        }
-        .pt-card:hover .pt-title {
-          color: #B45309;
-        }
+.pt-card:hover {
+  transform: translateY(-10px);
+  box-shadow: 0 30px 60px rgba(0,0,0,0.12);
+}
 
-        /* ── Arrow icon reveal ── */
-        .pt-arrow {
-          opacity: 0;
-          transition: opacity 0.2s ease;
-        }
-        .pt-card:hover .pt-arrow {
-          opacity: 1;
-        }
+.pt-card:hover::before {
+  opacity: 1;
+}
 
-        /* ── Swiper overrides ── */
-        .popular-slider {
-          padding-bottom: 60px !important;
-          overflow: visible !important;
-        }
-        .popular-slider .swiper-slide {
-          height: auto;
-        }
+/* IMAGE ZOOM (premium cinematic feel) */
+.pt-img {
+  transition: transform 0.8s cubic-bezier(0.25, 0.8, 0.25, 1);
+}
 
-        /* Nav buttons */
-        .popular-slider .swiper-button-prev,
-        .popular-slider .swiper-button-next {
-          width: 48px;
-          height: 48px;
-          border-radius: 9999px;
-          background: #ffffff;
-          border: 1px solid #e5e7eb;
-          box-shadow: 0 10px 30px rgba(0,0,0,0.10);
-          color: #111827;
-          transition: background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease;
-        }
-        .popular-slider .swiper-button-prev:hover,
-        .popular-slider .swiper-button-next:hover {
-          background-color: #111827;
-          color: #ffffff;
-          border-color: #111827;
-        }
-        .popular-slider .swiper-button-prev::after,
-        .popular-slider .swiper-button-next::after {
-          font-size: 14px;
-          font-weight: 900;
-        }
+.pt-card:hover .pt-img {
+  transform: scale(1.12);
+}
 
-        /* Pagination dots */
-        .popular-slider .swiper-pagination-bullet {
-          width: 10px;
-          height: 10px;
-          background: #d1d5db;
-          opacity: 1;
-          transition: width 0.2s ease, background-color 0.2s ease;
-        }
-        .popular-slider .swiper-pagination-bullet-active {
-          width: 26px;
-          border-radius: 9999px;
-          background: #111827;
-        }
-      `}</style>
+/* TITLE PREMIUM SHIFT */
+.pt-title {
+  transition: all 0.3s ease;
+  letter-spacing: -0.02em;
+}
+
+.pt-card:hover .pt-title {
+  color: #111827;
+}
+
+/* BOOK BUTTON PREMIUM */
+.pt-book-btn {
+  background: #fff;
+  border: 1px solid rgba(0,0,0,0.1);
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.pt-book-btn::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(120deg, transparent, rgba(0,0,0,0.08), transparent);
+  transform: translateX(-100%);
+}
+
+.pt-card:hover .pt-book-btn {
+  background: #111827;
+  color: white;
+  border-color: #111827;
+}
+
+.pt-card:hover .pt-book-btn::after {
+  animation: shine 1.2s ease;
+}
+
+@keyframes shine {
+  100% { transform: translateX(100%); }
+}
+
+/* ARROW FLOAT */
+.pt-arrow {
+  opacity: 0;
+  transform: translateY(10px);
+  transition: all 0.3s ease;
+}
+
+.pt-card:hover .pt-arrow {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* BADGES (premium glass style) */
+.badge-glass {
+  backdrop-filter: blur(10px);
+  background: rgba(255,255,255,0.85);
+  border: 1px solid rgba(255,255,255,0.4);
+}
+
+/* SWIPER PREMIUM */
+.popular-slider {
+  padding-bottom: 70px !important;
+  overflow: visible !important;
+}
+
+.popular-slider .swiper-slide {
+  transition: transform 0.4s ease;
+}
+
+.popular-slider .swiper-slide-active {
+  transform: scale(1.03);
+}
+
+/* NAV BUTTONS PREMIUM */
+.popular-slider .swiper-button-prev,
+.popular-slider .swiper-button-next {
+  width: 52px;
+  height: 52px;
+  border-radius: 999px;
+  background: rgba(255,255,255,0.9);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(0,0,0,0.08);
+  box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+  transition: all 0.3s ease;
+}
+
+.popular-slider .swiper-button-prev:hover,
+.popular-slider .swiper-button-next:hover {
+  background: #111827;
+  color: #fff;
+}
+
+/* PAGINATION */
+.popular-slider .swiper-pagination-bullet {
+  width: 8px;
+  height: 8px;
+  background: rgba(0,0,0,0.2);
+  transition: all 0.3s ease;
+}
+
+.popular-slider .swiper-pagination-bullet-active {
+  width: 22px;
+  border-radius: 999px;
+  background: #111827;
+}
+
+/* SECTION HEADER */
+h2 {
+  letter-spacing: -0.03em;
+}
+
+/* SUBTEXT */
+p {
+  line-height: 1.6;
+}
+`}</style>
 
       <div className="max-w-7xl mx-auto">
         {/* Header */}
@@ -244,7 +309,7 @@ const PopularTreks = () => {
 
                       {/* Category badge */}
                       <div
-                        className="absolute top-4 left-4 flex items-center gap-2 px-3 py-1.5 rounded-full text-[10px] font-bold tracking-widest uppercase shadow-sm"
+                        className="badge-glass absolute top-4 left-4 flex items-center gap-2 px-3 py-1.5 rounded-full text-[10px] font-bold"
                         style={{ background: config.bg, color: config.text }}
                       >
                         <span className="w-1.5 h-1.5 rounded-full shrink-0" style={{ background: config.dot }} />

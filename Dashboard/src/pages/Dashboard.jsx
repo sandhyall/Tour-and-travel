@@ -557,7 +557,7 @@ export default function Dashboard() {
               sub="Most recent across all trips"
             />
             <button
-              onClick={() => navigate("/admin/bookings")}
+              onClick={() => navigate("/admin-bookings")}
               style={{ ...btnSecondary, fontSize: 12, padding: "6px 14px" }}
             >
               View all →

@@ -31,7 +31,6 @@ const BANK_DETAILS = {
   branch: "Thamel Branch, Kathmandu",
 };
 
-// FIX 4: Format ISO date string to a readable label for display
 const formatDate = (isoString) => {
   if (!isoString) return "";
   return new Date(isoString).toLocaleDateString("en-US", {
@@ -50,30 +49,18 @@ export default function BookingModal({ trip, open, onClose }) {
   const [bankSlip, setBankSlip] = useState(null);
   const [error, setError] = useState("");
   const [form, setForm] = useState(() =>
-    JSON.parse(JSON.stringify(INITIAL_FORM_TEMPLATE))
+    JSON.parse(JSON.stringify(INITIAL_FORM_TEMPLATE)),
   );
 
-  const getAuthHeader = (additionalHeaders = {}) => {
-    const token = localStorage.getItem("token");
-    return {
-      headers: {
-        ...(token ? { Authorization: `Bearer ${token}` } : {}),
-        ...additionalHeaders,
-      },
-    };
-  };
-
-// In BookingModal.jsx, update your useEffect dependency array:
-useEffect(() => {
-  if (open) {
-    setForm(JSON.parse(JSON.stringify(INITIAL_FORM_TEMPLATE)));
-    setSelectedPackage(trip.packages?.[0] || null);
-    setPaymentMethod("card");
-    setBankSlip(null);
-    setError("");
-  }
-// Use the ID instead of the whole object
-}, [open, trip?._id]);
+  useEffect(() => {
+    if (open) {
+      setForm(JSON.parse(JSON.stringify(INITIAL_FORM_TEMPLATE)));
+      setSelectedPackage(trip.packages?.[0] || null);
+      setPaymentMethod("card");
+      setBankSlip(null);
+      setError("");
+    }
+  }, [open, trip?._id]);
 
   if (!open) return null;
 
@@ -87,7 +74,7 @@ useEffect(() => {
 
   const updateParticipant = (index, field, value) => {
     const updated = form.participants.map((p, i) =>
-      i === index ? { ...p, [field]: value } : p
+      i === index ? { ...p, [field]: value } : p,
     );
     setForm((prev) => ({ ...prev, participants: updated }));
   };
@@ -119,9 +106,16 @@ useEffect(() => {
   };
 
   // ==================== SUBMIT LOGIC ====================
- const createBooking = async () => {
+  const createBooking = async () => {
     setError("");
-    const validationError = validateBookingForm(form, selectedPackage, paymentMethod, bankSlip);
+
+    // 1. Validate
+    const validationError = validateBookingForm(
+      form,
+      selectedPackage,
+      paymentMethod,
+      bankSlip,
+    );
     if (validationError) {
       setError(validationError);
       toast.error(validationError);
@@ -140,21 +134,36 @@ useEffect(() => {
         packagePrice: selectedPackage.price,
       };
 
-      const { data } = await axios.post("/bookings", payload, getAuthHeader());
+      // Interceptor on the axios instance automatically attaches Authorization header.
+      // Do NOT pass manual config — it can conflict with the interceptor.
+      const { data } = await axios.post("/bookings", payload);
       const bookingId = data._id;
 
       if (paymentMethod === "card") {
-        const { data: payData } = await axios.post("/payments/card/checkout", { bookingId });
+        const { data: payData } = await axios.post("/payments/card/checkout", {
+          bookingId,
+        });
         window.location.href = payData.paymentUrl;
       } else {
         const fd = new FormData();
         fd.append("slip", bankSlip);
-        await axios.post(`/bookings/${bookingId}/slip`, fd, getAuthHeader());
+
+        // Do NOT manually set Content-Type for FormData.
+        // The browser must set it (with the multipart boundary) automatically.
+        // The interceptor handles Authorization.
+        await axios.post(`/bookings/${bookingId}/slip`, fd);
+
         toast.success("Booking submitted!");
         navigate(`/booking-success?bookingId=${bookingId}`);
       }
     } catch (err) {
-      setError(err.response?.data?.message || "Booking failed");
+      console.error("Booking Error:", err.response?.data);
+      const msg =
+        err.response?.status === 401
+          ? "Session expired. Please log in again."
+          : err.response?.data?.message || "Booking failed. Please try again.";
+      setError(msg);
+      toast.error(msg);
     } finally {
       setLoading(false);
     }
@@ -164,6 +173,7 @@ useEffect(() => {
     <div className="fixed inset-0 bg-black/70 z-[9999] overflow-y-auto">
       <div className="min-h-screen flex justify-center p-4 py-10">
         <div className="bg-white max-w-6xl w-full rounded-3xl overflow-hidden shadow-2xl">
+          {/* Header */}
           <div className="bg-black text-white px-8 py-6 flex justify-between items-center">
             <div>
               <h2 className="text-3xl font-bold">Book Expedition</h2>
@@ -237,7 +247,9 @@ useEffect(() => {
               {/* Participants */}
               <div className="space-y-6">
                 <div className="flex justify-between items-center border-b border-gray-100 pb-3">
-                  <h3 className="text-xl font-bold">Travelers / Participants</h3>
+                  <h3 className="text-xl font-bold">
+                    Travelers / Participants
+                  </h3>
                   <button
                     type="button"
                     onClick={addParticipant}
@@ -328,7 +340,11 @@ useEffect(() => {
                         placeholder="Nationality"
                         value={participant.nationality}
                         onChange={(e) =>
-                          updateParticipant(index, "nationality", e.target.value)
+                          updateParticipant(
+                            index,
+                            "nationality",
+                            e.target.value,
+                          )
                         }
                         className="border border-gray-200 bg-white rounded-xl px-4 py-2.5 outline-none focus:border-emerald-500 transition-colors"
                       />
@@ -337,7 +353,11 @@ useEffect(() => {
                       placeholder="Passport / ID Number"
                       value={participant.passportNumber}
                       onChange={(e) =>
-                        updateParticipant(index, "passportNumber", e.target.value)
+                        updateParticipant(
+                          index,
+                          "passportNumber",
+                          e.target.value,
+                        )
                       }
                       className="border border-gray-200 bg-white rounded-xl px-4 py-2.5 w-full outline-none focus:border-emerald-500 transition-colors"
                     />
@@ -350,7 +370,6 @@ useEffect(() => {
                 <h3 className="text-xl font-bold mb-4">Select Date</h3>
                 <div className="grid md:grid-cols-2 gap-4">
                   {trip.availableDates?.map((d, i) => {
-                    // FIX 6: Show remaining seats, not total seats
                     const seatsLeft = d.totalSeats - (d.bookedSeats || 0);
                     const isFull = seatsLeft <= 0 || d.status === "full";
                     const isSelected = form.travelDate === d.date;
@@ -367,11 +386,10 @@ useEffect(() => {
                           isFull
                             ? "opacity-40 cursor-not-allowed border-gray-100 bg-gray-50"
                             : isSelected
-                            ? "border-emerald-500 bg-emerald-50 shadow-sm"
-                            : "hover:bg-gray-50 border-gray-200"
+                              ? "border-emerald-500 bg-emerald-50 shadow-sm"
+                              : "hover:bg-gray-50 border-gray-200"
                         }`}
                       >
-                        {/* FIX 4: Render a human-readable date, not raw ISO string */}
                         <p className="font-bold text-slate-800">
                           {formatDate(d.date)}
                         </p>
@@ -380,13 +398,15 @@ useEffect(() => {
                             isFull
                               ? "text-red-400 font-semibold"
                               : seatsLeft <= 5
-                              ? "text-emerald-500 font-semibold"
-                              : "text-gray-400"
+                                ? "text-emerald-500 font-semibold"
+                                : "text-gray-400"
                           }`}
                         >
                           {isFull
                             ? "Fully booked"
-                            : `${seatsLeft} seat${seatsLeft !== 1 ? "s" : ""} remaining`}
+                            : `${seatsLeft} seat${
+                                seatsLeft !== 1 ? "s" : ""
+                              } remaining`}
                         </p>
                       </button>
                     );
@@ -404,7 +424,9 @@ useEffect(() => {
 
                 {paymentMethod === "card" && (
                   <div className="mt-4 border border-emerald-200 bg-emerald-50/40 rounded-xl p-5 text-sm text-emerald-900 flex flex-col gap-1.5">
-                    <p className="font-semibold">✓ Online Gateway Checkout Selected</p>
+                    <p className="font-semibold">
+                      ✓ Online Gateway Checkout Selected
+                    </p>
                     <p className="text-xs text-gray-600 leading-relaxed">
                       Clicking <strong>"Confirm & Book Now"</strong> will open a
                       secure merchant terminal to finalize your transaction via
@@ -413,64 +435,66 @@ useEffect(() => {
                   </div>
                 )}
 
-                {/* FIX 1: Single bank slip block (was duplicated) */}
                 {paymentMethod === "swift_bank_transfer" && (
-  <div className="mt-4 space-y-4">
-    
-    {/* BANK DETAILS CARD */}
-    <div className="border border-emerald-200 bg-emerald-50/40 rounded-xl p-5">
-      <h4 className="font-bold text-emerald-900 mb-3">
-        Bank Transfer Details
-      </h4>
+                  <div className="mt-4 space-y-4">
+                    {/* Bank Details Card */}
+                    <div className="border border-emerald-200 bg-emerald-50/40 rounded-xl p-5">
+                      <h4 className="font-bold text-emerald-900 mb-3">
+                        Bank Transfer Details
+                      </h4>
+                      <div className="text-sm text-gray-700 space-y-2">
+                        <p>
+                          <span className="font-semibold">Bank Name:</span>{" "}
+                          {BANK_DETAILS.bankName}
+                        </p>
+                        <p>
+                          <span className="font-semibold">Account Name:</span>{" "}
+                          {BANK_DETAILS.accountName}
+                        </p>
+                        <p>
+                          <span className="font-semibold">Account Number:</span>{" "}
+                          {BANK_DETAILS.accountNumber}
+                        </p>
+                        <p>
+                          <span className="font-semibold">SWIFT Code:</span>{" "}
+                          {BANK_DETAILS.swiftCode}
+                        </p>
+                        <p>
+                          <span className="font-semibold">Branch:</span>{" "}
+                          {BANK_DETAILS.branch}
+                        </p>
+                      </div>
+                      <p className="text-xs text-gray-500 mt-3">
+                        Please upload your payment receipt after completing the
+                        transfer.
+                      </p>
+                    </div>
 
-      <div className="text-sm text-gray-700 space-y-2">
-        <p>
-          <span className="font-semibold">Bank Name:</span> {BANK_DETAILS.bankName}
-        </p>
-        <p>
-          <span className="font-semibold">Account Name:</span> {BANK_DETAILS.accountName}
-        </p>
-        <p>
-          <span className="font-semibold">Account Number:</span> {BANK_DETAILS.accountNumber}
-        </p>
-        <p>
-          <span className="font-semibold">SWIFT Code:</span> {BANK_DETAILS.swiftCode}
-        </p>
-        <p>
-          <span className="font-semibold">Branch:</span> {BANK_DETAILS.branch}
-        </p>
-      </div>
-
-      <p className="text-xs text-gray-500 mt-3">
-        Please upload your payment receipt after completing the transfer.
-      </p>
-    </div>
-
-    {/* UPLOAD SLIP */}
-    <div className="border border-dashed border-gray-300 rounded-xl p-5 bg-gray-50/50">
-      <label className="block text-sm font-semibold text-gray-700 mb-2">
-        Upload Bank Transfer Slip / Receipt
-      </label>
-
-      <input
-        type="file"
-        accept="image/*,application/pdf"
-        onChange={(e) => setBankSlip(e.target.files?.[0] || null)}
-        className="w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-bold file:bg-emerald-100 file:text-emerald-800 hover:file:bg-emerald-200 cursor-pointer"
-      />
-
-      {bankSlip ? (
-        <p className="text-xs text-emerald-600 mt-2 font-medium">
-          ✓ Selected: {bankSlip.name}
-        </p>
-      ) : (
-        <p className="text-xs text-gray-400 mt-2">
-          Accepted formats: JPG, PNG, PDF
-        </p>
-      )}
-    </div>
-  </div>
-)}
+                    {/* Upload Slip */}
+                    <div className="border border-dashed border-gray-300 rounded-xl p-5 bg-gray-50/50">
+                      <label className="block text-sm font-semibold text-gray-700 mb-2">
+                        Upload Bank Transfer Slip / Receipt
+                      </label>
+                      <input
+                        type="file"
+                        accept="image/*,application/pdf"
+                        onChange={(e) =>
+                          setBankSlip(e.target.files?.[0] || null)
+                        }
+                        className="w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-bold file:bg-emerald-100 file:text-emerald-800 hover:file:bg-emerald-200 cursor-pointer"
+                      />
+                      {bankSlip ? (
+                        <p className="text-xs text-emerald-600 mt-2 font-medium">
+                          ✓ Selected: {bankSlip.name}
+                        </p>
+                      ) : (
+                        <p className="text-xs text-gray-400 mt-2">
+                          Accepted formats: JPG, PNG, PDF
+                        </p>
+                      )}
+                    </div>
+                  </div>
+                )}
               </div>
             </div>
 
@@ -494,7 +518,6 @@ useEffect(() => {
                   <div className="flex justify-between">
                     <span>Departure:</span>
                     <span className="font-bold text-slate-900">
-                      {/* FIX 4: Human-readable date in summary too */}
                       {formatDate(form.travelDate) || "-"}
                     </span>
                   </div>

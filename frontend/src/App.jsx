@@ -23,6 +23,7 @@ import ScrollToTop from "./Component/Common/ScrollToTop.jsx";
 import { useState } from "react";
 import ChatbotModal from "./Component/ChatbotModal.jsx";
 import { MessageCircle } from "lucide-react";
+import AuthPage from "./Pages/Authpage.jsx";
 
 const App = () => {
   const [openChat, setOpenChat] = useState(false);
@@ -64,6 +65,7 @@ const App = () => {
             <Route path="/booking-success" element={<BookingSuccess />} />
             <Route path="/booking-cancel" element={<BookingCancel />} />
             <Route path="/gallery" element={<GalleryPage />} />
+            <Route path="/login" element={<AuthPage />} />
            
           </Route>
         </Routes>

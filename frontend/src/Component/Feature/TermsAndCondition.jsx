@@ -19,7 +19,7 @@ const TermsAndConditions = () => {
         <div className="absolute inset-0 bg-gradient-to-r from-black/70 to-black/30"></div>
 
         <div className="relative max-w-7xl mx-auto px-6 py-24 md:py-32">
-          <p className="uppercase tracking-[0.3em] text-[#f1b400] text-sm font-bold mb-5">
+          <p className="uppercase tracking-[0.3em] text-emerald-500 text-sm font-bold mb-5">
             Policies & Conditions
           </p>
 
@@ -39,7 +39,7 @@ const TermsAndConditions = () => {
 
       <div className="max-w-6xl mx-auto px-6 py-20">
         <div className="max-w-5xl mb-20">
-          <p className="uppercase tracking-[0.25em] text-sm text-[#f1b400] font-bold mb-5">
+          <p className="uppercase tracking-[0.25em] text-sm text-emerald-500 font-bold mb-5">
             Important Information
           </p>
 
@@ -47,7 +47,7 @@ const TermsAndConditions = () => {
             Booking Policies & Travel Guidelines
           </h2>
 
-          <div className="w-24 h-1 bg-[#f1b400] rounded-full mb-10"></div>
+          <div className="w-24 h-1 bg-emerald-500 rounded-full mb-10"></div>
 
           <div className="space-y-8 text-lg leading-9 text-gray-700">
             <p>
@@ -101,7 +101,7 @@ const TermsAndConditions = () => {
 
         <section className="mb-20">
           <div className="flex items-center gap-3 mb-10">
-            <Calendar className="text-[#f1b400]" size={28} />
+            <Calendar className="text-emerald-500" size={28} />
 
             <h2 className="text-4xl font-black text-gray-900 uppercase tracking-tight">
               Booking & Payments
@@ -111,7 +111,7 @@ const TermsAndConditions = () => {
           <div className="grid md:grid-cols-2 gap-8">
             <div className="bg-white rounded-3xl p-10 border border-gray-100 shadow-lg">
               <div className="flex items-center gap-3 mb-6">
-                <Mountain className="text-[#f1b400]" size={26} />
+                <Mountain className="text-emerald-500" size={26} />
 
                 <h3 className="text-2xl font-black text-gray-900">
                   Nepal Trips
@@ -155,7 +155,7 @@ const TermsAndConditions = () => {
 
             <div className="bg-white rounded-3xl p-10 border border-gray-100 shadow-lg">
               <div className="flex items-center gap-3 mb-6">
-                <Globe className="text-[#f1b400]" size={26} />
+                <Globe className="text-emerald-500" size={26} />
 
                 <h3 className="text-2xl font-black text-gray-900">
                   Bhutan & Tibet
@@ -204,7 +204,7 @@ const TermsAndConditions = () => {
 
         <section className="mb-20">
           <div className="flex items-center gap-3 mb-10">
-            <ShieldCheck className="text-[#f1b400]" size={28} />
+            <ShieldCheck className="text-emerald-500" size={28} />
 
             <h2 className="text-4xl font-black text-gray-900 uppercase tracking-tight">
               Cancellation & Refund
@@ -259,7 +259,7 @@ const TermsAndConditions = () => {
         <section className="grid md:grid-cols-2 gap-8 mb-20">
           <div className="bg-white rounded-3xl p-10 border border-gray-100 shadow-lg">
             <div className="flex items-center gap-3 mb-6">
-              <CreditCard className="text-[#f1b400]" size={26} />
+              <CreditCard className="text-emerald-500" size={26} />
 
               <h3 className="text-2xl font-black text-gray-900">
                 Rescheduling Fees
@@ -283,7 +283,7 @@ const TermsAndConditions = () => {
 
           <div className="bg-white rounded-3xl p-10 border border-gray-100 shadow-lg">
             <div className="flex items-center gap-3 mb-6">
-              <Plane className="text-[#f1b400]" size={26} />
+              <Plane className="text-emerald-500" size={26} />
 
               <h3 className="text-2xl font-black text-gray-900">
                 Flight Delays
@@ -302,7 +302,7 @@ const TermsAndConditions = () => {
 
         <section className="bg-[#2c3338] rounded-3xl p-10 md:p-16 text-white shadow-2xl">
           <div className="flex items-center gap-3 mb-8">
-            <FileText className="text-[#f1b400]" size={30} />
+            <FileText className="text-emerald-500" size={30} />
 
             <h2 className="text-4xl font-black">Responsibility & Agreement</h2>
           </div>

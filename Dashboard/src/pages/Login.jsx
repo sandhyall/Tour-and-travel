@@ -20,7 +20,7 @@ export default function Login() {
       login(data.token, {
         name: "Admin User",
         email: email,
-        role: "Administrator",
+        role: "admin",
       });
       navigate("/");
     } catch (err) {

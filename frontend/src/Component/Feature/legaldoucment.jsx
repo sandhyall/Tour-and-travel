@@ -35,7 +35,7 @@ const LegalDocuments = () => {
         <div className="absolute inset-0 bg-gradient-to-r from-black/60 to-black/20"></div>
 
         <div className="relative max-w-7xl mx-auto px-6 py-24 md:py-32">
-          <p className="uppercase tracking-[0.3em] text-sm text-[#f1b400] font-bold mb-5">
+          <p className="uppercase tracking-[0.3em] text-sm text-emerald-500 font-bold mb-5">
             Official Documents
           </p>
 
@@ -53,7 +53,7 @@ const LegalDocuments = () => {
       \
       <div className="max-w-7xl mx-auto px-6 py-20">
         <div className="max-w-5xl mb-20">
-          <p className="uppercase tracking-[0.25em] text-sm text-[#f1b400] font-bold mb-5">
+          <p className="uppercase tracking-[0.25em] text-sm text-emerald-500 font-bold mb-5">
             Trusted Himalayan Travel Company
           </p>
 
@@ -61,7 +61,7 @@ const LegalDocuments = () => {
             Your Safety & Trust Matter To Us
           </h2>
 
-          <div className="w-24 h-1 bg-[#f1b400] rounded-full mb-10"></div>
+          <div className="w-24 h-1 bg-emerald-500 rounded-full mb-10"></div>
 
           <div className="space-y-8 text-lg leading-9 text-gray-700">
             <p>
@@ -104,7 +104,7 @@ const LegalDocuments = () => {
         </div>
 
         <div className="mb-14">
-          <p className="uppercase tracking-[0.25em] text-sm text-[#f1b400] font-bold mb-4">
+          <p className="uppercase tracking-[0.25em] text-sm text-emerald-500 font-bold mb-4">
             Government Authorized
           </p>
 
@@ -112,7 +112,7 @@ const LegalDocuments = () => {
             Documents & Certifications
           </h2>
 
-          <div className="w-20 h-1 bg-[#f1b400] rounded-full"></div>
+          <div className="w-20 h-1 bg-emerald-500 rounded-full"></div>
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
@@ -136,14 +136,14 @@ const LegalDocuments = () => {
                   {doc.title}
                 </h3>
 
-                <div className="w-14 h-1 bg-[#f1b400] rounded-full mx-auto mt-5"></div>
+                <div className="w-14 h-1 bg-emerald-500 rounded-full mx-auto mt-5"></div>
               </div>
             </div>
           ))}
         </div>
 
         <div className="mt-24 bg-[#2c3338] rounded-3xl p-10 md:p-16 text-center text-white shadow-2xl">
-          <p className="uppercase tracking-[0.25em] text-sm text-[#f1b400] font-bold mb-5">
+          <p className="uppercase tracking-[0.25em] text-sm text-emerald-500 font-bold mb-5">
             Travel With Confidence
           </p>
 
@@ -157,7 +157,7 @@ const LegalDocuments = () => {
             complete transparency and legal compliance.
           </p>
 
-          <button className="bg-[#f1b400] hover:bg-[#dca400] text-black font-black px-10 py-5 rounded-2xl transition-all duration-300 shadow-lg hover:scale-105 uppercase tracking-[0.15em] text-sm">
+          <button className="bg-emerald-500 hover:bg-emerald-600 text-white font-black px-10 py-5 rounded-2xl transition-all duration-300 shadow-lg hover:scale-105 uppercase tracking-[0.15em] text-sm">
             Contact Our Team
           </button>
         </div>

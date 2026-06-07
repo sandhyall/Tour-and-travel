@@ -1,113 +1,138 @@
-import React from "react";
+import React, { useRef } from "react";
 import { Link } from "react-router-dom";
+import { motion, useInView } from "framer-motion";
+
 import trekImage from "../../assets/trekImage.png";
 import travel from "../../assets/Travel.png";
 import tek from "../../assets/trek.png";
 
-import { motion } from "framer-motion";
-import { useInView } from "framer-motion";
-import { useRef } from "react";
+/* ── Reusable fade-up variant ── */
+const fadeUp = (delay = 0) => ({
+  hidden: { opacity: 0, y: 32 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: { duration: 0.7, ease: [0.22, 1, 0.36, 1], delay },
+  },
+});
 
 const TrustedPartner = () => {
   const ref = useRef(null);
-  const isInView = useInView(ref, {
-    amount: 0.3,
-    once: false,
-  });
+  const isInView = useInView(ref, { amount: 0.15, once: false });
+
+  const anim = (delay = 0) =>
+    isInView ? "visible" : "hidden";
 
   return (
     <section
       ref={ref}
-      className="bg-stone-50 py-20 px-6"
+      className="bg-stone-50 py-16 sm:py-20 px-4 sm:px-6 overflow-hidden"
     >
       <div className="max-w-7xl mx-auto">
 
-        {/* TITLE */}
+        {/* ── TITLE ── */}
         <motion.h2
-          animate={
-            isInView
-              ? { opacity: 1, y: 0, filter: "blur(0px)" }
-              : { opacity: 0, y: -60, filter: "blur(8px)" }
-          }
-          transition={{ duration: 0.8 }}
-          className="text-3xl md:text-5xl font-extrabold text-center mb-16"
+          variants={fadeUp(0)}
+          initial="hidden"
+          animate={anim()}
+          className="text-3xl sm:text-4xl md:text-5xl font-extrabold text-center mb-12 sm:mb-16 leading-tight"
         >
-          Your Trusted Partner for <br />
+          Your Trusted Partner for{" "}
+          <br className="hidden sm:block" />
           <span className="text-emerald-700">
-            Himalayan Treks & Tours
+            Himalayan Treks &amp; Tours
           </span>
         </motion.h2>
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-16 items-center">
 
-          {/* IMAGE SECTION */}
+          {/* ── IMAGE GRID ── */}
           <motion.div
-            animate={
-              isInView
-                ? { opacity: 1, x: 0, scale: 1 }
-                : { opacity: 0, x: -100, scale: 1.05 }
-            }
-            transition={{ duration: 0.9 }}
-            className="grid grid-cols-2 gap-4"
+            variants={fadeUp(0.1)}
+            initial="hidden"
+            animate={anim()}
+            className="grid grid-cols-2 gap-3 sm:gap-4"
           >
-            <img
-              src={trekImage}
-              className="col-span-2 w-full h-64 object-cover rounded-2xl shadow-lg"
-            />
-            <img
-              src={tek}
-              className="w-full h-48 object-cover rounded-2xl shadow-lg"
-            />
-            <img
-              src={travel}
-              className="w-full h-48 object-cover rounded-2xl shadow-lg"
-            />
+            <div className="col-span-2 overflow-hidden rounded-2xl shadow-lg">
+              <img
+                src={trekImage}
+                alt="Himalayan trek"
+                className="w-full h-56 sm:h-64 object-cover transition-transform duration-700 hover:scale-105"
+              />
+            </div>
+
+            <div className="overflow-hidden rounded-2xl shadow-lg">
+              <img
+                src={tek}
+                alt="Trek"
+                className="w-full h-40 sm:h-48 object-cover transition-transform duration-700 hover:scale-105"
+              />
+            </div>
+
+            <div className="overflow-hidden rounded-2xl shadow-lg">
+              <img
+                src={travel}
+                alt="Travel"
+                className="w-full h-40 sm:h-48 object-cover transition-transform duration-700 hover:scale-105"
+              />
+            </div>
           </motion.div>
 
-          {/* TEXT SECTION */}
-          <motion.div
-            animate={
-              isInView
-                ? { opacity: 1, x: 0 }
-                : { opacity: 0, x: 100 }
-            }
-            transition={{ duration: 0.9 }}
-            className="space-y-6 text-gray-700"
-          >
-            <h3 className="text-2xl font-bold text-gray-900">
+          {/* ── TEXT CONTENT ── */}
+          <div className="space-y-5 text-gray-700">
+
+            <motion.h3
+              variants={fadeUp(0.15)}
+              initial="hidden"
+              animate={anim()}
+              className="text-xl sm:text-2xl font-bold text-gray-900"
+            >
               Welcome to Wales Trek and Travel
-            </h3>
+            </motion.h3>
 
-            <p className="text-lg leading-relaxed">
-              <strong>Wales Trek and Travel</strong> is a
-              premier adventure travel company in Nepal...
-            </p>
+            <motion.p
+              variants={fadeUp(0.2)}
+              initial="hidden"
+              animate={anim()}
+              className="text-base sm:text-lg leading-relaxed"
+            >
+              <strong>Wales Trek and Travel</strong> is a premier adventure
+              travel company in Nepal…
+            </motion.p>
 
-            <p className="text-lg leading-relaxed">
-              We take pride in our high success rate and safety...
-            </p>
+            <motion.p
+              variants={fadeUp(0.25)}
+              initial="hidden"
+              animate={anim()}
+              className="text-base sm:text-lg leading-relaxed"
+            >
+              We take pride in our high success rate and safety…
+            </motion.p>
 
-            <p className="text-lg leading-relaxed">
-              Committed to responsible tourism...
-            </p>
+            <motion.p
+              variants={fadeUp(0.3)}
+              initial="hidden"
+              animate={anim()}
+              className="text-base sm:text-lg leading-relaxed"
+            >
+              Committed to responsible tourism…
+            </motion.p>
 
             <motion.div
-              animate={
-                isInView
-                  ? { opacity: 1, scale: 1 }
-                  : { opacity: 0, scale: 0.9 }
-              }
-              transition={{ delay: 0.4 }}
-              className="pt-4"
+              variants={fadeUp(0.38)}
+              initial="hidden"
+              animate={anim()}
+              className="pt-2"
             >
               <Link
                 to="/about-us"
-                className="inline-block bg-emerald-700 hover:bg-emerald-800 text-white font-bold py-4 px-10 rounded-lg shadow-md"
+                className="inline-block bg-emerald-700 hover:bg-emerald-800 active:bg-emerald-900 text-white font-bold py-3.5 px-9 rounded-lg shadow-md transition-colors duration-200 text-sm sm:text-base"
               >
                 Read more about us
               </Link>
             </motion.div>
-          </motion.div>
+
+          </div>
         </div>
       </div>
     </section>

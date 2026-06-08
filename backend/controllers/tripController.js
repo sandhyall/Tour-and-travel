@@ -31,9 +31,7 @@ const safeParse = (val) => {
   }
 };
 
-/* =========================
-   CREATE TRIP
-========================= */
+
 export const createTrip = async (req, res) => {
   try {
     const data = req.body;
@@ -43,7 +41,7 @@ export const createTrip = async (req, res) => {
       strict: true,
     });
 
-    // HERO IMAGE
+ 
     let heroImage = null;
 
     if (req.files?.featuredImage?.[0]) {
@@ -55,7 +53,7 @@ export const createTrip = async (req, res) => {
       };
     }
 
-    // GALLERY IMAGES
+   
     let galleryImages = [];
 
     if (req.files?.gallery?.length) {
@@ -93,7 +91,7 @@ export const createTrip = async (req, res) => {
       categoryType: data.categoryType ? data.categoryType.toLowerCase() : "standard",
       badge: data.badge === "true" || data.badge === true,
 
-      // ✅ FIXED: Strings "true"/"false" converted to actual booleans
+    
       isBestSeller2026: data.isBestSeller2026 === "true",
       isLuxuryVIP: data.isLuxuryVIP === "true",
       isPeakClimbing: data.isPeakClimbing === "true",
@@ -145,7 +143,7 @@ export const getTrips = async (req, res) => {
       }
     }
 
-    // Frontend category filter mapping
+   
     if (category === "best-sellers") filterQuery.isBestSeller2026 = true;
     if (category === "luxury") filterQuery.isLuxuryVIP = true;
     if (category === "peak-climbing") filterQuery.isPeakClimbing = true;
@@ -155,7 +153,7 @@ export const getTrips = async (req, res) => {
 
     const trips = await Trip.find(filterQuery).sort({ createdAt: -1 });
 
-    // If frontend requests grouped format (for tab-based components)
+
     if (format === "grouped") {
       const groupedPackages = {
         "best-sellers": trips.filter((t) => t.isBestSeller2026),
@@ -174,9 +172,7 @@ export const getTrips = async (req, res) => {
   }
 };
 
-/* =========================
-   GET BY ID
-========================= */
+
 export const getTripById = async (req, res) => {
   try {
     const trip = await Trip.findById(req.params.id);

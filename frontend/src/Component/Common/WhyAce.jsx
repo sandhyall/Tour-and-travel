@@ -174,30 +174,32 @@ const WhyAce = () => {
           adventure.
         </motion.p>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-y-12 gap-x-8">
-          {features.map((feature, index) => (
-            <motion.div
-              key={index}
-              className="flex flex-col items-center rounded-[28px] border border-slate-200 bg-white p-8 shadow-xl shadow-slate-200/70 transition hover:-translate-y-1 hover:shadow-2xl"
-              variants={cardVariants}
-              initial="hidden"
-              whileInView="visible"
-              viewport={{ once: true, amount: 0.2 }}
-              transition={{ delay: index * 0.08, duration: 0.55, ease: "easeOut" }}
-              whileHover={{ y: -6 }}
-            >
-              <div className="mb-6 h-16 w-16 flex items-center justify-center rounded-3xl bg-emerald-50">
-                {feature.icon}
-              </div>
-              <h3 className="text-xl font-semibold text-gray-900 mb-3">
-                {feature.title}
-              </h3>
-              <p className="text-gray-600 leading-relaxed text-sm md:text-base">
-                {feature.description}
-              </p>
-            </motion.div>
-          ))}
-        </div>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
+  {features.map((feature, index) => (
+    <motion.div
+      key={index}
+      className="flex flex-col items-center rounded-2xl border border-slate-200 bg-white p-6 md:p-7 shadow-md shadow-slate-200/60 transition hover:-translate-y-1 hover:shadow-xl"
+      variants={cardVariants}
+      initial="hidden"
+      whileInView="visible"
+      viewport={{ once: true, amount: 0.2 }}
+      transition={{ delay: index * 0.08, duration: 0.55, ease: "easeOut" }}
+      whileHover={{ y: -4 }}
+    >
+      <div className="mb-4 h-12 w-12 flex items-center justify-center rounded-2xl bg-emerald-50">
+        {feature.icon}
+      </div>
+
+      <h3 className="text-lg md:text-xl font-semibold text-gray-900 mb-2 text-center">
+        {feature.title}
+      </h3>
+
+      <p className="text-gray-600 leading-relaxed text-sm md:text-base text-center">
+        {feature.description}
+      </p>
+    </motion.div>
+  ))}
+</div>
       </div>
     </motion.section>
   );

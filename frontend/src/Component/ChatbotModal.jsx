@@ -33,11 +33,18 @@ export default function ChatbotModal({
 
   const bottomRef = useRef();
 
-  useEffect(() => {
-    if (open) {
-      fetchHistory();
-    }
-  }, [open]);
+useEffect(() => {
+  if (open) {
+    setMessages([
+      {
+        role: "assistant",
+        content:
+          "Welcome to Wales Trek and Travel ✈️🏔️\nHow can I help you today?",
+      },
+    ]);
+    setInput("");
+  }
+}, [open]);
 
   useEffect(() => {
     bottomRef.current?.scrollIntoView({
@@ -127,7 +134,7 @@ const sendMessage = async () => {
 
             <div>
               <h2 className="font-bold text-lg">
-                Travel AI Assistant
+                Wales Trek and Travel AI Assistant
               </h2>
 
               <p className="text-xs text-gray-300">

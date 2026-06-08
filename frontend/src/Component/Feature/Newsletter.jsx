@@ -62,7 +62,7 @@ const Newsletter = () => {
 
       <div className="relative z-10 max-w-5xl mx-auto bg-white/10 backdrop-blur-xl border border-white/10 rounded-3xl p-8 shadow-2xl shadow-black/30">
         <div className="mb-8 text-center">
-          <p className="text-sm uppercase tracking-[0.3em] text-blue-300 mb-3">
+          <p className="text-sm uppercase tracking-[0.3em] text-green-300 mb-3">
             Exclusive travel updates
           </p>
           <h2 className="text-3xl md:text-4xl font-semibold text-white mb-4 tracking-tight">
@@ -104,7 +104,7 @@ const Newsletter = () => {
             <button
               type="submit"
               disabled={loading}
-              className="inline-flex items-center justify-center gap-2 rounded-2xl bg-gradient-to-r from-blue-500 to-cyan-400 text-white font-semibold px-7 py-3 shadow-lg shadow-cyan-500/20 transition hover:scale-[1.01] disabled:cursor-not-allowed disabled:opacity-70"
+              className="inline-flex items-center justify-center gap-2 rounded-2xl bg-gradient-to-r from-green-500 to-emerald-400 text-white font-semibold px-7 py-3 shadow-lg shadow-cyan-500/20 transition hover:scale-[1.01] disabled:cursor-not-allowed disabled:opacity-70"
             >
               <Mail size={18} />
               {loading ? "Sending..." : "Subscribe Now"}

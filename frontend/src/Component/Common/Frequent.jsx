@@ -48,7 +48,7 @@ const FAQ = () => {
         <div className="text-center mb-12">
           <h2 className="text-3xl font-bold text-gray-800 relative inline-block">
             Frequently Asked Questions by Travelers
-            <span className="block w-16 h-1 bg-yellow-500 mx-auto mt-2"></span>
+            <span className="block w-16 h-1 bg-green-500 mx-auto mt-2"></span>
           </h2>
         </div>
 

@@ -1,8 +1,9 @@
 import React, { useState, useRef } from "react";
 import axios from "../../api/axios";
 import { Mail, Phone, MapPin, Clock, Send, ChevronDown, MessageCircle, CheckCircle2 } from "lucide-react";
+import photo from "../../assets/photo.jpg"
 
-/* ── Trip type options ──────────────────────────────────────────── */
+
 const TRIP_TYPES = [
   "Everest Base Camp Trek",
   "Annapurna Circuit",
@@ -16,7 +17,7 @@ const TRIP_TYPES = [
   "Custom / Other",
 ];
 
-/* ── Contact info cards ─────────────────────────────────────────── */
+
 const INFO_CARDS = [
   {
     icon: <Mail size={22} />,
@@ -56,7 +57,6 @@ const INFO_CARDS = [
   },
 ];
 
-/* ── FAQ data ───────────────────────────────────────────────────── */
 const FAQS = [
   {
     q: "How far in advance should I book a trek?",
@@ -152,7 +152,7 @@ const Contactus = () => {
       {/* ── HERO ────────────────────────────────────────────────── */}
       <div className="relative w-full h-[380px] md:h-[520px] overflow-hidden">
         <img
-          src="https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?auto=format&fit=crop&q=80&w=1600"
+          src={photo}
           alt="Nepal mountains"
           className="w-full h-full object-cover"
           style={{ animation: "slowZoom 14s ease-in-out infinite alternate" }}

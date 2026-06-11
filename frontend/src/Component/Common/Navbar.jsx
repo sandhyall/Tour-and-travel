@@ -1,7 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
 import { Link, NavLink } from "react-router-dom";
 import axios from "../../api/axios";
-import logo from "../../assets/logo.png";
 import newlogo from "../../assets/logo-removebg-preview.png";
 
 const LOCATIONS = [
@@ -27,21 +26,6 @@ const COMPANY_LINKS = {
 };
 
 // ── Icons ────────────────────────────────────────────────────────────────────
-
-const MenuIcon = () => (
-  <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
-    <line x1="3" y1="12" x2="21" y2="12"></line>
-    <line x1="3" y1="6" x2="21" y2="6"></line>
-    <line x1="3" y1="18" x2="21" y2="18"></line>
-  </svg>
-);
-
-const CloseIcon = () => (
-  <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
-    <line x1="18" y1="6" x2="6" y2="18"></line>
-    <line x1="6" y1="6" x2="18" y2="18"></line>
-  </svg>
-);
 
 const PhoneIcon = () => (
   <svg viewBox="0 0 24 24" width="9" height="9" fill="white">
@@ -108,7 +92,6 @@ const styles = `
     --wtt-transition: 0.18s ease;
   }
 
-  /* ---- sticky wrapper ---- */
   .wtt-header-sticky {
     position: sticky;
     top: 0;
@@ -151,7 +134,6 @@ const styles = `
   .wtt-topbar-link:hover { color: var(--wtt-cream); }
   .wtt-topbar-sep { color: rgba(255,255,255,0.15); font-size: 11px; }
 
-  /* hide topbar on mobile */
   @media (max-width: 767px) {
     .wtt-topbar { display: none; }
   }
@@ -198,16 +180,6 @@ const styles = `
     color: var(--wtt-muted);
     text-transform: uppercase;
     margin-top: 3px;
-  }
-
-  /* ---- toggle mobile button ---- */
-  .wtt-menu-toggle {
-    display: none;
-    background: none;
-    border: none;
-    color: var(--wtt-cream);
-    cursor: pointer;
-    padding: 4px;
   }
 
   /* ---- desktop nav links ---- */
@@ -421,7 +393,7 @@ const styles = `
   }
   .wtt-phone-icon {
     width: 16px; height: 16px; background: var(--wtt-green-d); border-radius: 50%;
-    display: flex; align-items: center; justify-center: center; flex-shrink: 0;
+    display: flex; align-items: center; justify-content: center; flex-shrink: 0;
   }
 
   /* ── BURGER BUTTON ── */
@@ -440,7 +412,19 @@ const styles = `
   .wtt-burger:hover { background: rgba(255,255,255,0.07); }
   @media (max-width: 1023px) { .wtt-burger { display: flex; } }
 
-  /* ── MOBILE DRAWER ── */
+  /* ── DRAWER OVERLAY ── */
+  .wtt-drawer-overlay {
+    position: fixed; inset: 0;
+    background: rgba(0,0,0,0.6);
+    z-index: 999;
+    backdrop-filter: blur(2px);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.28s ease;
+  }
+  .wtt-drawer-overlay--open { opacity: 1; pointer-events: all; }
+
+  /* ── DRAWER ── */
   .wtt-drawer {
     position: fixed;
     top: 0; right: 0; bottom: 0;
@@ -455,17 +439,6 @@ const styles = `
     overflow-y: auto;
   }
   .wtt-drawer--open { transform: translateX(0); }
-
-  .wtt-drawer-overlay {
-    position: fixed; inset: 0;
-    background: rgba(0,0,0,0.6);
-    z-index: 999;
-    backdrop-filter: blur(2px);
-    opacity: 0;
-    pointer-events: none;
-    transition: opacity 0.28s ease;
-  }
-  .wtt-drawer-overlay--open { opacity: 1; pointer-events: all; }
 
   /* drawer header */
   .wtt-drawer-header {
@@ -486,8 +459,37 @@ const styles = `
   }
   .wtt-drawer-close:hover { color: var(--wtt-cream); }
 
+  /* location strip */
+  .wtt-drawer-loc-strip {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    padding: 12px 16px;
+    border-bottom: 1px solid rgba(255,255,255,0.05);
+    background: rgba(0,0,0,0.2);
+    flex-shrink: 0;
+  }
+  .wtt-drawer-loc-pill {
+    display: flex; align-items: center; gap: 5px;
+    background: none;
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 20px;
+    color: var(--wtt-muted);
+    font-family: var(--wtt-font);
+    font-size: 11px; font-weight: 500;
+    padding: 4px 10px;
+    cursor: pointer;
+    transition: color var(--wtt-transition), border-color var(--wtt-transition), background var(--wtt-transition);
+  }
+  .wtt-drawer-loc-pill:hover { color: var(--wtt-cream); border-color: rgba(255,255,255,0.25); }
+  .wtt-drawer-loc-pill--active {
+    color: var(--wtt-green);
+    border-color: var(--wtt-green-d);
+    background: rgba(46,125,50,0.12);
+  }
+
   /* drawer body */
-  .wtt-drawer-body { flex: 1; padding: 12px 0; }
+  .wtt-drawer-body { flex: 1; padding: 12px 0; overflow-y: auto; }
 
   /* drawer nav items */
   .wtt-drawer-section {
@@ -509,7 +511,7 @@ const styles = `
   .wtt-drawer-trigger--active { color: var(--wtt-green); }
 
   .wtt-drawer-link {
-    display: block; padding: 11px 20px;
+    display: block; padding: 13px 20px;
     color: var(--wtt-muted); text-decoration: none;
     font-family: var(--wtt-font); font-size: 12px; font-weight: 600;
     letter-spacing: 0.14em; text-transform: uppercase;
@@ -538,105 +540,31 @@ const styles = `
     border-top: 1px solid var(--wtt-green-dim);
     background: var(--wtt-bg);
     flex-shrink: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
   }
+  .wtt-drawer-cta {
+    display: flex; align-items: center; gap: 8px;
+    border: 1px solid var(--wtt-green-d);
+    background: none; padding: 10px 18px;
+    color: var(--wtt-cream); font-family: var(--wtt-font);
+    font-size: 11px; font-weight: 700; letter-spacing: 0.14em;
+    text-transform: uppercase; text-decoration: none;
+    transition: background var(--wtt-transition), border-color var(--wtt-transition);
+  }
+  .wtt-drawer-cta:hover { background: rgba(46,125,50,0.15); border-color: var(--wtt-green); }
 
-  /* ── Mobile Sidebar Drawer Styles ── */
-  .wtt-mobile-drawer {
-    position: fixed;
-    top: 0;
-    right: 0;
-    bottom: 0;
-    width: 300px;
-    background: var(--wtt-bg-panel);
-    border-left: 1px solid var(--wtt-green-dim);
-    z-index: 1000;
-    padding: 24px;
-    display: flex;
-    flex-direction: column;
-    gap: 24px;
-    overflow-y: auto;
-    transform: translateX(100%);
-    transition: transform 0.3s ease-in-out;
-    box-shadow: var(--wtt-shadow);
+  .wtt-drawer-phone {
+    display: flex; align-items: center; gap: 10px;
   }
-  .wtt-mobile-drawer.open {
-    transform: translateX(0);
+  .wtt-drawer-phone-label {
+    font-size: 9.5px; letter-spacing: 0.18em; text-transform: uppercase;
+    color: var(--wtt-muted); margin-bottom: 2px; font-weight: 500; font-family: var(--wtt-font);
   }
-  .wtt-drawer-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    border-bottom: 1px solid var(--wtt-border);
-    padding-bottom: 12px;
-  }
-  .wtt-drawer-close {
-    background: none;
-    border: none;
-    color: var(--wtt-muted);
-    cursor: pointer;
-  }
-  .wtt-mobile-nav {
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
-  }
-  .wtt-mobile-dd-btn {
-    width: 100%;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    background: none;
-    border: none;
-    color: var(--wtt-cream);
-    font-family: var(--wtt-font);
-    font-size: 14px;
-    font-weight: 600;
-    padding: 8px 0;
-    cursor: pointer;
-    text-transform: uppercase;
-    letter-spacing: 0.08em;
-  }
-  .wtt-mobile-sublist {
-    display: flex;
-    flex-direction: column;
-    gap: 4px;
-    padding-left: 14px;
-    border-left: 1px solid rgba(255,255,255,0.05);
-    margin-top: 4px;
-    margin-bottom: 8px;
-  }
-  .wtt-mobile-sublink {
-    color: var(--wtt-muted);
-    text-decoration: none;
-    font-size: 13.5px;
-    padding: 6px 0;
-    font-family: var(--wtt-font);
-  }
-  .wtt-mobile-singlelink {
-    color: var(--wtt-cream);
-    text-decoration: none;
-    font-size: 14px;
-    font-weight: 600;
-    padding: 8px 0;
-    text-transform: uppercase;
-    letter-spacing: 0.08em;
-    display: block;
-  }
-  .wtt-mobile-utils {
-    margin-top: auto;
-    display: flex;
-    flex-direction: column;
-    gap: 16px;
-    border-top: 1px solid var(--wtt-border);
-    padding-top: 16px;
-  }
-
-  /* ── Responsive Viewport Handlers ── */
-  @media (max-width: 1024px) {
-    .wtt-topbar { display: none; }
-    .wtt-nav-links, .wtt-nav-right { display: none; }
-    .wtt-menu-toggle { display: block; }
-    .wtt-navbar { padding: 0 20px; }
+  .wtt-drawer-phone-num {
+    font-size: 14px; font-weight: 700; color: var(--wtt-cream);
+    letter-spacing: 0.04em; font-family: var(--wtt-font);
   }
 `;
 
@@ -650,7 +578,7 @@ const useHoverDropdown = () => {
   return { open, show, hide };
 };
 
-// ── Desktop Trip Panel Component ─────────────────────────────────────────────
+// ── Desktop Trip Panel ───────────────────────────────────────────────────────
 
 const TripPanel = ({ countryLabel, trips }) => (
   <div className="wtt-trip-panel">
@@ -669,7 +597,7 @@ const TripPanel = ({ countryLabel, trips }) => (
   </div>
 );
 
-// ── Drawer accordion section ─────────────────────────────────────────────────
+// ── Drawer Accordion ─────────────────────────────────────────────────────────
 
 const DrawerAccordion = ({ label, children }) => {
   const [open, setOpen] = useState(false);
@@ -687,25 +615,20 @@ const DrawerAccordion = ({ label, children }) => {
   );
 };
 
-// ── Main Responsive Navbar ───────────────────────────────────────────────────
+// ── Main Navbar ──────────────────────────────────────────────────────────────
 
 const Navbar = () => {
   const [location, setLocation] = useState(LOCATIONS[0]);
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  
-  // Mobile accordion state managers
-  const [mobNepalOpen, setMobNepalOpen] = useState(false);
-  const [mobBhutanOpen, setMobBhutanOpen] = useState(false);
-  const [mobTibetOpen, setMobTibetOpen] = useState(false);
-  const [mobCompanyOpen, setMobCompanyOpen] = useState(false);
-  const [mobLocOpen, setMobLocOpen] = useState(false);
+  // Single unified drawer state
+  const [drawerOpen, setDrawerOpen] = useState(false);
+  const closeDrawer = () => setDrawerOpen(false);
 
   const locRef = useRef(null);
 
-  // Desktop Dropdown Hooks
-  const nepal = useHoverDropdown();
-  const bhutan = useHoverDropdown();
-  const tibet = useHoverDropdown();
+  // Desktop dropdown hooks
+  const nepal   = useHoverDropdown();
+  const bhutan  = useHoverDropdown();
+  const tibet   = useHoverDropdown();
   const company = useHoverDropdown();
   const loc     = useHoverDropdown();
 
@@ -727,7 +650,7 @@ const Navbar = () => {
     fetchTrips();
   }, []);
 
-  // Close desktop location picker on outside click
+  // Close location picker on outside click
   useEffect(() => {
     const handler = (e) => {
       if (locRef.current && !locRef.current.contains(e.target)) loc.hide();
@@ -736,15 +659,11 @@ const Navbar = () => {
     return () => document.removeEventListener("mousedown", handler);
   }, []);
 
-  // Prevent background scrolling when mobile menu drawer is open
+  // Lock body scroll when drawer is open
   useEffect(() => {
-    if (mobileMenuOpen) {
-      document.body.style.overflow = "hidden";
-    } else {
-      document.body.style.overflow = "unset";
-    }
-    return () => { document.body.style.overflow = "unset"; };
-  }, [mobileMenuOpen]);
+    document.body.style.overflow = drawerOpen ? "hidden" : "";
+    return () => { document.body.style.overflow = ""; };
+  }, [drawerOpen]);
 
   return (
     <>
@@ -766,10 +685,11 @@ const Navbar = () => {
           </div>
         </div>
 
-        {/* ── Main Navbar Line ── */}
+        {/* ── Main Navbar ── */}
         <nav className="wtt-navbar">
-          <div className="flex items-center gap-3">
-            <img src={newlogo} alt="Company Logo" className="h-[46px] w-auto" />
+          {/* Brand */}
+          <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+            <img src={newlogo} alt="Company Logo" style={{ height: 46, width: "auto" }} />
             <Link to="/" className="wtt-brand">
               <div>
                 <div className="wtt-brand-name">Wales Trek &amp; Travel</div>
@@ -778,44 +698,23 @@ const Navbar = () => {
             </Link>
           </div>
 
-          {/* Hamburger Menu Toggle for Mobile */}
-          <button 
-            className="wtt-menu-toggle" 
-            onClick={() => setMobileMenuOpen(true)}
-            aria-label="Open Navigation Menu"
-          >
-            <MenuIcon />
-          </button>
-
-          {/* ── Desktop Links Row ── */}
+         
           <div className="wtt-nav-links">
-            <div
-              className="wtt-dd-wrap"
-              onMouseEnter={nepal.show}
-              onMouseLeave={nepal.hide}
-            >
+            <div className="wtt-dd-wrap" onMouseEnter={nepal.show} onMouseLeave={nepal.hide}>
               <button className={`wtt-nav-btn${nepal.open ? " wtt-nav-btn--active" : ""}`}>
                 Nepal <ChevronDown open={nepal.open} />
               </button>
               {nepal.open && <TripPanel countryLabel="Nepal" trips={nepalTrips} />}
             </div>
 
-            <div
-              className="wtt-dd-wrap"
-              onMouseEnter={bhutan.show}
-              onMouseLeave={bhutan.hide}
-            >
+            <div className="wtt-dd-wrap" onMouseEnter={bhutan.show} onMouseLeave={bhutan.hide}>
               <button className={`wtt-nav-btn${bhutan.open ? " wtt-nav-btn--active" : ""}`}>
                 Bhutan <ChevronDown open={bhutan.open} />
               </button>
               {bhutan.open && <TripPanel countryLabel="Bhutan" trips={bhutanTrips} />}
             </div>
 
-            <div
-              className="wtt-dd-wrap"
-              onMouseEnter={tibet.show}
-              onMouseLeave={tibet.hide}
-            >
+            <div className="wtt-dd-wrap" onMouseEnter={tibet.show} onMouseLeave={tibet.hide}>
               <button className={`wtt-nav-btn${tibet.open ? " wtt-nav-btn--active" : ""}`}>
                 Tibet <ChevronDown open={tibet.open} />
               </button>
@@ -826,11 +725,7 @@ const Navbar = () => {
             <NavLink to="/tibet" className="wtt-nav-btn">Tibet Page</NavLink>
             <div className="wtt-nav-divider" />
 
-            <div
-              className="wtt-dd-wrap"
-              onMouseEnter={company.show}
-              onMouseLeave={company.hide}
-            >
+            <div className="wtt-dd-wrap" onMouseEnter={company.show} onMouseLeave={company.hide}>
               <button className={`wtt-nav-btn${company.open ? " wtt-nav-btn--active" : ""}`}>
                 Company <ChevronDown open={company.open} />
               </button>
@@ -849,7 +744,7 @@ const Navbar = () => {
             </div>
           </div>
 
-          {/* ── Desktop Right Utilities ── */}
+          {/* ── Desktop Right ── */}
           <div className="wtt-nav-right">
             <Link to="/top-treks" className="wtt-top10-btn">
               <span className="wtt-top10-star"><StarIcon /></span>
@@ -888,7 +783,7 @@ const Navbar = () => {
             </div>
           </div>
 
-          {/* Burger (tablet + mobile) */}
+          {/* ── Burger (tablet + mobile) ── */}
           <button
             className="wtt-burger"
             onClick={() => setDrawerOpen((o) => !o)}
@@ -898,150 +793,6 @@ const Navbar = () => {
             <BurgerIcon open={drawerOpen} />
           </button>
         </nav>
-
-        {/* ── Mobile Drawer Panel Overlay & Sidebar ── */}
-        {mobileMenuOpen && (
-          <div 
-            className="fixed inset-0 bg-black/60 z-[999]" 
-            onClick={() => setMobileMenuOpen(false)} 
-          />
-        )}
-        <div className={`wtt-mobile-drawer ${mobileMenuOpen ? "open" : ""}`}>
-          <div className="wtt-drawer-header">
-            <div className="wtt-brand-name" style={{ fontSize: "16px" }}>Navigation</div>
-            <button className="wtt-drawer-close" onClick={() => setMobileMenuOpen(false)}>
-              <CloseIcon />
-            </button>
-          </div>
-
-          {/* Accordion List for Mobile Layout */}
-          <div className="wtt-mobile-nav">
-            {/* Nepal Dropdown Accordion */}
-            <div>
-              <button className="wtt-mobile-dd-btn" onClick={() => setMobNepalOpen(!mobNepalOpen)}>
-                Nepal <ChevronDown open={mobNepalOpen} />
-              </button>
-              {mobNepalOpen && (
-                <div className="wtt-mobile-sublist">
-                  {nepalTrips.length === 0 ? (
-                    <span className="wtt-mobile-sublink" style={{ opacity: 0.5 }}>Loading trips…</span>
-                  ) : (
-                    nepalTrips.map(t => (
-                      <Link key={t._id} to={`/feature/${t._id}`} className="wtt-mobile-sublink" onClick={() => setMobileMenuOpen(false)}>
-                        {t.title}
-                      </Link>
-                    ))
-                  )}
-                </div>
-              )}
-            </div>
-
-            {/* Bhutan Dropdown Accordion */}
-            <div>
-              <button className="wtt-mobile-dd-btn" onClick={() => setMobBhutanOpen(!mobBhutanOpen)}>
-                Bhutan <ChevronDown open={mobBhutanOpen} />
-              </button>
-              {mobBhutanOpen && (
-                <div className="wtt-mobile-sublist">
-                  {bhutanTrips.length === 0 ? (
-                    <span className="wtt-mobile-sublink" style={{ opacity: 0.5 }}>Loading trips…</span>
-                  ) : (
-                    bhutanTrips.map(t => (
-                      <Link key={t._id} to={`/feature/${t._id}`} className="wtt-mobile-sublink" onClick={() => setMobileMenuOpen(false)}>
-                        {t.title}
-                      </Link>
-                    ))
-                  )}
-                </div>
-              )}
-            </div>
-
-            {/* Tibet Dropdown Accordion */}
-            <div>
-              <button className="wtt-mobile-dd-btn" onClick={() => setMobTibetOpen(!mobTibetOpen)}>
-                Tibet <ChevronDown open={mobTibetOpen} />
-              </button>
-              {mobTibetOpen && (
-                <div className="wtt-mobile-sublist">
-                  {tibetTrips.length === 0 ? (
-                    <span className="wtt-mobile-sublink" style={{ opacity: 0.5 }}>Loading trips…</span>
-                  ) : (
-                    tibetTrips.map(t => (
-                      <Link key={t._id} to={`/feature/${t._id}`} className="wtt-mobile-sublink" onClick={() => setMobileMenuOpen(false)}>
-                        {t.title}
-                      </Link>
-                    ))
-                  )}
-                </div>
-              )}
-            </div>
-
-            <Link to="/tibet" className="wtt-mobile-singlelink" onClick={() => setMobileMenuOpen(false)}>
-              Tibet Page
-            </Link>
-
-            {/* Company Links Dropdown Accordion */}
-            <div>
-              <button className="wtt-mobile-dd-btn" onClick={() => setMobCompanyOpen(!mobCompanyOpen)}>
-                Company <ChevronDown open={mobCompanyOpen} />
-              </button>
-              {mobCompanyOpen && (
-                <div className="wtt-mobile-sublist">
-                  {Object.entries(COMPANY_LINKS).map(([title, links]) => (
-                    <div key={title} style={{ marginBottom: "10px" }}>
-                      <div className="wtt-col-title" style={{ border: "none", marginBottom: "4px" }}>{title}</div>
-                      {links.map(({ label, to }) => (
-                        <Link key={to} to={to} className="wtt-mobile-sublink" style={{ display: "block" }} onClick={() => setMobileMenuOpen(false)}>
-                          {label}
-                        </Link>
-                      ))}
-                    </div>
-                  ))}
-                </div>
-              )}
-            </div>
-
-            <Link to="/top-treks" className="wtt-mobile-singlelink" style={{ color: "var(--wtt-gold)" }} onClick={() => setMobileMenuOpen(false)}>
-              ★ Top 10 Treks
-            </Link>
-          </div>
-
-          {/* Drawer Footer Utilities */}
-          <div className="wtt-mobile-utils">
-            {/* Location Selector Accordion inside Mobile View */}
-            <div>
-              <button className="wtt-mobile-dd-btn" style={{ fontSize: "12px" }} onClick={() => setMobLocOpen(!mobLocOpen)}>
-                <span>Market: {location.flag} {location.name}</span>
-                <ChevronDown open={mobLocOpen} />
-              </button>
-              {mobLocOpen && (
-                <div className="wtt-mobile-sublist" style={{ borderLeft: "none", paddingLeft: 0 }}>
-                  {LOCATIONS.map((l) => (
-                    <div
-                      key={l.name}
-                      className="wtt-loc-option"
-                      style={{ padding: "8px 4px", borderRadius: "4px" }}
-                      onClick={() => {
-                        setLocation(l);
-                        setMobLocOpen(false);
-                      }}
-                    >
-                      {l.name} <span>{l.flag}</span>
-                    </div>
-                  ))}
-                </div>
-              )}
-            </div>
-
-            <div className="wtt-phone-wrap" style={{ alignItems: "flex-start", borderLeft: "none", paddingLeft: 0 }}>
-              <div className="wtt-phone-label">Call us now</div>
-              <a href="tel:+9779851233710" className="wtt-phone-num" style={{ textDecoration: "none" }}>
-                <div className="wtt-phone-icon"><PhoneIcon /></div>
-                +977 985 123 3710
-              </a>
-            </div>
-          </div>
-        </div>
       </header>
 
       {/* ── OVERLAY ── */}
@@ -1051,10 +802,10 @@ const Navbar = () => {
         aria-hidden="true"
       />
 
-      {/* ── MOBILE DRAWER ── */}
+      {/* ── DRAWER ── */}
       <div className={`wtt-drawer${drawerOpen ? " wtt-drawer--open" : ""}`} aria-modal="true" role="dialog">
 
-        {/* Drawer header */}
+        {/* Header */}
         <div className="wtt-drawer-header">
           <Link to="/" className="wtt-drawer-logo" onClick={closeDrawer}>
             <img src={newlogo} alt="Logo" style={{ height: 34, width: "auto" }} />
@@ -1078,10 +829,8 @@ const Navbar = () => {
           ))}
         </div>
 
-        {/* Drawer body */}
+        {/* Body */}
         <div className="wtt-drawer-body">
-
-          {/* Nepal */}
           <DrawerAccordion label="Nepal">
             {nepalTrips.length === 0
               ? <span className="wtt-drawer-sub-link" style={{ fontStyle: "italic", opacity: 0.5 }}>Loading…</span>
@@ -1092,7 +841,6 @@ const Navbar = () => {
                 ))}
           </DrawerAccordion>
 
-          {/* Bhutan */}
           <DrawerAccordion label="Bhutan">
             {bhutanTrips.length === 0
               ? <span className="wtt-drawer-sub-link" style={{ fontStyle: "italic", opacity: 0.5 }}>Loading…</span>
@@ -1103,7 +851,6 @@ const Navbar = () => {
                 ))}
           </DrawerAccordion>
 
-          {/* Tibet */}
           <DrawerAccordion label="Tibet">
             {tibetTrips.length === 0
               ? <span className="wtt-drawer-sub-link" style={{ fontStyle: "italic", opacity: 0.5 }}>Loading…</span>
@@ -1114,12 +861,10 @@ const Navbar = () => {
                 ))}
           </DrawerAccordion>
 
-          {/* Tibet Page */}
           <div className="wtt-drawer-section">
             <NavLink to="/tibet" className="wtt-drawer-link" onClick={closeDrawer}>Tibet Page</NavLink>
           </div>
 
-          {/* Company */}
           <DrawerAccordion label="Company">
             {Object.entries(COMPANY_LINKS).map(([section, links]) => (
               <React.Fragment key={section}>
@@ -1139,10 +884,9 @@ const Navbar = () => {
               </React.Fragment>
             ))}
           </DrawerAccordion>
-
         </div>
 
-        {/* Drawer footer */}
+        {/* Footer */}
         <div className="wtt-drawer-footer">
           <Link to="/top-treks" className="wtt-drawer-cta" onClick={closeDrawer}>
             <span style={{ color: "var(--wtt-gold)", display: "flex" }}><StarIcon /></span>
@@ -1160,7 +904,6 @@ const Navbar = () => {
             </div>
           </div>
         </div>
-
       </div>
     </>
   );

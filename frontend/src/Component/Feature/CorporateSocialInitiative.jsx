@@ -1,4 +1,5 @@
 import React from "react";
+import photo4 from "../../assets/photo4.jpg"
 
 const CorporateSocialInitiative = () => {
   const socialProjects = [
@@ -38,7 +39,7 @@ const CorporateSocialInitiative = () => {
       {/* ── HERO ─────────────────────────────────────────────────── */}
       <div className="relative w-full h-[420px] sm:h-[520px] overflow-hidden">
         <img
-          src="https://images.unsplash.com/photo-1511632765486-a01980e01a18?auto=format&fit=crop&q=85&w=1600"
+          src={photo4}
           alt="Community support in Nepal"
           className="w-full h-full object-cover object-center"
         />

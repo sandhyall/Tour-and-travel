@@ -94,7 +94,6 @@ const styles = `
     --wtt-transition: 0.18s ease;
   }
 
-  /* ---- sticky wrapper ---- */
   .wtt-header-sticky {
     position: sticky;
     top: 0;
@@ -137,7 +136,6 @@ const styles = `
   .wtt-topbar-link:hover { color: var(--wtt-cream); }
   .wtt-topbar-sep { color: rgba(255,255,255,0.15); font-size: 11px; }
 
-  /* hide topbar on mobile */
   @media (max-width: 767px) {
     .wtt-topbar { display: none; }
   }
@@ -184,10 +182,6 @@ const styles = `
     color: var(--wtt-muted);
     text-transform: uppercase;
     margin-top: 3px;
-  }
-  @media (max-width: 767px) {
-    .wtt-brand-name { font-size: 15px; }
-    .wtt-brand-sub  { display: none; }
   }
 
   /* ---- desktop nav links ---- */
@@ -403,7 +397,7 @@ const styles = `
   }
   .wtt-phone-icon {
     width: 16px; height: 16px; background: var(--wtt-green-d); border-radius: 50%;
-    display: flex; align-items: center; justify-center: center; flex-shrink: 0;
+    display: flex; align-items: center; justify-content: center; flex-shrink: 0;
   }
 
   /* ── BURGER BUTTON ── */
@@ -422,7 +416,19 @@ const styles = `
   .wtt-burger:hover { background: rgba(255,255,255,0.07); }
   @media (max-width: 1023px) { .wtt-burger { display: flex; } }
 
-  /* ── MOBILE DRAWER ── */
+  /* ── DRAWER OVERLAY ── */
+  .wtt-drawer-overlay {
+    position: fixed; inset: 0;
+    background: rgba(0,0,0,0.6);
+    z-index: 999;
+    backdrop-filter: blur(2px);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.28s ease;
+  }
+  .wtt-drawer-overlay--open { opacity: 1; pointer-events: all; }
+
+  /* ── DRAWER ── */
   .wtt-drawer {
     position: fixed;
     top: 0; right: 0; bottom: 0;
@@ -437,17 +443,6 @@ const styles = `
     overflow-y: auto;
   }
   .wtt-drawer--open { transform: translateX(0); }
-
-  .wtt-drawer-overlay {
-    position: fixed; inset: 0;
-    background: rgba(0,0,0,0.6);
-    z-index: 999;
-    backdrop-filter: blur(2px);
-    opacity: 0;
-    pointer-events: none;
-    transition: opacity 0.28s ease;
-  }
-  .wtt-drawer-overlay--open { opacity: 1; pointer-events: all; }
 
   /* drawer header */
   .wtt-drawer-header {
@@ -468,8 +463,37 @@ const styles = `
   }
   .wtt-drawer-close:hover { color: var(--wtt-cream); }
 
+  /* location strip */
+  .wtt-drawer-loc-strip {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    padding: 12px 16px;
+    border-bottom: 1px solid rgba(255,255,255,0.05);
+    background: rgba(0,0,0,0.2);
+    flex-shrink: 0;
+  }
+  .wtt-drawer-loc-pill {
+    display: flex; align-items: center; gap: 5px;
+    background: none;
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 20px;
+    color: var(--wtt-muted);
+    font-family: var(--wtt-font);
+    font-size: 11px; font-weight: 500;
+    padding: 4px 10px;
+    cursor: pointer;
+    transition: color var(--wtt-transition), border-color var(--wtt-transition), background var(--wtt-transition);
+  }
+  .wtt-drawer-loc-pill:hover { color: var(--wtt-cream); border-color: rgba(255,255,255,0.25); }
+  .wtt-drawer-loc-pill--active {
+    color: var(--wtt-green);
+    border-color: var(--wtt-green-d);
+    background: rgba(46,125,50,0.12);
+  }
+
   /* drawer body */
-  .wtt-drawer-body { flex: 1; padding: 12px 0; }
+  .wtt-drawer-body { flex: 1; padding: 12px 0; overflow-y: auto; }
 
   /* drawer nav items */
   .wtt-drawer-section {
@@ -491,7 +515,7 @@ const styles = `
   .wtt-drawer-trigger--active { color: var(--wtt-green); }
 
   .wtt-drawer-link {
-    display: block; padding: 11px 20px;
+    display: block; padding: 13px 20px;
     color: var(--wtt-muted); text-decoration: none;
     font-family: var(--wtt-font); font-size: 12px; font-weight: 600;
     letter-spacing: 0.14em; text-transform: uppercase;
@@ -520,47 +544,32 @@ const styles = `
     border-top: 1px solid var(--wtt-green-dim);
     background: var(--wtt-bg);
     flex-shrink: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
   }
   .wtt-drawer-cta {
-    display: flex; align-items: center; justify-content: center; gap: 8px;
-    width: 100%; padding: 12px;
-    border: 1px solid var(--wtt-green-d); background: none;
+    display: flex; align-items: center; gap: 8px;
+    border: 1px solid var(--wtt-green-d);
+    background: none; padding: 10px 18px;
     color: var(--wtt-cream); font-family: var(--wtt-font);
     font-size: 11px; font-weight: 700; letter-spacing: 0.14em;
     text-transform: uppercase; text-decoration: none;
     transition: background var(--wtt-transition), border-color var(--wtt-transition);
-    cursor: pointer;
   }
   .wtt-drawer-cta:hover { background: rgba(46,125,50,0.15); border-color: var(--wtt-green); }
+
   .wtt-drawer-phone {
-    margin-top: 12px;
     display: flex; align-items: center; gap: 10px;
   }
   .wtt-drawer-phone-label {
     font-size: 9.5px; letter-spacing: 0.18em; text-transform: uppercase;
-    color: var(--wtt-muted); font-family: var(--wtt-font); font-weight: 500;
+    color: var(--wtt-muted); margin-bottom: 2px; font-weight: 500; font-family: var(--wtt-font);
   }
   .wtt-drawer-phone-num {
-    font-size: 13px; font-weight: 700; color: var(--wtt-cream);
-    font-family: var(--wtt-font);
+    font-size: 14px; font-weight: 700; color: var(--wtt-cream);
+    letter-spacing: 0.04em; font-family: var(--wtt-font);
   }
-
-  /* ── LOCATION STRIP in drawer ── */
-  .wtt-drawer-loc-strip {
-    display: flex; gap: 6px; flex-wrap: wrap;
-    padding: 12px 20px;
-    border-bottom: 1px solid rgba(255,255,255,0.05);
-  }
-  .wtt-drawer-loc-pill {
-    display: flex; align-items: center; gap: 5px;
-    padding: 5px 10px; border: 1px solid rgba(255,255,255,0.08);
-    background: none; cursor: pointer; border-radius: 20px;
-    color: var(--wtt-muted); font-family: var(--wtt-font);
-    font-size: 11px; font-weight: 500; letter-spacing: 0.06em;
-    transition: all var(--wtt-transition);
-  }
-  .wtt-drawer-loc-pill:hover { border-color: var(--wtt-green-d); color: var(--wtt-cream); }
-  .wtt-drawer-loc-pill--active { border-color: var(--wtt-green); color: var(--wtt-green); }
 `;
 
 // ── Hooks ────────────────────────────────────────────────────────────────────
@@ -573,7 +582,7 @@ const useHoverDropdown = () => {
   return { open, show, hide };
 };
 
-// ── Trip panel (desktop) ─────────────────────────────────────────────────────
+// ── Desktop Trip Panel ───────────────────────────────────────────────────────
 
 const TripPanel = ({ countryLabel, trips }) => (
   <div className="wtt-trip-panel">
@@ -592,7 +601,7 @@ const TripPanel = ({ countryLabel, trips }) => (
   </div>
 );
 
-// ── Drawer accordion section ─────────────────────────────────────────────────
+// ── Drawer Accordion ─────────────────────────────────────────────────────────
 
 const DrawerAccordion = ({ label, children }) => {
   const [open, setOpen] = useState(false);
@@ -614,9 +623,13 @@ const DrawerAccordion = ({ label, children }) => {
 
 const Navbar = () => {
   const [location, setLocation] = useState(LOCATIONS[0]);
+  // Single unified drawer state
   const [drawerOpen, setDrawerOpen] = useState(false);
+  const closeDrawer = () => setDrawerOpen(false);
+
   const locRef = useRef(null);
 
+  // Desktop dropdown hooks
   const nepal   = useHoverDropdown();
   const bhutan  = useHoverDropdown();
   const tibet   = useHoverDropdown();
@@ -650,13 +663,11 @@ const Navbar = () => {
     return () => document.removeEventListener("mousedown", handler);
   }, []);
 
-  // Lock body scroll when drawer open
+  // Lock body scroll when drawer is open
   useEffect(() => {
     document.body.style.overflow = drawerOpen ? "hidden" : "";
     return () => { document.body.style.overflow = ""; };
   }, [drawerOpen]);
-
-  const closeDrawer = () => setDrawerOpen(false);
 
   return (
     <>
@@ -678,18 +689,20 @@ const Navbar = () => {
           </div>
         </div>
 
-        {/* ── Main nav ── */}
+        {/* ── Main Navbar ── */}
         <nav className="wtt-navbar">
           {/* Brand */}
-          <Link to="/" className="wtt-brand">
-            <img src={newlogo} alt="Company Logo" style={{ height: 40, width: "auto" }} />
-            <div>
-              <div className="wtt-brand-name">Wales Trek &amp; Travel</div>
-              <span className="wtt-brand-sub">Himalayan Specialists</span>
-            </div>
-          </Link>
+          <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+            <img src={newlogo} alt="Company Logo" style={{ height: 46, width: "auto" }} />
+            <Link to="/" className="wtt-brand">
+              <div>
+                <div className="wtt-brand-name">Wales Trek &amp; Travel</div>
+                <span className="wtt-brand-sub">Himalayan Specialists</span>
+              </div>
+            </Link>
+          </div>
 
-          {/* Desktop links */}
+         
           <div className="wtt-nav-links">
             <div className="wtt-dd-wrap" onMouseEnter={nepal.show} onMouseLeave={nepal.hide}>
               <button className={`wtt-nav-btn${nepal.open ? " wtt-nav-btn--active" : ""}`}>
@@ -735,7 +748,7 @@ const Navbar = () => {
             </div>
           </div>
 
-          {/* Desktop right */}
+          {/* ── Desktop Right ── */}
           <div className="wtt-nav-right">
             <Link to="/top-treks" className="wtt-top10-btn">
               <span className="wtt-top10-star"><StarIcon /></span>
@@ -776,7 +789,7 @@ const Navbar = () => {
             </div>
           </div>
 
-          {/* Burger (tablet + mobile) */}
+          {/* ── Burger (tablet + mobile) ── */}
           <button
             className="wtt-burger"
             onClick={() => setDrawerOpen((o) => !o)}
@@ -795,10 +808,10 @@ const Navbar = () => {
         aria-hidden="true"
       />
 
-      {/* ── MOBILE DRAWER ── */}
+      {/* ── DRAWER ── */}
       <div className={`wtt-drawer${drawerOpen ? " wtt-drawer--open" : ""}`} aria-modal="true" role="dialog">
 
-        {/* Drawer header */}
+        {/* Header */}
         <div className="wtt-drawer-header">
           <Link to="/" className="wtt-drawer-logo" onClick={closeDrawer}>
             <img src={newlogo} alt="Logo" style={{ height: 34, width: "auto" }} />
@@ -822,10 +835,8 @@ const Navbar = () => {
           ))}
         </div>
 
-        {/* Drawer body */}
+        {/* Body */}
         <div className="wtt-drawer-body">
-
-          {/* Nepal */}
           <DrawerAccordion label="Nepal">
             {nepalTrips.length === 0
               ? <span className="wtt-drawer-sub-link" style={{ fontStyle: "italic", opacity: 0.5 }}>Loading…</span>
@@ -836,7 +847,6 @@ const Navbar = () => {
                 ))}
           </DrawerAccordion>
 
-          {/* Bhutan */}
           <DrawerAccordion label="Bhutan">
             {bhutanTrips.length === 0
               ? <span className="wtt-drawer-sub-link" style={{ fontStyle: "italic", opacity: 0.5 }}>Loading…</span>
@@ -847,7 +857,6 @@ const Navbar = () => {
                 ))}
           </DrawerAccordion>
 
-          {/* Tibet */}
           <DrawerAccordion label="Tibet">
             {tibetTrips.length === 0
               ? <span className="wtt-drawer-sub-link" style={{ fontStyle: "italic", opacity: 0.5 }}>Loading…</span>
@@ -858,12 +867,10 @@ const Navbar = () => {
                 ))}
           </DrawerAccordion>
 
-          {/* Tibet Page */}
           <div className="wtt-drawer-section">
             <NavLink to="/tibet" className="wtt-drawer-link" onClick={closeDrawer}>Tibet Page</NavLink>
           </div>
 
-          {/* Company */}
           <DrawerAccordion label="Company">
             {Object.entries(COMPANY_LINKS).map(([section, links]) => (
               <React.Fragment key={section}>
@@ -883,10 +890,9 @@ const Navbar = () => {
               </React.Fragment>
             ))}
           </DrawerAccordion>
-
         </div>
 
-        {/* Drawer footer */}
+        {/* Footer */}
         <div className="wtt-drawer-footer">
           <Link to="/top-treks" className="wtt-drawer-cta" onClick={closeDrawer}>
             <span style={{ color: "var(--wtt-gold)", display: "flex" }}><StarIcon /></span>
@@ -904,7 +910,6 @@ const Navbar = () => {
             </div>
           </div>
         </div>
-
       </div>
     </>
   );

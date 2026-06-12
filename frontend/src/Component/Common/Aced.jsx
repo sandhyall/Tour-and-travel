@@ -1,34 +1,42 @@
 import React, { useState, useRef } from "react";
 import { motion, useInView } from "framer-motion";
+import video1 from "../../assets/video5.mp4";
+import video2 from "../../assets/video2.mp4";
+import video3 from "../../assets/video3.mp4";
+import video4 from "../../assets/video4.mp4";
+import photo from "../../assets/photo.jpg";
+import photo1 from "../../assets/photo1.jpg";
+import photo2 from "../../assets/photo2.jpg";
+import photo3 from "../../assets/photo3.jpg";
 
 const testimonials = [
   {
     id: 1,
     name: "Jason Ogasian",
     location: "Manaslu Circuit Trek",
-    embedUrl: "https://www.youtube.com/embed/bFy6jTEHlzQ?autoplay=1",
-    thumbnail: "https://i.ytimg.com/vi/bFy6jTEHlzQ/maxresdefault.jpg",
+    embedUrl: video1,
+    thumbnail: photo,
   },
   {
     id: 2,
     name: "Simon & Group",
     location: "Annapurna Base Camp Trek",
-    embedUrl: "https://www.youtube.com/embed/bFy6jTEHlzQ?autoplay=1",
-    thumbnail: "https://i.ytimg.com/vi/bFy6jTEHlzQ/maxresdefault.jpg",
+    embedUrl: video2,
+    thumbnail: photo1,
   },
   {
     id: 3,
     name: "Daroga Lal Yadav",
     location: "Everest Base Camp Trek",
-    embedUrl: "https://www.youtube.com/embed/bFy6jTEHlzQ?autoplay=1",
-    thumbnail: "https://i.ytimg.com/vi/bFy6jTEHlzQ/maxresdefault.jpg",
+    embedUrl: video3,
+    thumbnail: photo2,
   },
   {
     id: 4,
     name: "Kaitlyn & Team",
     location: "Everest Base Camp Trek",
-    embedUrl: "https://www.youtube.com/embed/bFy6jTEHlzQ?autoplay=1",
-    thumbnail: "https://i.ytimg.com/vi/bFy6jTEHlzQ/maxresdefault.jpg",
+    embedUrl: video4,
+    thumbnail: photo3,
   },
 ];
 
@@ -43,8 +51,6 @@ const Aced = () => {
 
   return (
     <div ref={ref} className="py-20 bg-white font-sans">
-
-      {/* 🌟 TITLE */}
       <motion.div
         initial={{ opacity: 0, y: -60, filter: "blur(10px)" }}
         animate={
@@ -55,17 +61,13 @@ const Aced = () => {
         transition={{ duration: 0.8 }}
         className="text-center mb-14"
       >
-        <h2 className="text-4xl font-bold text-gray-800">
-          They Aced It!
-        </h2>
+        <h2 className="text-4xl font-bold text-gray-800">They  Wales Trek and Travel!</h2>
         <p className="text-gray-600 mt-4 max-w-xl mx-auto">
           Hear what our travelers have to say about their experience.
         </p>
       </motion.div>
 
-      {/* 🎥 GRID */}
       <div className="max-w-7xl mx-auto px-4 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-
         {testimonials.map((item, index) => (
           <motion.div
             key={item.id}
@@ -75,13 +77,11 @@ const Aced = () => {
               scale: 0.95,
             }}
             animate={
-              isInView
-                ? { opacity: 1, y: 0, scale: 1 }
-                : { opacity: 0, y: 40 }
+              isInView ? { opacity: 1, y: 0, scale: 1 } : { opacity: 0, y: 40 }
             }
             transition={{
               duration: 0.6,
-              delay: index * 0.1, // ⭐ stagger effect
+              delay: index * 0.1,
             }}
             whileHover={{
               y: -10,
@@ -90,7 +90,6 @@ const Aced = () => {
             className="cursor-pointer group"
             onClick={() => setSelectedVideo(item.embedUrl)}
           >
-            {/* Thumbnail */}
             <div className="relative overflow-hidden rounded-2xl aspect-video mb-4 shadow-md group-hover:shadow-xl transition-all duration-300">
               <img
                 src={item.thumbnail}
@@ -98,7 +97,6 @@ const Aced = () => {
                 className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
               />
 
-              {/* Overlay */}
               <div className="absolute inset-0 flex items-center justify-center bg-black/20 group-hover:bg-black/30 transition-colors">
                 <motion.div
                   animate={{ scale: [1, 1.1, 1] }}
@@ -119,20 +117,16 @@ const Aced = () => {
               </div>
             </div>
 
-            {/* TEXT */}
             <div className="text-center">
               <h3 className="font-bold text-gray-900 text-lg truncate">
                 {item.name}
               </h3>
-              <p className="text-gray-500 text-sm">
-                {item.location}
-              </p>
+              <p className="text-gray-500 text-sm">{item.location}</p>
             </div>
           </motion.div>
         ))}
       </div>
 
-      {/* 🎬 MODAL */}
       {selectedVideo && (
         <motion.div
           initial={{ opacity: 0 }}

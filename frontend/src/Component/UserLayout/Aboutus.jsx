@@ -1,7 +1,11 @@
 import React, { useEffect, useRef, useState } from "react";
 import about from "../../assets/about.png";
+import photo5 from "../../assets/photo5.jpeg";
+import photo4 from "../../assets/photo4.jpg";
+import photo3 from "../../assets/photo3.jpg";
+import photo2 from "../../assets/photo2.jpg";
 
-/* ─── Animated Counter ─────────────────────────────────────────── */
+
 const Counter = ({ target, suffix = "" }) => {
   const [count, setCount] = useState(0);
   const ref = useRef(null);
@@ -42,7 +46,7 @@ const Counter = ({ target, suffix = "" }) => {
   );
 };
 
-/* ─── Main Component ────────────────────────────────────────────── */
+
 const Aboutus = () => {
   const stats = [
     { value: "15", suffix: "+", label: "Years Experience", desc: "Crafting Himalayan adventures trusted by explorers worldwide." },
@@ -80,7 +84,7 @@ const Aboutus = () => {
   return (
     <div className="bg-[#faf8f3] text-gray-900 font-sans">
 
-      {/* ── HERO ──────────────────────────────────────────────────── */}
+    
       <div className="relative w-full h-[420px] md:h-[640px] overflow-hidden">
         <img
          src="https://images.unsplash.com/photo-1469474968028-56623f02e42e?auto=format&fit=crop&q=80&w=2000"
@@ -91,7 +95,7 @@ alt="Himalayan mountain panorama"
 
         <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/35 to-transparent" />
 
-        {/* Decorative diagonal stripe */}
+      
         <div className="absolute bottom-0 left-0 right-0 h-24 bg-[#faf8f3]"
           style={{ clipPath: "polygon(0 100%, 100% 100%, 100% 0)" }} />
 
@@ -109,20 +113,18 @@ alt="Himalayan mountain panorama"
         </div>
       </div>
 
-      {/* ── MAIN CONTENT ──────────────────────────────────────────── */}
       <div className="max-w-7xl mx-auto px-4 md:px-6 py-16 md:py-24">
 
-        {/* Breadcrumb */}
+      
         <nav className="text-sm text-gray-500 mb-10">
           <span className="hover:text-[#f1b400] cursor-pointer transition-colors">Home</span>
           <span className="mx-3 text-gray-300">{">"}</span>
           <span className="text-emerald-500 font-semibold">About Us</span>
         </nav>
 
-        {/* ── WHO WE ARE ──────────────────────────────────────────── */}
+       
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-20 items-center mb-28">
 
-          {/* Left: Text */}
           <div>
             <p className="uppercase tracking-[0.25em] text-xs text-emerald-500 font-bold mb-4">
               Who We Are
@@ -155,19 +157,18 @@ alt="Himalayan mountain panorama"
             </div>
           </div>
 
-          {/* Right: Stacked images */}
           <div className="relative h-[380px] md:h-[520px]">
             <img
-              src="https://images.unsplash.com/photo-1533130061792-64b345e4a833?auto=format&fit=crop&q=80&w=700"
+              src={photo5}
               alt="Everest Base Camp Trek"
               className="absolute top-0 left-0 w-[72%] h-[75%] object-cover rounded-3xl shadow-2xl"
             />
             <img
-              src="https://images.unsplash.com/photo-1506905925346-21bda4d32df4?auto=format&fit=crop&q=80&w=500"
+              src={photo4}
               alt="Nepal mountains"
               className="absolute bottom-0 right-0 w-[58%] h-[55%] object-cover rounded-3xl shadow-2xl border-4 border-[#faf8f3]"
             />
-            {/* Badge */}
+           
             <div className="absolute top-[38%] right-[28%] bg-emerald-500 text-white rounded-2xl px-4 py-3 shadow-xl text-center">
               <p className="text-2xl font-black leading-none">15+</p>
               <p className="text-[11px] font-semibold uppercase tracking-wide mt-1 leading-tight">Years<br />of Trust</p>
@@ -175,7 +176,7 @@ alt="Himalayan mountain panorama"
           </div>
         </div>
 
-        {/* ── STATS ───────────────────────────────────────────────── */}
+       
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6 mb-28">
           {stats.map((s, i) => (
             <div
@@ -191,10 +192,10 @@ alt="Himalayan mountain panorama"
           ))}
         </div>
 
-        {/* ── OUR STORY + TIMELINE ────────────────────────────────── */}
+       
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16 items-start mb-28">
 
-          {/* Story text */}
+       
           <div className="bg-white rounded-3xl shadow-xl p-8 md:p-12 border border-gray-100">
             <p className="uppercase tracking-[0.25em] text-xs text-emerald-500 font-bold mb-4">
               Our Story
@@ -222,7 +223,7 @@ alt="Himalayan mountain panorama"
             </div>
           </div>
 
-          {/* Timeline */}
+       
           <div>
             <p className="uppercase tracking-[0.25em] text-xs text-emerald-500 font-bold mb-4">
               Milestones
@@ -246,11 +247,11 @@ alt="Himalayan mountain panorama"
           </div>
         </div>
 
-        {/* ── VISION & MISSION ────────────────────────────────────── */}
+       
         <div className="relative rounded-3xl overflow-hidden mb-28">
-          {/* Background image */}
+        
           <img
-            src="https://images.unsplash.com/photo-1439853949212-36589f9f8861?auto=format&fit=crop&q=80&w=1400"
+            src={photo3}
             alt="Himalayan peaks"
             className="absolute inset-0 w-full h-full object-cover"
           />
@@ -297,7 +298,7 @@ alt="Himalayan mountain panorama"
           </div>
         </div>
 
-        {/* ── CORE VALUES ─────────────────────────────────────────── */}
+   
         <div className="mb-28">
           <div className="text-center mb-14">
             <p className="uppercase tracking-[0.25em] text-xs text-emerald-500 font-bold mb-4">
@@ -326,7 +327,7 @@ alt="Himalayan mountain panorama"
           </div>
         </div>
 
-        {/* ── GALLERY STRIP ───────────────────────────────────────── */}
+   
         <div className="mb-28">
   <p className="uppercase tracking-[0.25em] text-xs text-emerald-500 font-bold mb-4 text-center">
     Our Adventures
@@ -337,40 +338,27 @@ alt="Himalayan mountain panorama"
   </h2>
 
   <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4">
-    {[
-      {
-        src: "https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?auto=format&fit=crop&q=80&w=600",
-        alt: "Himalayan peaks panorama",
-      },
-      {
-        src: "https://images.unsplash.com/photo-1533130061792-64b345e4a833?auto=format&fit=crop&q=80&w=600",
-        alt: "Trekking trail Nepal",
-      },
-      {
-        src: "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?auto=format&fit=crop&q=80&w=600",
-        alt: "Mountain valley Nepal",
-      },
-      
-  {
-  src: "https://images.unsplash.com/photo-1518002054494-3a6f94352e9d?auto=format&fit=crop&q=80&w=600",
-  alt: "Nepal mountain landscape with greenery",
-},
-    ].map(({ src, alt }, i) => (
-      <div
-        key={i}
-        className="overflow-hidden rounded-2xl aspect-square shadow-md group"
-      >
-        <img
-          src={src}
-          alt={alt}
-          className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
-        />
-      </div>
-    ))}
-  </div>
+  {[
+    { src: photo2, alt: "Himalayan peaks panorama" },
+    { src: photo5, alt: "Trekking trail Nepal" },
+    { src: photo4, alt: "Mountain valley Nepal" },
+    { src: photo3, alt: "Nepal mountain landscape with greenery" },
+  ].map(({ src, alt }, i) => (
+    <div
+      key={i}
+      className="overflow-hidden rounded-2xl aspect-square shadow-md group"
+    >
+      <img
+        src={src}
+        alt={alt}
+        className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
+      />
+    </div>
+  ))}
+</div>
 </div>
 
-        {/* ── CTA ─────────────────────────────────────────────────── */}
+      
         <div className="bg-[#2c3338] rounded-3xl p-10 md:p-16 text-center text-white shadow-2xl">
           <p className="uppercase tracking-[0.25em] text-xs text-emerald-500 font-bold mb-4">
             Start Your Adventure
@@ -389,18 +377,13 @@ alt="Himalayan mountain panorama"
             >
               Contact Our Team
             </button>
-            {/* <button
-              onClick={() => window.location.href = "/treks"}
-              className="bg-white/10 hover:bg-white/20 text-white font-bold px-10 py-4 rounded-2xl border border-white/20 transition-all duration-300 hover:scale-105"
-            >
-              View Our Treks
-            </button> */}
+           
           </div>
         </div>
 
       </div>
 
-      {/* Keyframe for hero slow zoom */}
+    
       <style>{`
         @keyframes slowZoom {
           from { transform: scale(1.05); }

@@ -187,23 +187,23 @@ const Footer = () => {
         {/* Contact quick-info */}
         <div className="space-y-2">
           <a
-            href="mailto:info@walestravel.com"
+            href="mailto:travelswales@gmail.com"
             className="flex items-center gap-3 text-sm text-gray-500 hover:text-emerald-600 transition-colors duration-200 group"
           >
             <div className="w-7 h-7 rounded-lg bg-gray-100 group-hover:bg-emerald-50 flex items-center justify-center">
               <Mail size={13} className="text-emerald-500" />
             </div>
-            info@walestravel.com
+            travelswales@gmail.com
           </a>
 
           <a
-            href="tel:+9779851233710"
+            href="tel:+9779703745286"
             className="flex items-center gap-3 text-sm text-gray-500 hover:text-emerald-600 transition-colors duration-200 group"
           >
             <div className="w-7 h-7 rounded-lg bg-gray-100 group-hover:bg-emerald-50 flex items-center justify-center">
               <Phone size={13} className="text-emerald-500" />
             </div>
-            +977 9851 233 710
+            +977 970-3745286
           </a>
 
           <div className="flex items-center gap-3 text-sm text-gray-500">

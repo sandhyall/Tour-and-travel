@@ -21,18 +21,18 @@ const INFO_CARDS = [
   {
     icon: <Mail size={22} />,
     label: "Email Us",
-    value: "info@walestravel.com",
+    value: "travelswales@gmail.com",
     sub: "We reply within 24 hours",
-    href: "mailto:info@walestravel.com",
+    href: "mailto:travelswales@gmail.com",
     color: "from-emerald-400/20 to-emerald-600/10",
     accent: "text-emerald-500",
   },
   {
     icon: <Phone size={22} />,
     label: "Call Us",
-    value: "+977 9851233710",
+    value: "+977 970-3745286",
     sub: "Available 9 AM – 6 PM (NST)",
-    href: "tel:+9779851233710",
+    href: "tel:+9779703745286",
     color: "from-amber-400/20 to-amber-600/10",
     accent: "text-[#f1b400]",
   },
@@ -225,7 +225,7 @@ const Contactus = () => {
 
             {/* WhatsApp CTA */}
             <a
-              href="https://wa.me/9779851233710"
+              href="https://wa.me/9779703745286"
               target="_blank"
               rel="noreferrer"
               className="flex items-center gap-4 bg-[#25D366]/10 border border-[#25D366]/30 rounded-2xl p-5 hover:bg-[#25D366]/15 transition-colors duration-200 group"

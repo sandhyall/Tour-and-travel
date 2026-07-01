@@ -2,8 +2,8 @@ import React, { useRef } from "react";
 import { Link } from "react-router-dom";
 import { motion, useInView } from "framer-motion";
 
-import trekImage from "../../assets/trekImage.png";
-import travel from "../../assets/Travel.png";
+import trekImage from "../../assets/trekImage.webp";
+import travel from "../../assets/Travel.webp";
 import tek from "../../assets/trek.webp";
 
 

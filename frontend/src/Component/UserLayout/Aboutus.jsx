@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from "react";
-import about from "../../assets/about.png";
+import about from "../../assets/about.webp";
 import photo5 from "../../assets/photo5.webp";
 import photo4 from "../../assets/photo4.webp";
 import photo3 from "../../assets/photo3.webp";
@@ -87,7 +87,7 @@ const Aboutus = () => {
     
       <div className="relative w-full h-[420px] md:h-[640px] overflow-hidden">
         <img
-         src="https://images.unsplash.com/photo-1469474968028-56623f02e42e?auto=format&fit=crop&q=80&w=2000"
+         src={about}
 alt="Himalayan mountain panorama"
           className="w-full h-full object-cover scale-105"
           style={{ animation: "slowZoom 14s ease-in-out infinite alternate" }}

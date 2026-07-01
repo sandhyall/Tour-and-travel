@@ -1,5 +1,6 @@
 import React from "react";
 import { Link, useNavigate } from "react-router-dom";
+import meet from "../../assets/meet.webp";
 
 const teamMembers = [
   {
@@ -31,7 +32,7 @@ const MeetOurTeam = () => {
     <div className="bg-[#faf8f3] text-gray-900 font-sans">
       <div className="relative w-full h-[420px] md:h-[620px] overflow-hidden">
         <img
-          src="https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?auto=format&fit=crop&q=80&w=1500"
+          src={meet}
           alt="Wales Trek and Travel Team"
           fetchpriority="high"
           className="w-full h-full object-cover"

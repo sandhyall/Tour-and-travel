@@ -1,5 +1,17 @@
 import React, { useState } from "react";
-import { ChevronDown, Play, X, Star, Shield, Globe, Users, Award, Mountain, Clock, Heart } from "lucide-react";
+import {
+  ChevronDown,
+  Play,
+  X,
+  Star,
+  Shield,
+  Globe,
+  Users,
+  Award,
+  Mountain,
+  Clock,
+  Heart,
+} from "lucide-react";
 import ace from "../../assets/Ace.png";
 
 const WhyAce = () => {
@@ -11,8 +23,6 @@ const WhyAce = () => {
   const toggleAccordion = (index) => {
     setOpenIndex(openIndex === index ? null : index);
   };
-
-  /* ── DATA ───────────────────────────────────────────────────── */
 
   const stats = [
     { value: "15+", label: "Years of Experience", icon: Clock },
@@ -129,10 +139,6 @@ const WhyAce = () => {
 
   return (
     <div className="font-sans bg-[#faf8f3] text-gray-900">
-
-      {/* ══════════════════════════════════════════════════════════
-          HERO — UNCHANGED
-      ══════════════════════════════════════════════════════════ */}
       <div className="relative h-[75vh] min-h-[600px] w-full flex items-center justify-center overflow-hidden bg-black">
         <img
           src={ace}
@@ -149,7 +155,9 @@ const WhyAce = () => {
             With Confidence
           </h1>
           <p className="text-lg md:text-2xl text-gray-200 font-light leading-relaxed mb-12 max-w-4xl mx-auto">
-            "Wales Trek and Travel was founded with a passion for sharing the beauty, culture, and adventure of the Himalayas while creating meaningful and unforgettable travel experiences."
+            "Wales Trek and Travel was founded with a passion for sharing the
+            beauty, culture, and adventure of the Himalayas while creating
+            meaningful and unforgettable travel experiences."
           </p>
           <button
             onClick={() => setIsVideoModalOpen(true)}
@@ -163,9 +171,6 @@ const WhyAce = () => {
         </div>
       </div>
 
-      {/* ══════════════════════════════════════════════════════════
-          VIDEO MODAL — UNCHANGED
-      ══════════════════════════════════════════════════════════ */}
       {isVideoModalOpen && (
         <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/95 p-4">
           <button
@@ -187,9 +192,6 @@ const WhyAce = () => {
         </div>
       )}
 
-      {/* ══════════════════════════════════════════════════════════
-          ★ NEW: STATS BAR
-      ══════════════════════════════════════════════════════════ */}
       <div className="bg-[#0b2545] py-12 px-6">
         <div className="max-w-7xl mx-auto grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-6">
           {stats.map(({ value, label, icon: Icon }, i) => (
@@ -211,12 +213,7 @@ const WhyAce = () => {
         </div>
       </div>
 
-      {/* ══════════════════════════════════════════════════════════
-          CONTENT SECTION
-      ══════════════════════════════════════════════════════════ */}
       <div className="max-w-6xl mx-auto py-24 px-6">
-
-        {/* HEADER — UNCHANGED */}
         <div className="flex flex-col lg:flex-row justify-between items-start lg:items-end gap-8 mb-16">
           <div className="max-w-3xl">
             <p className="uppercase tracking-[0.25em] text-sm text-emerald-500 font-bold mb-5">
@@ -228,7 +225,9 @@ const WhyAce = () => {
             </h2>
             <div className="w-24 h-1 bg-emerald-500 rounded-full mb-8" />
             <p className="text-xl text-gray-600 leading-relaxed">
-              Discover why thousands of travelers from around the world trust Wales Trek and Travel for unforgettable Himalayan trekking and adventure experiences.
+              Discover why thousands of travelers from around the world trust
+              Wales Trek and Travel for unforgettable Himalayan trekking and
+              adventure experiences.
             </p>
           </div>
           <button
@@ -239,9 +238,6 @@ const WhyAce = () => {
           </button>
         </div>
 
-        {/* ══════════════════════════════════════════════════════
-            ★ NEW: WHAT SETS US APART — 3 feature cards
-        ══════════════════════════════════════════════════════ */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-16">
           {features.map(({ icon: Icon, title, desc, accent }, i) => (
             <div
@@ -267,10 +263,12 @@ const WhyAce = () => {
           ))}
         </div>
 
-        {/* ACCORDION — UNCHANGED */}
         <div className="bg-white rounded-3xl border border-gray-100 shadow-xl overflow-hidden">
           {reasons.map((reason, index) => (
-            <div key={index} className="border-b border-gray-100 last:border-b-0">
+            <div
+              key={index}
+              className="border-b border-gray-100 last:border-b-0"
+            >
               <button
                 onClick={() => toggleAccordion(index)}
                 className="w-full flex items-center justify-between px-8 md:px-12 py-8 text-left group transition-all"
@@ -281,23 +279,31 @@ const WhyAce = () => {
                   </span>
                   <span
                     className={`text-xl md:text-3xl font-semibold transition-all duration-300 ${
-                      openIndex === index ? "text-emerald-600 translate-x-2" : "text-gray-800"
+                      openIndex === index
+                        ? "text-emerald-600 translate-x-2"
+                        : "text-gray-800"
                     }`}
                   >
                     {reason.title}
                   </span>
                 </div>
-                <div className={`transition-transform duration-500 ${openIndex === index ? "rotate-180" : ""}`}>
+                <div
+                  className={`transition-transform duration-500 ${openIndex === index ? "rotate-180" : ""}`}
+                >
                   <ChevronDown
                     size={30}
                     strokeWidth={1.8}
-                    className={openIndex === index ? "text-emerald-600" : "text-gray-400"}
+                    className={
+                      openIndex === index ? "text-emerald-600" : "text-gray-400"
+                    }
                   />
                 </div>
               </button>
               <div
                 className={`transition-all duration-500 ease-in-out overflow-hidden ${
-                  openIndex === index ? "max-h-96 opacity-100" : "max-h-0 opacity-0"
+                  openIndex === index
+                    ? "max-h-96 opacity-100"
+                    : "max-h-0 opacity-0"
                 }`}
               >
                 <div className="pl-24 md:pl-36 pr-10 md:pr-16 pb-10 text-gray-600 text-lg leading-9">
@@ -308,9 +314,6 @@ const WhyAce = () => {
           ))}
         </div>
 
-        {/* ══════════════════════════════════════════════════════
-            ★ NEW: TRAVELER REVIEWS
-        ══════════════════════════════════════════════════════ */}
         <div className="mt-24">
           <div className="text-center mb-14">
             <p className="uppercase tracking-[0.25em] text-sm text-emerald-500 font-bold mb-4">
@@ -321,65 +324,77 @@ const WhyAce = () => {
             </h2>
             <div className="w-16 h-1 bg-emerald-500 rounded-full mx-auto mb-6" />
             <p className="text-gray-500 text-lg max-w-xl mx-auto leading-relaxed">
-              Thousands of adventurers have trusted us with their dream Himalayan journey. Here's what a few of them had to say.
+              Thousands of adventurers have trusted us with their dream
+              Himalayan journey. Here's what a few of them had to say.
             </p>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {testimonials.map(({ name, country, trek, rating, text, initials, color }, i) => (
-              <div
-                key={i}
-                className="bg-white rounded-3xl p-8 border border-gray-100 shadow-sm hover:shadow-xl transition-all duration-300 hover:-translate-y-1 flex flex-col gap-5"
-              >
-                {/* Stars */}
-                <div className="flex gap-1">
-                  {Array.from({ length: rating }).map((_, j) => (
-                    <Star key={j} size={14} className="text-amber-400 fill-amber-400" />
-                  ))}
-                </div>
-
-                {/* Quote */}
-                <p className="text-gray-600 text-sm leading-7 flex-1">
-                  "{text}"
-                </p>
-
-                {/* Trek badge */}
+            {testimonials.map(
+              ({ name, country, trek, rating, text, initials, color }, i) => (
                 <div
-                  className="inline-flex items-center gap-2 text-xs font-semibold px-3 py-1.5 rounded-full self-start"
-                  style={{ backgroundColor: color + "15", color }}
+                  key={i}
+                  className="bg-white rounded-3xl p-8 border border-gray-100 shadow-sm hover:shadow-xl transition-all duration-300 hover:-translate-y-1 flex flex-col gap-5"
                 >
-                  <Mountain size={11} />
-                  {trek}
-                </div>
+                  <div className="flex gap-1">
+                    {Array.from({ length: rating }).map((_, j) => (
+                      <Star
+                        key={j}
+                        size={14}
+                        className="text-amber-400 fill-amber-400"
+                      />
+                    ))}
+                  </div>
 
-                {/* Author */}
-                <div className="flex items-center gap-3 pt-2 border-t border-gray-50">
+                  <p className="text-gray-600 text-sm leading-7 flex-1">
+                    "{text}"
+                  </p>
+
                   <div
-                    className="w-10 h-10 rounded-xl flex items-center justify-center text-white font-black text-sm flex-shrink-0"
-                    style={{ backgroundColor: color }}
+                    className="inline-flex items-center gap-2 text-xs font-semibold px-3 py-1.5 rounded-full self-start"
+                    style={{ backgroundColor: color + "15", color }}
                   >
-                    {initials}
+                    <Mountain size={11} />
+                    {trek}
                   </div>
-                  <div>
-                    <p className="font-bold text-gray-900 text-sm leading-tight">{name}</p>
-                    <p className="text-xs text-gray-400">{country}</p>
+
+                  <div className="flex items-center gap-3 pt-2 border-t border-gray-50">
+                    <div
+                      className="w-10 h-10 rounded-xl flex items-center justify-center text-white font-black text-sm flex-shrink-0"
+                      style={{ backgroundColor: color }}
+                    >
+                      {initials}
+                    </div>
+                    <div>
+                      <p className="font-bold text-gray-900 text-sm leading-tight">
+                        {name}
+                      </p>
+                      <p className="text-xs text-gray-400">{country}</p>
+                    </div>
                   </div>
                 </div>
-              </div>
-            ))}
+              ),
+            )}
           </div>
 
-          {/* Rating summary strip */}
           <div className="mt-10 bg-white rounded-2xl border border-gray-100 shadow-sm px-8 py-6 flex flex-col sm:flex-row items-center justify-between gap-6">
             <div className="flex items-center gap-4">
-              <div className="text-5xl font-black text-gray-900 leading-none">4.9</div>
+              <div className="text-5xl font-black text-gray-900 leading-none">
+                4.9
+              </div>
               <div>
                 <div className="flex gap-1 mb-1">
                   {Array.from({ length: 5 }).map((_, i) => (
-                    <Star key={i} size={16} className="text-amber-400 fill-amber-400" />
+                    <Star
+                      key={i}
+                      size={16}
+                      className="text-amber-400 fill-amber-400"
+                    />
                   ))}
                 </div>
-                <p className="text-sm text-gray-500 font-medium">Average across all platforms</p>
+                <p className="text-sm text-gray-500 font-medium">
+                  Average across all platforms
+                </p>
               </div>
             </div>
             <div className="flex flex-wrap gap-4 justify-center sm:justify-end">
@@ -388,7 +403,10 @@ const WhyAce = () => {
                 { platform: "Google", reviews: "850+" },
                 { platform: "Trustpilot", reviews: "430+" },
               ].map(({ platform, reviews }) => (
-                <div key={platform} className="text-center px-5 py-3 bg-gray-50 rounded-xl border border-gray-100">
+                <div
+                  key={platform}
+                  className="text-center px-5 py-3 bg-gray-50 rounded-xl border border-gray-100"
+                >
                   <p className="font-black text-gray-900 text-sm">{reviews}</p>
                   <p className="text-xs text-gray-400">{platform}</p>
                 </div>
@@ -397,7 +415,6 @@ const WhyAce = () => {
           </div>
         </div>
 
-        {/* BOTTOM CTA — UNCHANGED */}
         <div className="mt-24 bg-[#2c3338] rounded-3xl p-10 md:p-16 text-center text-white shadow-2xl">
           <p className="uppercase tracking-[0.25em] text-sm text-emerald-500 font-bold mb-5">
             Begin Your Adventure
@@ -406,13 +423,15 @@ const WhyAce = () => {
             Discover The Magic Of The Himalayas
           </h2>
           <p className="max-w-3xl mx-auto text-lg text-gray-300 leading-9 mb-10">
-            Whether you dream of trekking to Everest Base Camp, exploring ancient Himalayan cultures, or experiencing luxury mountain adventures, Wales Trek and Travel is here to make your journey extraordinary.
+            Whether you dream of trekking to Everest Base Camp, exploring
+            ancient Himalayan cultures, or experiencing luxury mountain
+            adventures, Wales Trek and Travel is here to make your journey
+            extraordinary.
           </p>
           <button className="bg-emerald-500 hover:bg-emerald-600 text-white font-black px-10 py-5 rounded-2xl transition-all duration-300 shadow-lg hover:scale-105 uppercase tracking-[0.15em] text-sm">
             Plan Your Trip
           </button>
         </div>
-
       </div>
     </div>
   );

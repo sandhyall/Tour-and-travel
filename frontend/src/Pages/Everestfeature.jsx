@@ -4,12 +4,39 @@ import axios from "../../src/api/axios";
 import { Link } from "react-router-dom";
 import BookingModal from "../Component/BookingModal";
 import {
-  MapPin, Clock, CheckCircle, XCircle, ArrowLeft, Compass,
-  Loader2, Mountain, Calendar, ChevronDown, ChevronUp,
-  Download, Star, Wind, Thermometer, X, Maximize2,
-  ChevronLeft, ChevronRight, Users, Shield, PhoneCall,
-  Package, Tag, ArrowRight, Globe, BadgeCheck, Map,
-  FileText, UserCheck, Languages, Briefcase, ExternalLink,
+  MapPin,
+  Clock,
+  CheckCircle,
+  XCircle,
+  ArrowLeft,
+  Compass,
+  Loader2,
+  Mountain,
+  Calendar,
+  ChevronDown,
+  ChevronUp,
+  Download,
+  Star,
+  Wind,
+  Thermometer,
+  X,
+  Maximize2,
+  ChevronLeft,
+  ChevronRight,
+  Users,
+  Shield,
+  PhoneCall,
+  Package,
+  Tag,
+  ArrowRight,
+  Globe,
+  BadgeCheck,
+  Map,
+  FileText,
+  UserCheck,
+  Languages,
+  Briefcase,
+  ExternalLink,
   ZoomIn,
 } from "lucide-react";
 
@@ -32,7 +59,6 @@ const resolveImage = (raw) => {
 const FALLBACK_BANNER =
   "https://images.unsplash.com/photo-1544735716-392fe2489ffa?q=80&w=1600";
 
-// ── Fonts: high-legibility pairing ──────────────────────────────
 const fonts = {
   display: "'Cormorant Garamond', 'Playfair Display', Georgia, serif",
   body: "'Nunito Sans', 'Lato', 'Segoe UI', system-ui, sans-serif",
@@ -46,8 +72,6 @@ if (typeof document !== "undefined" && !document.getElementById("trip-fonts")) {
     "https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;600;700&family=Nunito+Sans:wght@400;500;600;700;800&display=swap";
   document.head.appendChild(link);
 }
-
-// ── Shared Components ────────────────────────────────────────────
 
 function SectionHeading({ children, sub }) {
   return (
@@ -81,7 +105,9 @@ function TripBadge({ label, variant = "default" }) {
     default: "bg-gray-800 text-white",
   };
   return (
-    <span className={`inline-flex items-center px-2.5 py-1 text-[9px] font-black tracking-[0.2em] uppercase rounded ${styles[variant]}`}>
+    <span
+      className={`inline-flex items-center px-2.5 py-1 text-[9px] font-black tracking-[0.2em] uppercase rounded ${styles[variant]}`}
+    >
       {label}
     </span>
   );
@@ -95,7 +121,9 @@ function DifficultyPill({ label }) {
     Strenuous: "bg-red-50 text-red-700 border border-red-200",
   };
   return (
-    <span className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[11px] font-bold ${map[label] || "bg-gray-100 text-gray-600 border border-gray-200"}`}>
+    <span
+      className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[11px] font-bold ${map[label] || "bg-gray-100 text-gray-600 border border-gray-200"}`}
+    >
       <span className="w-1.5 h-1.5 rounded-full bg-current opacity-70" />
       {label}
     </span>
@@ -118,8 +146,14 @@ function AccordionFAQ({ faqs }) {
             >
               {faq.question}
             </span>
-            <span className={`shrink-0 w-6 h-6 rounded-full flex items-center justify-center border transition-all ${open === idx ? "bg-emerald-500 border-emerald-500 text-white" : "border-gray-200 text-gray-400 group-hover:border-emerald-300"}`}>
-              {open === idx ? <ChevronUp size={12} /> : <ChevronDown size={12} />}
+            <span
+              className={`shrink-0 w-6 h-6 rounded-full flex items-center justify-center border transition-all ${open === idx ? "bg-emerald-500 border-emerald-500 text-white" : "border-gray-200 text-gray-400 group-hover:border-emerald-300"}`}
+            >
+              {open === idx ? (
+                <ChevronUp size={12} />
+              ) : (
+                <ChevronDown size={12} />
+              )}
             </span>
           </button>
           {open === idx && (
@@ -153,11 +187,17 @@ function PackageCard({ pkg }) {
             <Tag size={14} className="text-emerald-500" />
           </div>
           <div>
-            <p className="text-[15px] font-bold text-gray-900" style={{ fontFamily: fonts.body }}>
+            <p
+              className="text-[15px] font-bold text-gray-900"
+              style={{ fontFamily: fonts.body }}
+            >
               {pkg.name || "Package"}
             </p>
             {pkg.description && (
-              <p className="text-sm text-gray-500 mt-0.5 leading-snug line-clamp-1" style={{ fontFamily: fonts.body }}>
+              <p
+                className="text-sm text-gray-500 mt-0.5 leading-snug line-clamp-1"
+                style={{ fontFamily: fonts.body }}
+              >
                 {pkg.description}
               </p>
             )}
@@ -169,7 +209,10 @@ function PackageCard({ pkg }) {
               USD {Number(pkg.oldPrice).toLocaleString()}
             </p>
           )}
-          <p className="text-lg font-bold text-gray-950 leading-tight" style={{ fontFamily: fonts.display }}>
+          <p
+            className="text-lg font-bold text-gray-950 leading-tight"
+            style={{ fontFamily: fonts.display }}
+          >
             {pkg.price ? `USD ${Number(pkg.price).toLocaleString()}` : "—"}
           </p>
           {discount && (
@@ -182,7 +225,10 @@ function PackageCard({ pkg }) {
 
       {pkg.description && (
         <div className="px-5 pb-3 bg-white">
-          <p className="text-sm text-gray-500 leading-relaxed" style={{ fontFamily: fonts.body }}>
+          <p
+            className="text-sm text-gray-500 leading-relaxed"
+            style={{ fontFamily: fonts.body }}
+          >
             {pkg.description}
           </p>
         </div>
@@ -194,27 +240,47 @@ function PackageCard({ pkg }) {
             onClick={() => setOpen((p) => !p)}
             className="w-full flex items-center justify-between px-5 py-3 bg-gray-50 hover:bg-emerald-50/40 transition-colors text-left"
           >
-            <span className="text-[12px] font-bold text-gray-600 flex items-center gap-1.5" style={{ fontFamily: fonts.body }}>
+            <span
+              className="text-[12px] font-bold text-gray-600 flex items-center gap-1.5"
+              style={{ fontFamily: fonts.body }}
+            >
               <Users size={12} className="text-emerald-500" />
               Group Pricing ({pkg.groupPricing.length} tiers)
             </span>
-            {open ? <ChevronUp size={13} className="text-gray-400" /> : <ChevronDown size={13} className="text-gray-400" />}
+            {open ? (
+              <ChevronUp size={13} className="text-gray-400" />
+            ) : (
+              <ChevronDown size={13} className="text-gray-400" />
+            )}
           </button>
           {open && (
             <div className="px-5 pb-4 bg-white space-y-2 pt-3">
               <div className="grid grid-cols-3 gap-2 mb-1">
                 {["Min Pax", "Max Pax", "Price / Person"].map((h) => (
-                  <span key={h} className="text-[10px] font-black uppercase tracking-widest text-gray-400" style={{ fontFamily: fonts.body }}>
+                  <span
+                    key={h}
+                    className="text-[10px] font-black uppercase tracking-widest text-gray-400"
+                    style={{ fontFamily: fonts.body }}
+                  >
                     {h}
                   </span>
                 ))}
               </div>
               {pkg.groupPricing.map((tier, i) => (
-                <div key={i} className="grid grid-cols-3 gap-2 items-center px-3 py-2.5 rounded-xl bg-gray-50 border border-gray-100">
-                  <span className="text-[15px] font-semibold text-gray-700">{tier.minPax || "—"}</span>
-                  <span className="text-[15px] font-semibold text-gray-700">{tier.maxPax || "—"}</span>
+                <div
+                  key={i}
+                  className="grid grid-cols-3 gap-2 items-center px-3 py-2.5 rounded-xl bg-gray-50 border border-gray-100"
+                >
+                  <span className="text-[15px] font-semibold text-gray-700">
+                    {tier.minPax || "—"}
+                  </span>
+                  <span className="text-[15px] font-semibold text-gray-700">
+                    {tier.maxPax || "—"}
+                  </span>
                   <span className="text-[15px] font-bold text-emerald-700">
-                    {tier.pricePerPax ? `USD ${Number(tier.pricePerPax).toLocaleString()}` : "—"}
+                    {tier.pricePerPax
+                      ? `USD ${Number(tier.pricePerPax).toLocaleString()}`
+                      : "—"}
                   </span>
                 </div>
               ))}
@@ -227,12 +293,13 @@ function PackageCard({ pkg }) {
 }
 
 const dateStatusStyle = (status) => {
-  if (status === "available") return "bg-emerald-50 text-emerald-700 border border-emerald-200";
-  if (status === "limited") return "bg-amber-50 text-amber-700 border border-amber-200";
+  if (status === "available")
+    return "bg-emerald-50 text-emerald-700 border border-emerald-200";
+  if (status === "limited")
+    return "bg-amber-50 text-amber-700 border border-amber-200";
   return "bg-red-50 text-red-500 border border-red-200";
 };
 
-// ── MAP IMAGE SECTION ────────────────────────────────────────────
 function MapSection({ mapImage, mapLink }) {
   const [expanded, setExpanded] = useState(false);
   const imageUrl = resolveImage(mapImage);
@@ -263,17 +330,22 @@ function MapSection({ mapImage, mapLink }) {
       <div className="rounded-2xl border border-gray-100 overflow-hidden shadow-sm">
         <div className="h-1 bg-gradient-to-r from-emerald-400 via-emerald-300 to-transparent" />
 
-        {/* Header */}
         <div className="px-4 sm:px-5 py-4 bg-white flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-gray-100">
           <div className="flex items-center gap-3">
             <div className="w-9 h-9 rounded-xl bg-emerald-50 border border-emerald-100 flex items-center justify-center shrink-0">
               <Map size={16} className="text-emerald-500" />
             </div>
             <div>
-              <p className="text-[15px] font-bold text-gray-900" style={{ fontFamily: fonts.body }}>
+              <p
+                className="text-[15px] font-bold text-gray-900"
+                style={{ fontFamily: fonts.body }}
+              >
                 Route & Trail Map
               </p>
-              <p className="text-[12px] text-gray-400 font-medium mt-0.5" style={{ fontFamily: fonts.body }}>
+              <p
+                className="text-[12px] text-gray-400 font-medium mt-0.5"
+                style={{ fontFamily: fonts.body }}
+              >
                 Full route overview with key landmarks
               </p>
             </div>
@@ -285,7 +357,15 @@ function MapSection({ mapImage, mapLink }) {
               className="flex items-center gap-1.5 text-[12px] font-bold text-gray-500 hover:text-emerald-600 px-3 py-1.5 rounded-lg hover:bg-emerald-50 transition-all border border-gray-200"
               style={{ fontFamily: fonts.body }}
             >
-              {expanded ? <><ChevronUp size={12} /> Collapse</> : <><Maximize2 size={12} /> Expand</>}
+              {expanded ? (
+                <>
+                  <ChevronUp size={12} /> Collapse
+                </>
+              ) : (
+                <>
+                  <Maximize2 size={12} /> Expand
+                </>
+              )}
             </button>
             <button
               onClick={handleDownload}
@@ -295,8 +375,8 @@ function MapSection({ mapImage, mapLink }) {
               <Download size={12} /> Download Map
             </button>
             {mapLink && (
-              
-              <a  href={mapLink}
+              <a
+                href={mapLink}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="flex items-center gap-1.5 text-[12px] font-bold text-blue-600 hover:text-blue-500 px-3 py-1.5 rounded-lg hover:bg-blue-50 transition-all border border-blue-200"
@@ -308,7 +388,6 @@ function MapSection({ mapImage, mapLink }) {
           </div>
         </div>
 
-        {/* Map Image */}
         <div
           className="relative bg-gray-100 overflow-hidden transition-all duration-500 ease-in-out"
           style={{ height: expanded ? "600px" : "380px" }}
@@ -317,9 +396,12 @@ function MapSection({ mapImage, mapLink }) {
             src={imageUrl}
             alt="Trail Map"
             className="w-full h-full object-contain bg-gray-50"
-            onError={(e) => { e.currentTarget.src = "https://placehold.co/1200x600?text=Map+Unavailable"; }}
+            onError={(e) => {
+              e.currentTarget.src =
+                "https://placehold.co/1200x600?text=Map+Unavailable";
+            }}
           />
-          {/* Zoom hint overlay */}
+
           <button
             onClick={() => setExpanded((p) => !p)}
             className="absolute bottom-3 right-3 w-9 h-9 rounded-full bg-white/90 backdrop-blur-sm border border-gray-200 flex items-center justify-center shadow-sm hover:bg-white transition-all"
@@ -328,10 +410,12 @@ function MapSection({ mapImage, mapLink }) {
           </button>
         </div>
 
-        {/* Footer */}
         <div className="px-4 sm:px-5 py-3 bg-gray-50 flex items-center gap-2 border-t border-gray-100">
           <MapPin size={11} className="text-emerald-400 shrink-0" />
-          <p className="text-[12px] text-gray-400 font-medium" style={{ fontFamily: fonts.body }}>
+          <p
+            className="text-[12px] text-gray-400 font-medium"
+            style={{ fontFamily: fonts.body }}
+          >
             Click "Expand" for a larger view · Download for offline use
           </p>
         </div>
@@ -340,10 +424,10 @@ function MapSection({ mapImage, mapLink }) {
   );
 }
 
-// ── GUIDE SECTION ────────────────────────────────────────────────
 function GuideSection({ guide }) {
   const photoUrl = resolveImage(guide?.photo) || guide?.photo?.url;
-  const hasAnyInfo = guide?.name || guide?.bio || guide?.experience || guide?.languages;
+  const hasAnyInfo =
+    guide?.name || guide?.bio || guide?.experience || guide?.languages;
   if (!hasAnyInfo) return null;
 
   return (
@@ -355,8 +439,6 @@ function GuideSection({ guide }) {
 
         <div className="p-5 sm:p-6 bg-white">
           <div className="flex flex-col sm:flex-row items-start gap-5">
-
-            {/* Photo */}
             <div className="shrink-0 mx-auto sm:mx-0">
               {photoUrl ? (
                 <img
@@ -374,7 +456,6 @@ function GuideSection({ guide }) {
               )}
             </div>
 
-            {/* Details */}
             <div className="flex-1 min-w-0 w-full">
               {guide.name && (
                 <h3
@@ -385,7 +466,6 @@ function GuideSection({ guide }) {
                 </h3>
               )}
 
-              {/* Pills */}
               <div className="flex flex-wrap gap-2 mb-4 justify-center sm:justify-start">
                 {guide.experience && (
                   <span
@@ -407,7 +487,6 @@ function GuideSection({ guide }) {
                 )}
               </div>
 
-              {/* Bio */}
               {guide.bio && (
                 <p
                   className="text-[15px] text-gray-600 leading-relaxed"
@@ -424,7 +503,6 @@ function GuideSection({ guide }) {
   );
 }
 
-// ── DOWNLOAD SECTION ─────────────────────────────────────────────
 function DownloadSection({ brochure, itineraryPdf }) {
   const hasBrochure = brochure?.url;
   const hasItineraryPdf = itineraryPdf?.url;
@@ -483,47 +561,58 @@ function DownloadSection({ brochure, itineraryPdf }) {
 
   return (
     <section>
-      <SectionHeading sub="Downloadable Resources">Trip Documents</SectionHeading>
+      <SectionHeading sub="Downloadable Resources">
+        Trip Documents
+      </SectionHeading>
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-        {resources.map(({ label, desc, url, filename, icon: Icon, color }, i) => {
-          const c = colorMap[color];
-          return (
-            <div
-              key={i}
-              className={`rounded-2xl border bg-white overflow-hidden hover:shadow-md transition-all duration-200 ${c.border}`}
-            >
-              <div className="p-5 flex items-start gap-4">
-                <div className={`w-11 h-11 rounded-xl border flex items-center justify-center shrink-0 ${c.icon}`}>
-                  <Icon size={20} className={c.iconColor} />
+        {resources.map(
+          ({ label, desc, url, filename, icon: Icon, color }, i) => {
+            const c = colorMap[color];
+            return (
+              <div
+                key={i}
+                className={`rounded-2xl border bg-white overflow-hidden hover:shadow-md transition-all duration-200 ${c.border}`}
+              >
+                <div className="p-5 flex items-start gap-4">
+                  <div
+                    className={`w-11 h-11 rounded-xl border flex items-center justify-center shrink-0 ${c.icon}`}
+                  >
+                    <Icon size={20} className={c.iconColor} />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p
+                      className="text-[15px] font-bold text-gray-900"
+                      style={{ fontFamily: fonts.body }}
+                    >
+                      {label}
+                    </p>
+                    <p
+                      className="text-sm text-gray-500 mt-0.5 leading-snug"
+                      style={{ fontFamily: fonts.body }}
+                    >
+                      {desc}
+                    </p>
+                  </div>
                 </div>
-                <div className="flex-1 min-w-0">
-                  <p className="text-[15px] font-bold text-gray-900" style={{ fontFamily: fonts.body }}>
-                    {label}
-                  </p>
-                  <p className="text-sm text-gray-500 mt-0.5 leading-snug" style={{ fontFamily: fonts.body }}>
-                    {desc}
-                  </p>
+                <div className="px-5 pb-5">
+                  <button
+                    onClick={() => handleDownload(url, filename)}
+                    className={`w-full flex items-center justify-center gap-2 text-sm font-bold py-3 rounded-xl transition-colors ${c.btn}`}
+                    style={{ fontFamily: fonts.body }}
+                  >
+                    <Download size={14} />
+                    Download PDF
+                  </button>
                 </div>
               </div>
-              <div className="px-5 pb-5">
-                <button
-                  onClick={() => handleDownload(url, filename)}
-                  className={`w-full flex items-center justify-center gap-2 text-sm font-bold py-3 rounded-xl transition-colors ${c.btn}`}
-                  style={{ fontFamily: fonts.body }}
-                >
-                  <Download size={14} />
-                  Download PDF
-                </button>
-              </div>
-            </div>
-          );
-        })}
+            );
+          },
+        )}
       </div>
     </section>
   );
 }
 
-// ── MAIN COMPONENT ───────────────────────────────────────────────
 const Everestfeature = () => {
   const { id } = useParams();
   const navigate = useNavigate();
@@ -545,8 +634,9 @@ const Everestfeature = () => {
         const { data } = await axios.get(`/trips/${id}`);
         setTrip(data);
         const banner =
-          resolveImage(data.bannerImage || data.featuredImage || data.heroImage) ||
-          FALLBACK_BANNER;
+          resolveImage(
+            data.bannerImage || data.featuredImage || data.heroImage,
+          ) || FALLBACK_BANNER;
         const galleryArr = (data.galleryImages || data.gallery || [])
           .map(resolveImage)
           .filter(Boolean);
@@ -565,7 +655,9 @@ const Everestfeature = () => {
       if (!galleryOpen) return;
       if (e.key === "Escape") setGalleryOpen(false);
       if (e.key === "ArrowLeft")
-        setGalleryIndex((p) => (p - 1 + lightboxImages.length) % lightboxImages.length);
+        setGalleryIndex(
+          (p) => (p - 1 + lightboxImages.length) % lightboxImages.length,
+        );
       if (e.key === "ArrowRight")
         setGalleryIndex((p) => (p + 1) % lightboxImages.length);
     };
@@ -605,7 +697,10 @@ const Everestfeature = () => {
             <Loader2 className="w-14 h-14 animate-spin text-emerald-300 absolute inset-0" />
             <Mountain className="w-6 h-6 text-emerald-600 absolute inset-0 m-auto" />
           </div>
-          <p className="text-[11px] font-bold tracking-[0.35em] uppercase text-gray-400" style={{ fontFamily: fonts.body }}>
+          <p
+            className="text-[11px] font-bold tracking-[0.35em] uppercase text-gray-400"
+            style={{ fontFamily: fonts.body }}
+          >
             Preparing Your Expedition
           </p>
         </div>
@@ -620,10 +715,16 @@ const Everestfeature = () => {
           <Mountain size={32} className="text-gray-300" />
         </div>
         <div className="text-center space-y-1">
-          <p className="font-bold text-gray-900 text-lg" style={{ fontFamily: fonts.display }}>
+          <p
+            className="font-bold text-gray-900 text-lg"
+            style={{ fontFamily: fonts.display }}
+          >
             {error || "Trip not found"}
           </p>
-          <p className="text-[15px] text-gray-400" style={{ fontFamily: fonts.body }}>
+          <p
+            className="text-[15px] text-gray-400"
+            style={{ fontFamily: fonts.body }}
+          >
             Please go back and try again.
           </p>
         </div>
@@ -651,7 +752,11 @@ const Everestfeature = () => {
   const faqs = trip.faqs || [];
 
   const categoryLabel =
-    { standard: "Standard Trek", comfort: "Comfort Trek", luxury: "Luxury Trek" }[trip.categoryType] ||
+    {
+      standard: "Standard Trek",
+      comfort: "Comfort Trek",
+      luxury: "Luxury Trek",
+    }[trip.categoryType] ||
     trip.categoryType ||
     "Classic";
 
@@ -660,23 +765,28 @@ const Everestfeature = () => {
     .sort((a, b) => new Date(a.date) - new Date(b.date))[0];
 
   return (
-    <div className="min-h-screen bg-white antialiased" style={{ fontFamily: fonts.body }}>
-
-      {/* ═══════════════ HERO ═══════════════ */}
+    <div
+      className="min-h-screen bg-white antialiased"
+      style={{ fontFamily: fonts.body }}
+    >
       <div className="relative h-[72vh] min-h-[480px] sm:min-h-[540px] overflow-hidden">
         <img
           src={bannerImage}
           alt={trip.title}
           className="absolute inset-0 w-full h-full object-cover"
           style={{ filter: "brightness(0.42) saturate(0.8)" }}
-          onError={(e) => { e.currentTarget.src = FALLBACK_BANNER; }}
+          onError={(e) => {
+            e.currentTarget.src = FALLBACK_BANNER;
+          }}
         />
         <div
           className="absolute inset-0"
-          style={{ background: "linear-gradient(180deg, rgba(0,0,0,0.25) 0%, transparent 38%, rgba(0,0,0,0.7) 72%, rgba(0,0,0,0.92) 100%)" }}
+          style={{
+            background:
+              "linear-gradient(180deg, rgba(0,0,0,0.25) 0%, transparent 38%, rgba(0,0,0,0.7) 72%, rgba(0,0,0,0.92) 100%)",
+          }}
         />
 
-        {/* Nav row */}
         <div className="absolute top-0 inset-x-0 flex items-center justify-between px-4 sm:px-14 pt-6 z-20">
           <button
             onClick={() => navigate(-1)}
@@ -685,7 +795,10 @@ const Everestfeature = () => {
             <span className="w-9 h-9 rounded-full bg-white/10 border border-white/15 backdrop-blur-sm flex items-center justify-center group-hover:bg-white/20 transition-all">
               <ArrowLeft size={14} />
             </span>
-            <span className="text-[13px] font-semibold tracking-wide hidden sm:block" style={{ fontFamily: fonts.body }}>
+            <span
+              className="text-[13px] font-semibold tracking-wide hidden sm:block"
+              style={{ fontFamily: fonts.body }}
+            >
               Back to Trips
             </span>
           </button>
@@ -699,20 +812,34 @@ const Everestfeature = () => {
           </button>
         </div>
 
-        {/* Hero content */}
         <div className="absolute bottom-0 inset-x-0 px-4 sm:px-14 pb-12 z-10">
           <div className="max-w-[1400px] mx-auto">
             <div className="flex flex-wrap gap-2 mb-4">
-              {trip.isBestSeller2026 && <TripBadge label="Best Seller 2026" variant="bestseller" />}
-              {trip.isLuxuryVIP && <TripBadge label="Luxury VIP" variant="luxury" />}
-              {trip.isPeakClimbing && <TripBadge label="Peak Climbing" variant="peak" />}
-              {trip.isShortTrek && <TripBadge label="Short Trek" variant="short" />}
-              {trip.isBhutanTour && <TripBadge label="Bhutan Tour" variant="bhutan" />}
-              {trip.isTibetTour && <TripBadge label="Tibet Tour" variant="tibet" />}
+              {trip.isBestSeller2026 && (
+                <TripBadge label="Best Seller 2026" variant="bestseller" />
+              )}
+              {trip.isLuxuryVIP && (
+                <TripBadge label="Luxury VIP" variant="luxury" />
+              )}
+              {trip.isPeakClimbing && (
+                <TripBadge label="Peak Climbing" variant="peak" />
+              )}
+              {trip.isShortTrek && (
+                <TripBadge label="Short Trek" variant="short" />
+              )}
+              {trip.isBhutanTour && (
+                <TripBadge label="Bhutan Tour" variant="bhutan" />
+              )}
+              {trip.isTibetTour && (
+                <TripBadge label="Tibet Tour" variant="tibet" />
+              )}
               {trip.badge && <TripBadge label="Popular" variant="popular" />}
             </div>
 
-            <p className="text-emerald-400 text-[11px] font-bold tracking-[0.35em] uppercase mb-3" style={{ fontFamily: fonts.body }}>
+            <p
+              className="text-emerald-400 text-[11px] font-bold tracking-[0.35em] uppercase mb-3"
+              style={{ fontFamily: fonts.body }}
+            >
               {categoryLabel} &nbsp;·&nbsp; {trip.country || "Nepal"}
             </p>
 
@@ -727,7 +854,9 @@ const Everestfeature = () => {
               {[
                 { icon: Clock, text: `${trip.duration || "N/A"} Days` },
                 { icon: MapPin, text: trip.startPoint || "Kathmandu" },
-                ...(trip.maxAltitude ? [{ icon: Mountain, text: trip.maxAltitude }] : []),
+                ...(trip.maxAltitude
+                  ? [{ icon: Mountain, text: trip.maxAltitude }]
+                  : []),
               ].map(({ icon: Icon, text }, i) => (
                 <span
                   key={i}
@@ -744,43 +873,91 @@ const Everestfeature = () => {
         </div>
       </div>
 
-      {/* ═══════════════ MAIN CONTENT ═══════════════ */}
       <div className="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-14 py-12 lg:py-16 grid grid-cols-1 lg:grid-cols-[1fr_360px] gap-10 lg:gap-16">
-
-        {/* ── LEFT COLUMN ── */}
         <div className="space-y-14 min-w-0">
-
-          {/* Quick Info Grid */}
           <section>
             <div className="bg-white border border-gray-100 rounded-2xl overflow-hidden shadow-sm">
               <div className="h-1 bg-gradient-to-r from-emerald-400 via-emerald-300 to-transparent" />
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
                 {[
-                  { icon: Compass, label: "Country", value: trip.country || "Nepal" },
-                  { icon: Clock, label: "Duration", value: `${trip.duration || "—"} Days` },
-                  { icon: Mountain, label: "Difficulty", value: trip.difficulty || "—" },
-                  { icon: Wind, label: "Activity", value: trip.activity || "Trekking" },
-                  { icon: Mountain, label: "Max. Altitude", value: trip.maxAltitude || "—" },
-                  { icon: Calendar, label: "Best Season", value: trip.bestSeason || "—" },
-                  { icon: Star, label: "Accommodation", value: trip.accommodation || "—" },
-                  { icon: Thermometer, label: "Meals", value: trip.meals || "—" },
-                  { icon: MapPin, label: "Start Point", value: trip.startPoint || "—" },
-                  { icon: MapPin, label: "End Point", value: trip.endPoint || "—" },
+                  {
+                    icon: Compass,
+                    label: "Country",
+                    value: trip.country || "Nepal",
+                  },
+                  {
+                    icon: Clock,
+                    label: "Duration",
+                    value: `${trip.duration || "—"} Days`,
+                  },
+                  {
+                    icon: Mountain,
+                    label: "Difficulty",
+                    value: trip.difficulty || "—",
+                  },
+                  {
+                    icon: Wind,
+                    label: "Activity",
+                    value: trip.activity || "Trekking",
+                  },
+                  {
+                    icon: Mountain,
+                    label: "Max. Altitude",
+                    value: trip.maxAltitude || "—",
+                  },
+                  {
+                    icon: Calendar,
+                    label: "Best Season",
+                    value: trip.bestSeason || "—",
+                  },
+                  {
+                    icon: Star,
+                    label: "Accommodation",
+                    value: trip.accommodation || "—",
+                  },
+                  {
+                    icon: Thermometer,
+                    label: "Meals",
+                    value: trip.meals || "—",
+                  },
+                  {
+                    icon: MapPin,
+                    label: "Start Point",
+                    value: trip.startPoint || "—",
+                  },
+                  {
+                    icon: MapPin,
+                    label: "End Point",
+                    value: trip.endPoint || "—",
+                  },
                   { icon: BadgeCheck, label: "Category", value: categoryLabel },
-                  { icon: Globe, label: "Activity Type", value: trip.activity || "Trekking" },
+                  {
+                    icon: Globe,
+                    label: "Activity Type",
+                    value: trip.activity || "Trekking",
+                  },
                 ].map(({ icon: Icon, label, value }, i) => (
                   <div
                     key={i}
                     className="flex items-center gap-4 px-4 sm:px-5 py-4 sm:py-5 hover:bg-emerald-50/30 transition-colors border-b border-r border-gray-100"
                   >
                     <div className="w-9 h-9 rounded-xl bg-gray-50 border border-gray-100 flex items-center justify-center shrink-0">
-                      <Icon size={15} className="text-emerald-500 stroke-[1.75]" />
+                      <Icon
+                        size={15}
+                        className="text-emerald-500 stroke-[1.75]"
+                      />
                     </div>
                     <div className="min-w-0">
-                      <p className="text-[10px] font-bold tracking-widest uppercase text-gray-400 mb-0.5" style={{ fontFamily: fonts.body }}>
+                      <p
+                        className="text-[10px] font-bold tracking-widest uppercase text-gray-400 mb-0.5"
+                        style={{ fontFamily: fonts.body }}
+                      >
                         {label}
                       </p>
-                      <p className="text-[15px] font-bold text-gray-900 truncate" style={{ fontFamily: fonts.body }}>
+                      <p
+                        className="text-[15px] font-bold text-gray-900 truncate"
+                        style={{ fontFamily: fonts.body }}
+                      >
                         {value}
                       </p>
                     </div>
@@ -790,33 +967,38 @@ const Everestfeature = () => {
             </div>
           </section>
 
-          {/* Overview */}
           <section>
-            <SectionHeading sub="About This Journey">Expedition Overview</SectionHeading>
+            <SectionHeading sub="About This Journey">
+              Expedition Overview
+            </SectionHeading>
             <div
               className="text-[16px] text-gray-600 leading-[1.9] whitespace-pre-line"
               style={{ fontFamily: fonts.body }}
             >
-              {trip.overview || "No overview has been added for this expedition yet."}
+              {trip.overview ||
+                "No overview has been added for this expedition yet."}
             </div>
           </section>
 
-          {/* ── MAP IMAGE SECTION ── */}
           {(trip.mapImage || trip.mapLink) && (
             <MapSection mapImage={trip.mapImage} mapLink={trip.mapLink} />
           )}
 
-          {/* ── DOWNLOAD DOCUMENTS ── */}
           {(trip.brochure?.url || trip.itineraryPdf?.url) && (
-            <DownloadSection brochure={trip.brochure} itineraryPdf={trip.itineraryPdf} />
+            <DownloadSection
+              brochure={trip.brochure}
+              itineraryPdf={trip.itineraryPdf}
+            />
           )}
 
-          {/* Gallery */}
           {rawGallery.length > 0 && (
             <section>
               <SectionHeading sub="Moments From The Trail">
                 Photo Gallery{" "}
-                <span className="text-gray-300 font-light" style={{ fontFamily: fonts.body, fontSize: "1rem" }}>
+                <span
+                  className="text-gray-300 font-light"
+                  style={{ fontFamily: fonts.body, fontSize: "1rem" }}
+                >
                   ({rawGallery.length})
                 </span>
               </SectionHeading>
@@ -833,7 +1015,9 @@ const Everestfeature = () => {
                         src={first}
                         alt="Gallery feature"
                         className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
-                        onError={(e) => { e.currentTarget.src = "https://placehold.co/600x600"; }}
+                        onError={(e) => {
+                          e.currentTarget.src = "https://placehold.co/600x600";
+                        }}
                       />
                       <div className="absolute inset-0 bg-black/0 group-hover:bg-black/15 transition-all duration-300" />
                     </button>
@@ -852,17 +1036,27 @@ const Everestfeature = () => {
                         src={resolvedUrl}
                         alt={`Gallery ${i + 2}`}
                         className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
-                        onError={(e) => { e.currentTarget.src = "https://placehold.co/300x300"; }}
+                        onError={(e) => {
+                          e.currentTarget.src = "https://placehold.co/300x300";
+                        }}
                       />
                       <div className="absolute inset-0 bg-black/0 group-hover:bg-black/25 transition-all duration-300 flex items-center justify-center">
-                        <Maximize2 size={16} className="text-white opacity-0 group-hover:opacity-100 transition-opacity drop-shadow" />
+                        <Maximize2
+                          size={16}
+                          className="text-white opacity-0 group-hover:opacity-100 transition-opacity drop-shadow"
+                        />
                       </div>
                       {i === 3 && rawGallery.length > 5 && (
                         <div className="absolute inset-0 bg-black/65 flex flex-col items-center justify-center">
-                          <span className="text-white font-bold text-xl leading-none" style={{ fontFamily: fonts.display }}>
+                          <span
+                            className="text-white font-bold text-xl leading-none"
+                            style={{ fontFamily: fonts.display }}
+                          >
                             +{rawGallery.length - 5}
                           </span>
-                          <span className="text-gray-300 text-[9px] font-bold uppercase tracking-[0.2em] mt-1">more</span>
+                          <span className="text-gray-300 text-[9px] font-bold uppercase tracking-[0.2em] mt-1">
+                            more
+                          </span>
                         </div>
                       )}
                     </button>
@@ -872,10 +1066,11 @@ const Everestfeature = () => {
             </section>
           )}
 
-          {/* Highlights */}
           {highlights.length > 0 && (
             <section>
-              <SectionHeading sub="What Makes This Special">Key Highlights</SectionHeading>
+              <SectionHeading sub="What Makes This Special">
+                Key Highlights
+              </SectionHeading>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                 {highlights.map((item, idx) => (
                   <div
@@ -885,7 +1080,10 @@ const Everestfeature = () => {
                     <div className="mt-1 w-5 h-5 rounded-full bg-emerald-50 border border-emerald-200 flex items-center justify-center shrink-0 group-hover:bg-emerald-100 transition-colors">
                       <div className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
                     </div>
-                    <span className="text-[15px] text-gray-700 leading-relaxed" style={{ fontFamily: fonts.body }}>
+                    <span
+                      className="text-[15px] text-gray-700 leading-relaxed"
+                      style={{ fontFamily: fonts.body }}
+                    >
                       {typeof item === "string" ? item : item.text}
                     </span>
                   </div>
@@ -894,22 +1092,30 @@ const Everestfeature = () => {
             </section>
           )}
 
-          {/* Itinerary */}
           {itinerary.length > 0 && (
             <section>
-              <SectionHeading sub="Complete Day-by-Day Breakdown">Detailed Itinerary</SectionHeading>
+              <SectionHeading sub="Complete Day-by-Day Breakdown">
+                Detailed Itinerary
+              </SectionHeading>
 
-              {/* Itinerary PDF download CTA */}
               {trip.itineraryPdf?.url && (
                 <div className="mb-5 flex items-center justify-between gap-4 px-4 py-3 rounded-xl bg-blue-50 border border-blue-100">
                   <div className="flex items-center gap-3">
                     <FileText size={16} className="text-blue-500 shrink-0" />
-                    <p className="text-[13px] font-semibold text-blue-800" style={{ fontFamily: fonts.body }}>
+                    <p
+                      className="text-[13px] font-semibold text-blue-800"
+                      style={{ fontFamily: fonts.body }}
+                    >
                       Download the full itinerary as a PDF for offline reference
                     </p>
                   </div>
                   <button
-                    onClick={() => handleBrochureDownload(trip.itineraryPdf.url, "trip-itinerary.pdf")}
+                    onClick={() =>
+                      handleBrochureDownload(
+                        trip.itineraryPdf.url,
+                        "trip-itinerary.pdf",
+                      )
+                    }
                     className="flex items-center gap-1.5 text-[12px] font-bold text-blue-700 hover:text-white bg-white hover:bg-blue-600 px-3 py-2 rounded-lg border border-blue-200 transition-all shrink-0"
                     style={{ fontFamily: fonts.body }}
                   >
@@ -930,46 +1136,69 @@ const Everestfeature = () => {
                         onClick={() => setActiveDay(isOpen ? -1 : idx)}
                         className={`w-full flex items-center gap-3 sm:gap-4 px-4 sm:px-5 py-4 text-left transition-colors ${isOpen ? "bg-emerald-50/40" : "bg-white hover:bg-gray-50"}`}
                       >
-                        <div className={`shrink-0 w-10 h-10 rounded-xl flex flex-col items-center justify-center transition-all ${isOpen ? "bg-emerald-500 text-white" : "bg-gray-50 border border-gray-200 text-gray-500"}`}>
+                        <div
+                          className={`shrink-0 w-10 h-10 rounded-xl flex flex-col items-center justify-center transition-all ${isOpen ? "bg-emerald-500 text-white" : "bg-gray-50 border border-gray-200 text-gray-500"}`}
+                        >
                           <span className="text-[8px] font-bold uppercase tracking-wider leading-none opacity-70">
                             {isOpen ? "Day" : "D"}
                           </span>
-                          <span className="text-sm font-bold leading-tight">{day.day || idx + 1}</span>
+                          <span className="text-sm font-bold leading-tight">
+                            {day.day || idx + 1}
+                          </span>
                         </div>
                         <div className="flex-1 min-w-0">
-                          <span className="text-[15px] font-semibold text-gray-900 leading-snug block" style={{ fontFamily: fonts.body }}>
+                          <span
+                            className="text-[15px] font-semibold text-gray-900 leading-snug block"
+                            style={{ fontFamily: fonts.body }}
+                          >
                             {day.title || day.heading}
                           </span>
                           <div className="flex flex-wrap gap-2 sm:gap-3 mt-1">
                             {day.meals && (
-                              <span className="text-[11px] text-gray-400 font-medium" style={{ fontFamily: fonts.body }}>
+                              <span
+                                className="text-[11px] text-gray-400 font-medium"
+                                style={{ fontFamily: fonts.body }}
+                              >
                                 🍽 {day.meals}
                               </span>
                             )}
                             {day.accommodation && (
-                              <span className="text-[11px] text-gray-400 font-medium" style={{ fontFamily: fonts.body }}>
+                              <span
+                                className="text-[11px] text-gray-400 font-medium"
+                                style={{ fontFamily: fonts.body }}
+                              >
                                 🏨 {day.accommodation}
                               </span>
                             )}
                             {day.altitude && (
-                              <span className="text-[11px] text-gray-400 font-medium" style={{ fontFamily: fonts.body }}>
+                              <span
+                                className="text-[11px] text-gray-400 font-medium"
+                                style={{ fontFamily: fonts.body }}
+                              >
                                 ⛰ {day.altitude}
                               </span>
                             )}
                           </div>
                         </div>
-                        <span className={`shrink-0 w-6 h-6 rounded-full flex items-center justify-center transition-all ${isOpen ? "bg-emerald-500 text-white" : "bg-gray-100 text-gray-400"}`}>
-                          {isOpen ? <ChevronUp size={12} /> : <ChevronDown size={12} />}
+                        <span
+                          className={`shrink-0 w-6 h-6 rounded-full flex items-center justify-center transition-all ${isOpen ? "bg-emerald-500 text-white" : "bg-gray-100 text-gray-400"}`}
+                        >
+                          {isOpen ? (
+                            <ChevronUp size={12} />
+                          ) : (
+                            <ChevronDown size={12} />
+                          )}
                         </span>
                       </button>
-                      {isOpen && (day.description || day.details || day.content) && (
-                        <div
-                          className="px-5 sm:px-6 py-5 bg-white border-t border-emerald-100 text-[15px] text-gray-600 leading-[1.85] whitespace-pre-line"
-                          style={{ fontFamily: fonts.body }}
-                        >
-                          {day.description || day.details || day.content}
-                        </div>
-                      )}
+                      {isOpen &&
+                        (day.description || day.details || day.content) && (
+                          <div
+                            className="px-5 sm:px-6 py-5 bg-white border-t border-emerald-100 text-[15px] text-gray-600 leading-[1.85] whitespace-pre-line"
+                            style={{ fontFamily: fonts.body }}
+                          >
+                            {day.description || day.details || day.content}
+                          </div>
+                        )}
                     </div>
                   );
                 })}
@@ -977,88 +1206,128 @@ const Everestfeature = () => {
             </section>
           )}
 
-          {/* Includes / Excludes */}
           <section>
-            <SectionHeading sub="Package Scope">What's Included &amp; Excluded</SectionHeading>
+            <SectionHeading sub="Package Scope">
+              What's Included &amp; Excluded
+            </SectionHeading>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {/* Included */}
               <div className="rounded-2xl border border-gray-100 overflow-hidden">
                 <div className="px-5 py-4 flex items-center gap-3 border-b border-gray-100 bg-white">
                   <div className="w-7 h-7 rounded-lg bg-emerald-50 border border-emerald-100 flex items-center justify-center">
                     <CheckCircle size={14} className="text-emerald-500" />
                   </div>
-                  <h3 className="text-[15px] font-bold text-gray-800" style={{ fontFamily: fonts.body }}>
+                  <h3
+                    className="text-[15px] font-bold text-gray-800"
+                    style={{ fontFamily: fonts.body }}
+                  >
                     What's Included
                   </h3>
                 </div>
                 <div className="p-5 bg-white space-y-3">
-                  {includes.length > 0 ? includes.map((inc, i) => (
-                    <div key={i} className="flex items-start gap-3 text-[15px] text-gray-600">
-                      <span className="text-emerald-500 font-bold text-base leading-none mt-0.5 shrink-0">✓</span>
-                      <span className="leading-snug" style={{ fontFamily: fonts.body }}>
-                        {typeof inc === "string" ? inc : inc.text}
-                      </span>
-                    </div>
-                  )) : (
-                    <p className="text-[15px] text-gray-400 italic" style={{ fontFamily: fonts.body }}>Standard logistics included.</p>
+                  {includes.length > 0 ? (
+                    includes.map((inc, i) => (
+                      <div
+                        key={i}
+                        className="flex items-start gap-3 text-[15px] text-gray-600"
+                      >
+                        <span className="text-emerald-500 font-bold text-base leading-none mt-0.5 shrink-0">
+                          ✓
+                        </span>
+                        <span
+                          className="leading-snug"
+                          style={{ fontFamily: fonts.body }}
+                        >
+                          {typeof inc === "string" ? inc : inc.text}
+                        </span>
+                      </div>
+                    ))
+                  ) : (
+                    <p
+                      className="text-[15px] text-gray-400 italic"
+                      style={{ fontFamily: fonts.body }}
+                    >
+                      Standard logistics included.
+                    </p>
                   )}
                 </div>
               </div>
 
-              {/* Excluded */}
               <div className="rounded-2xl border border-gray-100 overflow-hidden">
                 <div className="px-5 py-4 flex items-center gap-3 border-b border-gray-100 bg-white">
                   <div className="w-7 h-7 rounded-lg bg-rose-50 border border-rose-100 flex items-center justify-center">
                     <XCircle size={14} className="text-rose-400" />
                   </div>
-                  <h3 className="text-[15px] font-bold text-gray-800" style={{ fontFamily: fonts.body }}>
+                  <h3
+                    className="text-[15px] font-bold text-gray-800"
+                    style={{ fontFamily: fonts.body }}
+                  >
                     What's Excluded
                   </h3>
                 </div>
                 <div className="p-5 bg-white space-y-3">
-                  {excludes.length > 0 ? excludes.map((exc, i) => (
-                    <div key={i} className="flex items-start gap-3 text-[15px] text-gray-600">
-                      <span className="text-rose-400 font-bold text-base leading-none mt-0.5 shrink-0">✕</span>
-                      <span className="leading-snug" style={{ fontFamily: fonts.body }}>
-                        {typeof exc === "string" ? exc : exc.text}
-                      </span>
-                    </div>
-                  )) : (
-                    <p className="text-[15px] text-gray-400 italic" style={{ fontFamily: fonts.body }}>Personal gear excluded.</p>
+                  {excludes.length > 0 ? (
+                    excludes.map((exc, i) => (
+                      <div
+                        key={i}
+                        className="flex items-start gap-3 text-[15px] text-gray-600"
+                      >
+                        <span className="text-rose-400 font-bold text-base leading-none mt-0.5 shrink-0">
+                          ✕
+                        </span>
+                        <span
+                          className="leading-snug"
+                          style={{ fontFamily: fonts.body }}
+                        >
+                          {typeof exc === "string" ? exc : exc.text}
+                        </span>
+                      </div>
+                    ))
+                  ) : (
+                    <p
+                      className="text-[15px] text-gray-400 italic"
+                      style={{ fontFamily: fonts.body }}
+                    >
+                      Personal gear excluded.
+                    </p>
                   )}
                 </div>
               </div>
             </div>
           </section>
 
-          {/* Packages */}
           {packages.length > 0 && (
             <section>
-              <SectionHeading sub="Budget Tier Configurations">Pricing Packages</SectionHeading>
+              <SectionHeading sub="Budget Tier Configurations">
+                Pricing Packages
+              </SectionHeading>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {packages.map((pkg, i) => <PackageCard key={i} pkg={pkg} />)}
+                {packages.map((pkg, i) => (
+                  <PackageCard key={i} pkg={pkg} />
+                ))}
               </div>
             </section>
           )}
 
-          {/* Available Dates */}
           {availableDates.length > 0 && (
             <section>
-              <SectionHeading sub="Operational Fixed Dates Matrix">Departure Dates &amp; Availability</SectionHeading>
+              <SectionHeading sub="Operational Fixed Dates Matrix">
+                Departure Dates &amp; Availability
+              </SectionHeading>
               <div className="bg-white border border-gray-100 rounded-2xl overflow-hidden shadow-sm">
                 <div className="h-1 bg-gradient-to-r from-emerald-400 via-emerald-300 to-transparent" />
 
-                {/* Table header — hidden on mobile, shown on sm+ */}
                 <div className="hidden sm:grid grid-cols-[1fr_auto_auto_auto] gap-4 px-5 py-3 border-b border-gray-100 bg-gray-50/60">
-                  {["Departure Date", "Seats", "Price", "Status"].map((h, i) => (
-                    <span
-                      key={i}
-                      className={`text-[10px] font-black uppercase tracking-widest text-gray-400 ${i === 0 ? "" : i === 3 ? "text-center min-w-[80px]" : i === 2 ? "text-right min-w-[80px]" : "text-center min-w-[64px]"}`}
-                      style={{ fontFamily: fonts.body }}
-                    >
-                      {h}
-                    </span>
-                  ))}
+                  {["Departure Date", "Seats", "Price", "Status"].map(
+                    (h, i) => (
+                      <span
+                        key={i}
+                        className={`text-[10px] font-black uppercase tracking-widest text-gray-400 ${i === 0 ? "" : i === 3 ? "text-center min-w-[80px]" : i === 2 ? "text-right min-w-[80px]" : "text-center min-w-[64px]"}`}
+                        style={{ fontFamily: fonts.body }}
+                      >
+                        {h}
+                      </span>
+                    ),
+                  )}
                 </div>
 
                 <div className="divide-y divide-gray-50">
@@ -1070,28 +1339,52 @@ const Everestfeature = () => {
                         key={idx}
                         className={`transition-colors ${soldOut ? "opacity-50" : "hover:bg-emerald-50/30"}`}
                       >
-                        {/* Mobile layout */}
                         <div className="sm:hidden px-4 py-4 space-y-3">
                           <div className="flex items-center justify-between">
                             <div className="flex items-center gap-3">
                               {dateObj && (
                                 <div className="shrink-0 w-11 h-11 rounded-xl bg-gray-50 border border-gray-100 flex flex-col items-center justify-center">
                                   <span className="text-[9px] font-bold uppercase tracking-wider text-emerald-500 leading-none">
-                                    {dateObj.toLocaleString("default", { month: "short" })}
+                                    {dateObj.toLocaleString("default", {
+                                      month: "short",
+                                    })}
                                   </span>
-                                  <span className="text-base font-black text-gray-900 leading-tight">{dateObj.getDate()}</span>
+                                  <span className="text-base font-black text-gray-900 leading-tight">
+                                    {dateObj.getDate()}
+                                  </span>
                                 </div>
                               )}
                               <div>
-                                <p className="text-[15px] font-semibold text-gray-900" style={{ fontFamily: fonts.body }}>
-                                  {dateObj ? dateObj.toLocaleDateString("en-US", { weekday: "short", year: "numeric", month: "long", day: "numeric" }) : d.date || "TBA"}
+                                <p
+                                  className="text-[15px] font-semibold text-gray-900"
+                                  style={{ fontFamily: fonts.body }}
+                                >
+                                  {dateObj
+                                    ? dateObj.toLocaleDateString("en-US", {
+                                        weekday: "short",
+                                        year: "numeric",
+                                        month: "long",
+                                        day: "numeric",
+                                      })
+                                    : d.date || "TBA"}
                                 </p>
-                                <p className="text-[12px] text-gray-400 font-medium" style={{ fontFamily: fonts.body }}>
-                                  {d.totalSeats ? `${d.totalSeats} seats` : "Open"} · {d.price ? `USD ${Number(d.price).toLocaleString()}` : "Standard"}
+                                <p
+                                  className="text-[12px] text-gray-400 font-medium"
+                                  style={{ fontFamily: fonts.body }}
+                                >
+                                  {d.totalSeats
+                                    ? `${d.totalSeats} seats`
+                                    : "Open"}{" "}
+                                  ·{" "}
+                                  {d.price
+                                    ? `USD ${Number(d.price).toLocaleString()}`
+                                    : "Standard"}
                                 </p>
                               </div>
                             </div>
-                            <span className={`text-[10px] font-black px-2.5 py-1 rounded-full uppercase tracking-wide capitalize ${dateStatusStyle(d.status)}`}>
+                            <span
+                              className={`text-[10px] font-black px-2.5 py-1 rounded-full uppercase tracking-wide capitalize ${dateStatusStyle(d.status)}`}
+                            >
                               {d.status || "available"}
                             </span>
                           </div>
@@ -1106,23 +1399,39 @@ const Everestfeature = () => {
                           )}
                         </div>
 
-                        {/* Desktop layout */}
                         <div className="hidden sm:grid grid-cols-[1fr_auto_auto_auto] gap-4 items-center px-5 py-4">
                           <div className="flex items-center gap-3">
                             {dateObj && (
                               <div className="shrink-0 w-11 h-11 rounded-xl bg-gray-50 border border-gray-100 flex flex-col items-center justify-center">
                                 <span className="text-[9px] font-bold uppercase tracking-wider text-emerald-500 leading-none">
-                                  {dateObj.toLocaleString("default", { month: "short" })}
+                                  {dateObj.toLocaleString("default", {
+                                    month: "short",
+                                  })}
                                 </span>
-                                <span className="text-base font-black text-gray-900 leading-tight">{dateObj.getDate()}</span>
+                                <span className="text-base font-black text-gray-900 leading-tight">
+                                  {dateObj.getDate()}
+                                </span>
                               </div>
                             )}
                             <div>
-                              <p className="text-[15px] font-semibold text-gray-900" style={{ fontFamily: fonts.body }}>
-                                {dateObj ? dateObj.toLocaleDateString("en-US", { weekday: "short", year: "numeric", month: "long", day: "numeric" }) : d.date || "TBA"}
+                              <p
+                                className="text-[15px] font-semibold text-gray-900"
+                                style={{ fontFamily: fonts.body }}
+                              >
+                                {dateObj
+                                  ? dateObj.toLocaleDateString("en-US", {
+                                      weekday: "short",
+                                      year: "numeric",
+                                      month: "long",
+                                      day: "numeric",
+                                    })
+                                  : d.date || "TBA"}
                               </p>
                               {trip.duration && (
-                                <p className="text-[12px] text-gray-400 font-medium mt-0.5" style={{ fontFamily: fonts.body }}>
+                                <p
+                                  className="text-[12px] text-gray-400 font-medium mt-0.5"
+                                  style={{ fontFamily: fonts.body }}
+                                >
                                   {trip.duration}-day expedition
                                 </p>
                               )}
@@ -1131,16 +1440,26 @@ const Everestfeature = () => {
                           <div className="min-w-[64px] text-center">
                             {d.totalSeats ? (
                               <div className="flex flex-col items-center">
-                                <Users size={13} className="text-gray-400 mb-0.5" />
-                                <span className="text-sm font-bold text-gray-700">{d.totalSeats}</span>
+                                <Users
+                                  size={13}
+                                  className="text-gray-400 mb-0.5"
+                                />
+                                <span className="text-sm font-bold text-gray-700">
+                                  {d.totalSeats}
+                                </span>
                               </div>
                             ) : (
-                              <span className="text-sm text-gray-400">Open</span>
+                              <span className="text-sm text-gray-400">
+                                Open
+                              </span>
                             )}
                           </div>
                           <div className="min-w-[80px] text-right">
                             {d.price ? (
-                              <p className="text-sm font-bold text-gray-900" style={{ fontFamily: fonts.display }}>
+                              <p
+                                className="text-sm font-bold text-gray-900"
+                                style={{ fontFamily: fonts.display }}
+                              >
                                 USD {Number(d.price).toLocaleString()}
                               </p>
                             ) : (
@@ -1148,7 +1467,9 @@ const Everestfeature = () => {
                             )}
                           </div>
                           <div className="min-w-[80px] flex flex-col items-center gap-2">
-                            <span className={`text-[9px] font-black px-2.5 py-1 rounded-full uppercase tracking-wide capitalize ${dateStatusStyle(d.status)}`}>
+                            <span
+                              className={`text-[9px] font-black px-2.5 py-1 rounded-full uppercase tracking-wide capitalize ${dateStatusStyle(d.status)}`}
+                            >
                               {d.status || "available"}
                             </span>
                             {!soldOut && (
@@ -1170,13 +1491,13 @@ const Everestfeature = () => {
             </section>
           )}
 
-          {/* Guide Section */}
           {trip.guideInfo && <GuideSection guide={trip.guideInfo} />}
 
-          {/* FAQs */}
           {faqs.length > 0 && (
             <section>
-              <SectionHeading sub="Common Questions">Frequently Asked Questions</SectionHeading>
+              <SectionHeading sub="Common Questions">
+                Frequently Asked Questions
+              </SectionHeading>
               <div className="bg-white border border-gray-100 rounded-2xl px-5 sm:px-6 py-2">
                 <AccordionFAQ faqs={faqs} />
               </div>
@@ -1184,11 +1505,8 @@ const Everestfeature = () => {
           )}
         </div>
 
-        {/* ── SIDEBAR ── */}
         <aside ref={sidebarRef} className="w-full">
           <div className="sticky top-6 space-y-4">
-
-            {/* Price + Booking Card */}
             <div className="bg-white border border-gray-200 rounded-2xl overflow-hidden shadow-lg shadow-gray-100/80">
               <div className="h-1.5 bg-gradient-to-r from-emerald-500 to-emerald-300" />
               <div className="px-5 sm:px-6 pt-6 pb-5">
@@ -1205,11 +1523,19 @@ const Everestfeature = () => {
                   </div>
                 )}
                 <div className="flex items-baseline gap-1.5">
-                  <span className="text-4xl font-bold text-gray-950 leading-none" style={{ fontFamily: fonts.display }}>
-                    {trip.price ? `USD ${Number(trip.price).toLocaleString()}` : "Contact Us"}
+                  <span
+                    className="text-4xl font-bold text-gray-950 leading-none"
+                    style={{ fontFamily: fonts.display }}
+                  >
+                    {trip.price
+                      ? `USD ${Number(trip.price).toLocaleString()}`
+                      : "Contact Us"}
                   </span>
                 </div>
-                <p className="text-[12px] text-gray-400 font-medium mt-1.5 tracking-wide" style={{ fontFamily: fonts.body }}>
+                <p
+                  className="text-[12px] text-gray-400 font-medium mt-1.5 tracking-wide"
+                  style={{ fontFamily: fonts.body }}
+                >
                   per person · all inclusive
                 </p>
               </div>
@@ -1223,10 +1549,14 @@ const Everestfeature = () => {
                   Book This Expedition
                 </button>
 
-                {/* Brochure download */}
                 {trip.brochure?.url ? (
                   <button
-                    onClick={() => handleBrochureDownload(trip.brochure.url, "trip-brochure.pdf")}
+                    onClick={() =>
+                      handleBrochureDownload(
+                        trip.brochure.url,
+                        "trip-brochure.pdf",
+                      )
+                    }
                     className="w-full flex items-center justify-center gap-2 border border-emerald-200 bg-emerald-50 hover:bg-emerald-100 text-emerald-700 font-semibold py-3 rounded-xl transition-colors text-[15px]"
                     style={{ fontFamily: fonts.body }}
                   >
@@ -1242,10 +1572,14 @@ const Everestfeature = () => {
                   </button>
                 )}
 
-                {/* Itinerary PDF download */}
                 {trip.itineraryPdf?.url && (
                   <button
-                    onClick={() => handleBrochureDownload(trip.itineraryPdf.url, "trip-itinerary.pdf")}
+                    onClick={() =>
+                      handleBrochureDownload(
+                        trip.itineraryPdf.url,
+                        "trip-itinerary.pdf",
+                      )
+                    }
                     className="w-full flex items-center justify-center gap-2 border border-blue-200 bg-blue-50 hover:bg-blue-100 text-blue-700 font-semibold py-3 rounded-xl transition-colors text-[15px]"
                     style={{ fontFamily: fonts.body }}
                   >
@@ -1261,46 +1595,70 @@ const Everestfeature = () => {
                   { icon: Star, text: "Expert guides" },
                   { icon: CheckCircle, text: "Secure booking" },
                 ].map(({ icon: Icon, text }, i) => (
-                  <div key={i} className="flex items-center gap-2 text-[12px] text-gray-500 font-medium" style={{ fontFamily: fonts.body }}>
-                    <Icon size={12} className="text-emerald-400 shrink-0" /> {text}
+                  <div
+                    key={i}
+                    className="flex items-center gap-2 text-[12px] text-gray-500 font-medium"
+                    style={{ fontFamily: fonts.body }}
+                  >
+                    <Icon size={12} className="text-emerald-400 shrink-0" />{" "}
+                    {text}
                   </div>
                 ))}
               </div>
             </div>
 
-            {/* Next Departure */}
             {nextDate && (
               <div className="bg-white border border-emerald-200 rounded-2xl px-5 py-4">
-                <p className="text-[11px] font-bold uppercase tracking-[0.2em] text-emerald-500 mb-2 flex items-center gap-1.5" style={{ fontFamily: fonts.body }}>
+                <p
+                  className="text-[11px] font-bold uppercase tracking-[0.2em] text-emerald-500 mb-2 flex items-center gap-1.5"
+                  style={{ fontFamily: fonts.body }}
+                >
                   <Calendar size={11} /> Next Departure
                 </p>
-                <p className="font-bold text-gray-900 text-[15px]" style={{ fontFamily: fonts.body }}>
-                  {new Date(nextDate.date).toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" })}
+                <p
+                  className="font-bold text-gray-900 text-[15px]"
+                  style={{ fontFamily: fonts.body }}
+                >
+                  {new Date(nextDate.date).toLocaleDateString("en-US", {
+                    month: "long",
+                    day: "numeric",
+                    year: "numeric",
+                  })}
                 </p>
                 <div className="flex items-center justify-between mt-2">
                   {nextDate.totalSeats && (
-                    <span className="text-[12px] text-gray-500 font-medium flex items-center gap-1" style={{ fontFamily: fonts.body }}>
+                    <span
+                      className="text-[12px] text-gray-500 font-medium flex items-center gap-1"
+                      style={{ fontFamily: fonts.body }}
+                    >
                       <Users size={11} /> {nextDate.totalSeats} seats
                     </span>
                   )}
-                  <span className={`text-[10px] font-black px-2 py-0.5 rounded-full uppercase tracking-wide capitalize ${dateStatusStyle(nextDate.status)}`}>
+                  <span
+                    className={`text-[10px] font-black px-2 py-0.5 rounded-full uppercase tracking-wide capitalize ${dateStatusStyle(nextDate.status)}`}
+                  >
                     {nextDate.status || "available"}
                   </span>
                 </div>
               </div>
             )}
 
-            {/* Upcoming dates */}
             {availableDates.length > 0 && (
               <div className="bg-white border border-gray-200 rounded-2xl overflow-hidden shadow-sm">
                 <div className="px-5 py-4 border-b border-gray-100 flex items-center justify-between">
                   <div className="flex items-center gap-2">
                     <Calendar size={13} className="text-emerald-500" />
-                    <span className="text-[11px] font-bold uppercase tracking-[0.2em] text-gray-500" style={{ fontFamily: fonts.body }}>
+                    <span
+                      className="text-[11px] font-bold uppercase tracking-[0.2em] text-gray-500"
+                      style={{ fontFamily: fonts.body }}
+                    >
                       Upcoming Departures
                     </span>
                   </div>
-                  <span className="text-[11px] text-gray-400 font-medium" style={{ fontFamily: fonts.body }}>
+                  <span
+                    className="text-[11px] text-gray-400 font-medium"
+                    style={{ fontFamily: fonts.body }}
+                  >
                     {availableDates.length} dates
                   </span>
                 </div>
@@ -1312,13 +1670,27 @@ const Everestfeature = () => {
                       onClick={() => setBookingOpen(true)}
                     >
                       <div>
-                        <p className="text-[14px] font-semibold text-gray-800" style={{ fontFamily: fonts.body }}>{date.date}</p>
-                        <p className="text-[11px] text-gray-400 mt-0.5 font-medium" style={{ fontFamily: fonts.body }}>
-                          {date.totalSeats ? `${date.totalSeats} seats` : "Open"}
-                          {date.price ? ` · USD ${Number(date.price).toLocaleString()}` : ""}
+                        <p
+                          className="text-[14px] font-semibold text-gray-800"
+                          style={{ fontFamily: fonts.body }}
+                        >
+                          {date.date}
+                        </p>
+                        <p
+                          className="text-[11px] text-gray-400 mt-0.5 font-medium"
+                          style={{ fontFamily: fonts.body }}
+                        >
+                          {date.totalSeats
+                            ? `${date.totalSeats} seats`
+                            : "Open"}
+                          {date.price
+                            ? ` · USD ${Number(date.price).toLocaleString()}`
+                            : ""}
                         </p>
                       </div>
-                      <span className={`text-[10px] font-bold px-2.5 py-1 rounded-full uppercase tracking-wide ${dateStatusStyle(date.status)}`}>
+                      <span
+                        className={`text-[10px] font-bold px-2.5 py-1 rounded-full uppercase tracking-wide ${dateStatusStyle(date.status)}`}
+                      >
                         {date.status || "available"}
                       </span>
                     </div>
@@ -1327,23 +1699,36 @@ const Everestfeature = () => {
               </div>
             )}
 
-            {/* Packages sidebar */}
             {packages.length > 0 && (
               <div className="bg-white border border-gray-200 rounded-2xl overflow-hidden shadow-sm">
                 <div className="px-5 py-4 border-b border-gray-100 flex items-center gap-2">
                   <Package size={13} className="text-emerald-500" />
-                  <span className="text-[11px] font-bold uppercase tracking-[0.2em] text-gray-500" style={{ fontFamily: fonts.body }}>
+                  <span
+                    className="text-[11px] font-bold uppercase tracking-[0.2em] text-gray-500"
+                    style={{ fontFamily: fonts.body }}
+                  >
                     Available Packages
                   </span>
                 </div>
                 <div className="p-3 space-y-2">
                   {packages.map((pkg, i) => (
-                    <div key={i} className="flex items-center justify-between px-3.5 py-2.5 rounded-xl bg-gray-50">
-                      <span className="text-[14px] font-semibold text-gray-700" style={{ fontFamily: fonts.body }}>
+                    <div
+                      key={i}
+                      className="flex items-center justify-between px-3.5 py-2.5 rounded-xl bg-gray-50"
+                    >
+                      <span
+                        className="text-[14px] font-semibold text-gray-700"
+                        style={{ fontFamily: fonts.body }}
+                      >
                         {pkg.name || `Package ${i + 1}`}
                       </span>
-                      <span className="text-[14px] font-bold text-gray-900" style={{ fontFamily: fonts.body }}>
-                        {pkg.price ? `USD ${Number(pkg.price).toLocaleString()}` : "—"}
+                      <span
+                        className="text-[14px] font-bold text-gray-900"
+                        style={{ fontFamily: fonts.body }}
+                      >
+                        {pkg.price
+                          ? `USD ${Number(pkg.price).toLocaleString()}`
+                          : "—"}
                       </span>
                     </div>
                   ))}
@@ -1351,12 +1736,14 @@ const Everestfeature = () => {
               </div>
             )}
 
-            {/* Guide sidebar preview */}
             {trip.guideInfo?.name && (
               <div className="bg-white border border-gray-200 rounded-2xl overflow-hidden shadow-sm">
                 <div className="px-5 py-4 border-b border-gray-100 flex items-center gap-2">
                   <UserCheck size={13} className="text-emerald-500" />
-                  <span className="text-[11px] font-bold uppercase tracking-[0.2em] text-gray-500" style={{ fontFamily: fonts.body }}>
+                  <span
+                    className="text-[11px] font-bold uppercase tracking-[0.2em] text-gray-500"
+                    style={{ fontFamily: fonts.body }}
+                  >
                     Your Lead Guide
                   </span>
                 </div>
@@ -1373,11 +1760,17 @@ const Everestfeature = () => {
                     </div>
                   )}
                   <div>
-                    <p className="text-[15px] font-bold text-gray-900" style={{ fontFamily: fonts.body }}>
+                    <p
+                      className="text-[15px] font-bold text-gray-900"
+                      style={{ fontFamily: fonts.body }}
+                    >
                       {trip.guideInfo.name}
                     </p>
                     {trip.guideInfo.experience && (
-                      <p className="text-[12px] text-gray-400 mt-0.5" style={{ fontFamily: fonts.body }}>
+                      <p
+                        className="text-[12px] text-gray-400 mt-0.5"
+                        style={{ fontFamily: fonts.body }}
+                      >
                         {trip.guideInfo.experience}
                       </p>
                     )}
@@ -1386,14 +1779,19 @@ const Everestfeature = () => {
               </div>
             )}
 
-            {/* Contact CTA */}
             <div className="bg-gray-950 rounded-2xl p-5 text-center space-y-3">
               <PhoneCall size={18} className="text-emerald-400 mx-auto" />
               <div>
-                <p className="text-[15px] font-semibold text-white" style={{ fontFamily: fonts.body }}>
+                <p
+                  className="text-[15px] font-semibold text-white"
+                  style={{ fontFamily: fonts.body }}
+                >
                   Need a custom booking?
                 </p>
-                <p className="text-[13px] text-gray-400 mt-0.5" style={{ fontFamily: fonts.body }}>
+                <p
+                  className="text-[13px] text-gray-400 mt-0.5"
+                  style={{ fontFamily: fonts.body }}
+                >
                   Group rates &amp; private departures available
                 </p>
               </div>
@@ -1409,15 +1807,24 @@ const Everestfeature = () => {
         </aside>
       </div>
 
-      {/* ═══════════════ BOOKING MODAL ═══════════════ */}
-      <BookingModal trip={trip} open={bookingOpen} onClose={() => setBookingOpen(false)} />
+      <BookingModal
+        trip={trip}
+        open={bookingOpen}
+        onClose={() => setBookingOpen(false)}
+      />
 
-      {/* ═══════════════ LIGHTBOX ═══════════════ */}
       {galleryOpen && lightboxImages.length > 0 && (
-        <div className="fixed inset-0 z-50 bg-black/97 flex flex-col" onClick={() => setGalleryOpen(false)}>
+        <div
+          className="fixed inset-0 z-50 bg-black/97 flex flex-col"
+          onClick={() => setGalleryOpen(false)}
+        >
           <div className="absolute top-0 inset-x-0 flex items-center justify-between px-4 sm:px-6 py-5 z-10">
-            <span className="text-[13px] text-white/50 font-semibold tracking-widest" style={{ fontFamily: fonts.body }}>
-              {String(galleryIndex + 1).padStart(2, "0")} / {String(lightboxImages.length).padStart(2, "0")}
+            <span
+              className="text-[13px] text-white/50 font-semibold tracking-widest"
+              style={{ fontFamily: fonts.body }}
+            >
+              {String(galleryIndex + 1).padStart(2, "0")} /{" "}
+              {String(lightboxImages.length).padStart(2, "0")}
             </span>
             <button
               onClick={() => setGalleryOpen(false)}
@@ -1429,7 +1836,13 @@ const Everestfeature = () => {
 
           <div className="flex-1 flex items-center justify-center relative px-12 sm:px-16">
             <button
-              onClick={(e) => { e.stopPropagation(); setGalleryIndex((p) => (p - 1 + lightboxImages.length) % lightboxImages.length); }}
+              onClick={(e) => {
+                e.stopPropagation();
+                setGalleryIndex(
+                  (p) =>
+                    (p - 1 + lightboxImages.length) % lightboxImages.length,
+                );
+              }}
               className="absolute left-3 sm:left-4 w-11 h-11 rounded-full bg-white/8 hover:bg-white/18 text-white flex items-center justify-center border border-white/10 transition-all"
             >
               <ChevronLeft size={20} />
@@ -1439,10 +1852,16 @@ const Everestfeature = () => {
               alt={`Photo ${galleryIndex + 1}`}
               className="max-w-full max-h-[78vh] rounded-2xl object-contain shadow-2xl"
               onClick={(e) => e.stopPropagation()}
-              onError={(e) => { e.currentTarget.src = "https://placehold.co/800x600?text=Unavailable"; }}
+              onError={(e) => {
+                e.currentTarget.src =
+                  "https://placehold.co/800x600?text=Unavailable";
+              }}
             />
             <button
-              onClick={(e) => { e.stopPropagation(); setGalleryIndex((p) => (p + 1) % lightboxImages.length); }}
+              onClick={(e) => {
+                e.stopPropagation();
+                setGalleryIndex((p) => (p + 1) % lightboxImages.length);
+              }}
               className="absolute right-3 sm:right-4 w-11 h-11 rounded-full bg-white/8 hover:bg-white/18 text-white flex items-center justify-center border border-white/10 transition-all"
             >
               <ChevronRight size={20} />
@@ -1450,14 +1869,21 @@ const Everestfeature = () => {
           </div>
 
           {lightboxImages.length > 1 && (
-            <div className="pb-6 sm:pb-7 flex items-center justify-center gap-1.5 overflow-x-auto px-4 sm:px-6" onClick={(e) => e.stopPropagation()}>
+            <div
+              className="pb-6 sm:pb-7 flex items-center justify-center gap-1.5 overflow-x-auto px-4 sm:px-6"
+              onClick={(e) => e.stopPropagation()}
+            >
               {lightboxImages.map((img, i) => (
                 <button
                   key={i}
                   onClick={() => setGalleryIndex(i)}
                   className={`shrink-0 w-12 sm:w-14 h-9 sm:h-10 rounded-lg overflow-hidden border-[1.5px] transition-all ${i === galleryIndex ? "border-emerald-400 opacity-100 scale-105" : "border-transparent opacity-35 hover:opacity-60"}`}
                 >
-                  <img src={img} alt="" className="w-full h-full object-cover" />
+                  <img
+                    src={img}
+                    alt=""
+                    className="w-full h-full object-cover"
+                  />
                 </button>
               ))}
             </div>

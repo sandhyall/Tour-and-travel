@@ -1,7 +1,8 @@
 import React, { useState, useRef } from "react";
+import { Link } from "react-router-dom";
 import axios from "../../api/axios";
 import { Mail, Phone, MapPin, Clock, Send, ChevronDown, MessageCircle, CheckCircle2 } from "lucide-react";
-import photo from "../../assets/photo.jpg"
+import photo from "../../assets/photo.webp"
 
 
 const TRIP_TYPES = [
@@ -76,7 +77,7 @@ const FAQS = [
   },
 ];
 
-/* ── FAQ Accordion ──────────────────────────────────────────────── */
+
 const FAQ = ({ q, a }) => {
   const [open, setOpen] = useState(false);
   return (
@@ -84,6 +85,7 @@ const FAQ = ({ q, a }) => {
       <button
         onClick={() => setOpen(!open)}
         className="w-full flex items-center justify-between px-6 py-5 text-left bg-white hover:bg-gray-50 transition-colors duration-200"
+        aria-expanded={open}
       >
         <span className="font-semibold text-gray-900 pr-4">{q}</span>
         <ChevronDown
@@ -92,16 +94,19 @@ const FAQ = ({ q, a }) => {
         />
       </button>
       <div
-        className="overflow-hidden transition-all duration-300"
-        style={{ maxHeight: open ? "200px" : "0px" }}
+        className={`grid transition-all duration-300 ease-in-out ${
+          open ? "grid-rows-[1fr] opacity-100" : "grid-rows-[0fr] opacity-0"
+        }`}
       >
-        <p className="px-6 pb-5 text-gray-600 leading-7 bg-white">{a}</p>
+        <div className="overflow-hidden">
+          <p className="px-6 pb-5 text-gray-600 leading-7 bg-white">{a}</p>
+        </div>
       </div>
     </div>
   );
 };
 
-/* ── Main Component ─────────────────────────────────────────────── */
+
 const Contactus = () => {
   const [formData, setFormData] = useState({
     name: "",
@@ -149,11 +154,11 @@ const Contactus = () => {
   return (
     <div className="bg-[#faf8f3] min-h-screen font-sans">
 
-      {/* ── HERO ────────────────────────────────────────────────── */}
       <div className="relative w-full h-[380px] md:h-[520px] overflow-hidden">
         <img
           src={photo}
           alt="Nepal mountains"
+          fetchpriority="high"
           className="w-full h-full object-cover"
           style={{ animation: "slowZoom 14s ease-in-out infinite alternate" }}
         />
@@ -178,12 +183,12 @@ const Contactus = () => {
 
         {/* Breadcrumb */}
         <nav className="text-sm text-gray-500 mb-12">
-          <span className="hover:text-[#f1b400] cursor-pointer transition-colors">Home</span>
+          <Link to="/" className="hover:text-[#f1b400] transition-colors">Home</Link>
           <span className="mx-3 text-gray-300">{">"}</span>
           <span className="text-emerald-500 font-semibold">Contact Us</span>
         </nav>
 
-        {/* ── INFO CARDS ──────────────────────────────────────────── */}
+     
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 mb-20">
           {INFO_CARDS.map((card, i) => (
             <a
@@ -197,7 +202,7 @@ const Contactus = () => {
                 {card.icon}
               </div>
               <p className="text-xs font-bold uppercase tracking-widest text-gray-400 mb-2">{card.label}</p>
-              <p className={`font-bold text-gray-900 text-base mb-1 group-hover:${card.accent} transition-colors duration-200`}>
+              <p className="font-bold text-gray-900 text-base mb-1 transition-colors duration-200">
                 {card.value}
               </p>
               <p className="text-gray-500 text-sm">{card.sub}</p>
@@ -205,7 +210,7 @@ const Contactus = () => {
           ))}
         </div>
 
-        {/* ── FORM + SIDEBAR ───────────────────────────────────────── */}
+
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-10 mb-20">
 
           {/* Left sidebar */}
@@ -223,14 +228,13 @@ const Contactus = () => {
               </p>
             </div>
 
-            {/* WhatsApp CTA */}
             <a
               href="https://wa.me/9779703745286"
               target="_blank"
               rel="noreferrer"
               className="flex items-center gap-4 bg-[#25D366]/10 border border-[#25D366]/30 rounded-2xl p-5 hover:bg-[#25D366]/15 transition-colors duration-200 group"
             >
-              <div className="w-11 h-11 rounded-xl bg-[#25D366] flex items-center justify-center flex-shrink-0 shadow-md group-hover:scale-110 transition-transform duration-200">
+              <div className="w-11 h-11 rounded-xl bg-[#25D366] flex items-center justify-center flex-shrink-0 shadow-md md:group-hover:scale-110 transition-transform duration-200">
                 <MessageCircle size={20} className="text-white" />
               </div>
               <div>
@@ -252,12 +256,11 @@ const Contactus = () => {
             </div>
           </div>
 
-          {/* ── FORM ───────────────────────────────────────────────── */}
           <div className="lg:col-span-2" ref={formRef}>
-            <div className="bg-white rounded-3xl shadow-xl border border-gray-100 p-8 md:p-12">
+            <div className="bg-white rounded-3xl shadow-xl border border-gray-100 p-6 sm:p-8 md:p-12">
 
               {success ? (
-                /* ── SUCCESS STATE ──────────────────────────────────── */
+            
                 <div className="text-center py-16">
                   <div className="w-20 h-20 rounded-full bg-emerald-50 border-2 border-emerald-200 flex items-center justify-center mx-auto mb-6">
                     <CheckCircle2 size={40} className="text-emerald-500" />
@@ -266,13 +269,13 @@ const Contactus = () => {
                   <p className="text-gray-600 leading-7 max-w-sm mx-auto mb-8">{success}</p>
                   <button
                     onClick={() => setSuccess("")}
-                    className="bg-emerald-500 hover:bg-emerald-600 text-white font-bold px-8 py-3.5 rounded-2xl transition-all duration-200 hover:scale-105"
+                    className="bg-emerald-500 hover:bg-emerald-600 text-white font-bold px-8 py-3.5 rounded-2xl transition-all duration-200 md:hover:scale-105"
                   >
                     Send Another Message
                   </button>
                 </div>
               ) : (
-                /* ── FORM FIELDS ────────────────────────────────────── */
+              
                 <form onSubmit={handleSubmit} className="space-y-6">
   <div>
     <h3 className="text-xl font-black text-gray-900 mb-5">
@@ -376,7 +379,7 @@ const Contactus = () => {
     <button
       type="submit"
       disabled={loading}
-      className="w-full sm:w-auto flex items-center justify-center gap-3 bg-emerald-500 hover:bg-emerald-600 disabled:bg-emerald-300 text-white font-bold px-10 py-4 rounded-2xl transition-all duration-300 shadow-lg hover:scale-105 disabled:scale-100"
+      className="w-full sm:w-auto flex items-center justify-center gap-3 bg-emerald-500 hover:bg-emerald-600 disabled:bg-emerald-300 text-white font-bold px-10 py-4 rounded-2xl transition-all duration-300 shadow-lg md:hover:scale-105 disabled:scale-100"
     >
       {loading ? (
         <>
@@ -410,7 +413,7 @@ const Contactus = () => {
         </div>
 
         {/* ── BOTTOM CTA ──────────────────────────────────────────── */}
-        <div className="bg-[#2c3338] rounded-3xl p-10 md:p-16 text-center text-white shadow-2xl">
+        <div className="bg-[#2c3338] rounded-3xl p-8 sm:p-10 md:p-16 text-center text-white shadow-2xl">
           <p className="uppercase tracking-[0.25em] text-xs text-emerald-500 font-bold mb-4">Ready to Explore?</p>
           <h2 className="text-3xl md:text-5xl font-black mb-6 leading-tight">
             Your Himalayan Adventure Awaits
@@ -420,7 +423,7 @@ const Contactus = () => {
           </p>
           <button
             onClick={() => formRef.current?.scrollIntoView({ behavior: "smooth" })}
-            className="bg-emerald-500 hover:bg-emerald-600 text-white font-bold px-10 py-4 rounded-2xl transition-all duration-300 shadow-lg hover:scale-105"
+            className="bg-emerald-500 hover:bg-emerald-600 text-white font-bold px-10 py-4 rounded-2xl transition-all duration-300 shadow-lg md:hover:scale-105"
           >
             Start Planning Now
           </button>

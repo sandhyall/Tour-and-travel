@@ -4,9 +4,9 @@ import { motion, useInView } from "framer-motion";
 
 import trekImage from "../../assets/trekImage.png";
 import travel from "../../assets/Travel.png";
-import tek from "../../assets/trek.png";
+import tek from "../../assets/trek.webp";
 
-/* ── Reusable fade-up variant ── */
+
 const fadeUp = (delay = 0) => ({
   hidden: { opacity: 0, y: 32 },
   visible: {
@@ -30,7 +30,7 @@ const TrustedPartner = () => {
     >
       <div className="max-w-7xl mx-auto">
 
-        {/* ── TITLE ── */}
+      
         <motion.h2
           variants={fadeUp(0)}
           initial="hidden"
@@ -46,7 +46,7 @@ const TrustedPartner = () => {
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-16 items-center">
 
-          {/* ── IMAGE GRID ── */}
+        
           <motion.div
             variants={fadeUp(0.1)}
             initial="hidden"
@@ -57,7 +57,7 @@ const TrustedPartner = () => {
               <img
                 src={trekImage}
                 alt="Himalayan trek"
-                className="w-full h-56 sm:h-64 object-cover transition-transform duration-700 hover:scale-105"
+                className="w-full h-56 sm:h-64 object-cover transition-transform duration-700 md:hover:scale-105"
               />
             </div>
 
@@ -65,7 +65,9 @@ const TrustedPartner = () => {
               <img
                 src={tek}
                 alt="Trek"
-                className="w-full h-40 sm:h-48 object-cover transition-transform duration-700 hover:scale-105"
+                loading="lazy"
+                decoding="async"
+                className="w-full h-40 sm:h-48 object-cover transition-transform duration-700 md:hover:scale-105"
               />
             </div>
 
@@ -73,12 +75,13 @@ const TrustedPartner = () => {
               <img
                 src={travel}
                 alt="Travel"
-                className="w-full h-40 sm:h-48 object-cover transition-transform duration-700 hover:scale-105"
+                loading="lazy"
+                decoding="async"
+                className="w-full h-40 sm:h-48 object-cover transition-transform duration-700 md:hover:scale-105"
               />
             </div>
           </motion.div>
 
-          {/* ── TEXT CONTENT ── */}
           <div className="space-y-5 text-gray-700">
 
             <motion.h3

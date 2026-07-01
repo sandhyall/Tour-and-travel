@@ -1,20 +1,37 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import axios from "../api/axios"; 
+import axios from "../api/axios";
 import toast from "react-hot-toast";
 
-// ─── tiny SVG mountain logo ──────────────────────────────────────────────────
 const MountainIcon = () => (
   <svg width="32" height="32" viewBox="0 0 32 32" fill="none">
     <polygon points="16,4 30,28 2,28" fill="#10b981" opacity="0.15" />
-    <polygon points="16,4 30,28 2,28" fill="none" stroke="#10b981" strokeWidth="1.5" strokeLinejoin="round" />
+    <polygon
+      points="16,4 30,28 2,28"
+      fill="none"
+      stroke="#10b981"
+      strokeWidth="1.5"
+      strokeLinejoin="round"
+    />
     <polygon points="10,16 20,28 0,28" fill="#10b981" opacity="0.3" />
-    <polygon points="10,16 20,28 0,28" fill="none" stroke="#10b981" strokeWidth="1" strokeLinejoin="round" />
+    <polygon
+      points="10,16 20,28 0,28"
+      fill="none"
+      stroke="#10b981"
+      strokeWidth="1"
+      strokeLinejoin="round"
+    />
   </svg>
 );
 
-// ─── field component ─────────────────────────────────────────────────────────
-function Field({ label, type = "text", value, onChange, placeholder, autoComplete }) {
+function Field({
+  label,
+  type = "text",
+  value,
+  onChange,
+  placeholder,
+  autoComplete,
+}) {
   const [focused, setFocused] = useState(false);
   return (
     <div className="relative">
@@ -41,24 +58,20 @@ function Field({ label, type = "text", value, onChange, placeholder, autoComplet
   );
 }
 
-// ─── main component ───────────────────────────────────────────────────────────
 export default function AuthPage() {
   const navigate = useNavigate();
-  const [mode, setMode] = useState("login"); // "login" | "register"
+  const [mode, setMode] = useState("login");
   const [loading, setLoading] = useState(false);
 
-  // login fields
   const [loginEmail, setLoginEmail] = useState("");
   const [loginPassword, setLoginPassword] = useState("");
 
-  // register fields
   const [regFirstName, setRegFirstName] = useState("");
   const [regLastName, setRegLastName] = useState("");
   const [regEmail, setRegEmail] = useState("");
   const [regPassword, setRegPassword] = useState("");
   const [regConfirm, setRegConfirm] = useState("");
 
-  // ── login submit ────────────────────────────────────────────────────────────
   const handleLogin = async (e) => {
     e.preventDefault();
     if (!loginEmail || !loginPassword) {
@@ -71,21 +84,27 @@ export default function AuthPage() {
         email: loginEmail,
         password: loginPassword,
       });
-      localStorage.setItem("token", data.token); 
+      localStorage.setItem("token", data.token);
       toast.success("Welcome back!");
-      navigate("/"); 
+      navigate("/");
     } catch (err) {
-      const msg = err.response?.data?.message || "Login failed. Please try again.";
+      const msg =
+        err.response?.data?.message || "Login failed. Please try again.";
       toast.error(msg);
     } finally {
       setLoading(false);
     }
   };
 
-  // ── register submit ─────────────────────────────────────────────────────────
   const handleRegister = async (e) => {
     e.preventDefault();
-    if (!regFirstName || !regLastName || !regEmail || !regPassword || !regConfirm) {
+    if (
+      !regFirstName ||
+      !regLastName ||
+      !regEmail ||
+      !regPassword ||
+      !regConfirm
+    ) {
       toast.error("Please fill in all fields.");
       return;
     }
@@ -109,7 +128,8 @@ export default function AuthPage() {
       toast.success("Account created! Welcome aboard.");
       navigate("/login");
     } catch (err) {
-      const msg = err.response?.data?.message || "Registration failed. Please try again.";
+      const msg =
+        err.response?.data?.message || "Registration failed. Please try again.";
       toast.error(msg);
     } finally {
       setLoading(false);
@@ -118,9 +138,7 @@ export default function AuthPage() {
 
   return (
     <div className="min-h-screen bg-slate-950 flex">
-     
       <div className="hidden lg:flex lg:w-1/2 relative overflow-hidden flex-col justify-between p-12">
-        
         <div
           className="absolute inset-0 bg-cover bg-center"
           style={{
@@ -130,7 +148,6 @@ export default function AuthPage() {
         />
         <div className="absolute inset-0 bg-gradient-to-br from-slate-950/80 via-slate-900/70 to-emerald-950/60" />
 
-        {/* grid lines decoration */}
         <div
           className="absolute inset-0 opacity-10"
           style={{
@@ -140,7 +157,6 @@ export default function AuthPage() {
           }}
         />
 
-        {/* content */}
         <div className="relative z-10 flex items-center gap-3">
           <MountainIcon />
           <span className="text-white font-bold text-lg tracking-tight">
@@ -169,7 +185,6 @@ export default function AuthPage() {
             trekking experiences with local experts.
           </p>
 
-          {/* stats row */}
           <div className="flex gap-8 pt-2">
             {[
               { n: "200+", label: "Expeditions" },
@@ -185,16 +200,13 @@ export default function AuthPage() {
         </div>
       </div>
 
-      {/* ── RIGHT PANEL — form ─────────────────────────────────────────────── */}
       <div className="w-full lg:w-1/2 flex items-center justify-center p-6 py-12">
         <div className="w-full max-w-md">
-          {/* mobile logo */}
           <div className="flex items-center gap-2 mb-10 lg:hidden">
             <MountainIcon />
             <span className="text-white font-bold text-lg">Ace Travel</span>
           </div>
 
-          {/* tab switcher */}
           <div className="flex bg-slate-800/50 rounded-2xl p-1 mb-8 border border-slate-700/50">
             {["login", "register"].map((m) => (
               <button
@@ -211,13 +223,10 @@ export default function AuthPage() {
             ))}
           </div>
 
-          {/* ── LOGIN FORM ──────────────────────────────────────────────── */}
           {mode === "login" && (
             <form onSubmit={handleLogin} className="space-y-4">
               <div className="mb-6">
-                <h2 className="text-2xl font-black text-white">
-                  Welcome back
-                </h2>
+                <h2 className="text-2xl font-black text-white">Welcome back</h2>
                 <p className="text-slate-400 text-sm mt-1">
                   Sign in to manage your bookings
                 </p>
@@ -256,9 +265,24 @@ export default function AuthPage() {
               >
                 {loading ? (
                   <span className="flex items-center justify-center gap-2">
-                    <svg className="animate-spin h-4 w-4" viewBox="0 0 24 24" fill="none">
-                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z" />
+                    <svg
+                      className="animate-spin h-4 w-4"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                    >
+                      <circle
+                        className="opacity-25"
+                        cx="12"
+                        cy="12"
+                        r="10"
+                        stroke="currentColor"
+                        strokeWidth="4"
+                      />
+                      <path
+                        className="opacity-75"
+                        fill="currentColor"
+                        d="M4 12a8 8 0 018-8v8z"
+                      />
                     </svg>
                     Signing in…
                   </span>
@@ -280,7 +304,6 @@ export default function AuthPage() {
             </form>
           )}
 
-          {/* ── REGISTER FORM ────────────────────────────────────────────── */}
           {mode === "register" && (
             <form onSubmit={handleRegister} className="space-y-4">
               <div className="mb-6">
@@ -334,7 +357,6 @@ export default function AuthPage() {
                 autoComplete="new-password"
               />
 
-              {/* password strength indicator */}
               {regPassword.length > 0 && (
                 <div className="space-y-1">
                   <div className="flex gap-1">
@@ -343,10 +365,10 @@ export default function AuthPage() {
                         regPassword.length >= 12
                           ? 4
                           : regPassword.length >= 8
-                          ? 3
-                          : regPassword.length >= 6
-                          ? 2
-                          : 1;
+                            ? 3
+                            : regPassword.length >= 6
+                              ? 2
+                              : 1;
                       return (
                         <div
                           key={i}
@@ -355,10 +377,10 @@ export default function AuthPage() {
                               ? strength === 4
                                 ? "bg-emerald-400"
                                 : strength === 3
-                                ? "bg-amber-400"
-                                : strength === 2
-                                ? "bg-orange-400"
-                                : "bg-red-400"
+                                  ? "bg-amber-400"
+                                  : strength === 2
+                                    ? "bg-orange-400"
+                                    : "bg-red-400"
                               : "bg-slate-700"
                           }`}
                         />
@@ -369,15 +391,14 @@ export default function AuthPage() {
                     {regPassword.length >= 12
                       ? "Strong password"
                       : regPassword.length >= 8
-                      ? "Good password"
-                      : regPassword.length >= 6
-                      ? "Weak — add more characters"
-                      : "Too short"}
+                        ? "Good password"
+                        : regPassword.length >= 6
+                          ? "Weak — add more characters"
+                          : "Too short"}
                   </p>
                 </div>
               )}
 
-              {/* confirm match indicator */}
               {regConfirm.length > 0 && (
                 <p
                   className={`text-xs ${
@@ -399,9 +420,24 @@ export default function AuthPage() {
               >
                 {loading ? (
                   <span className="flex items-center justify-center gap-2">
-                    <svg className="animate-spin h-4 w-4" viewBox="0 0 24 24" fill="none">
-                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z" />
+                    <svg
+                      className="animate-spin h-4 w-4"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                    >
+                      <circle
+                        className="opacity-25"
+                        cx="12"
+                        cy="12"
+                        r="10"
+                        stroke="currentColor"
+                        strokeWidth="4"
+                      />
+                      <path
+                        className="opacity-75"
+                        fill="currentColor"
+                        d="M4 12a8 8 0 018-8v8z"
+                      />
                     </svg>
                     Creating account…
                   </span>

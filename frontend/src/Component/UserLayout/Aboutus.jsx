@@ -1,9 +1,9 @@
 import React, { useEffect, useRef, useState } from "react";
 import about from "../../assets/about.png";
-import photo5 from "../../assets/photo5.jpeg";
-import photo4 from "../../assets/photo4.jpg";
-import photo3 from "../../assets/photo3.jpg";
-import photo2 from "../../assets/photo2.jpg";
+import photo5 from "../../assets/photo5.webp";
+import photo4 from "../../assets/photo4.webp";
+import photo3 from "../../assets/photo3.webp";
+import photo2 from "../../assets/photo2.webp";
 
 
 const Counter = ({ target, suffix = "" }) => {

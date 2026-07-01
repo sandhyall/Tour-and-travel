@@ -73,9 +73,9 @@ const features = [
     description:
       "Well-experienced professional guides and staff are dedicated to provide you with best quality trip experience.",
     icon: (
-      <div className="bg-yellow-400 p-3 rounded-xl shadow-sm">
+      <div className="bg-yellow-400 p-2.5 rounded-xl shadow-sm w-12 h-12 flex items-center justify-center">
         <svg
-          className="w-8 h-8 text-black"
+          className="w-7 h-7 text-black"
           fill="none"
           stroke="currentColor"
           viewBox="0 0 24 24"
@@ -148,14 +148,16 @@ const WhyAce = () => {
     <motion.section
       className="py-16 bg-gray-50 px-4"
       initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
+      whileInView={{ opacity: 1 }}
+      viewport={{ once: true, amount: 0.1 }}
       transition={{ duration: 0.7, ease: "easeOut" }}
     >
       <div className="max-w-6xl mx-auto text-center">
         <motion.h2
           className="text-3xl md:text-4xl font-bold text-gray-900 mb-2 relative inline-block"
           initial={{ opacity: 0, y: 15 }}
-          animate={{ opacity: 1, y: 0 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, amount: 0.5 }}
           transition={{ duration: 0.6, ease: "easeOut" }}
         >
           Why Wales Trek & Travel?
@@ -165,7 +167,8 @@ const WhyAce = () => {
         <motion.p
           className="text-gray-600 max-w-3xl mx-auto mt-6 mb-16 text-lg leading-relaxed"
           initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, amount: 0.5 }}
           transition={{ delay: 0.1, duration: 0.6, ease: "easeOut" }}
         >
           We have been helping you to explore the Himalayas since 2006. With
@@ -175,31 +178,30 @@ const WhyAce = () => {
         </motion.p>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
-  {features.map((feature, index) => (
-    <motion.div
-      key={index}
-      className="flex flex-col items-center rounded-2xl border border-slate-200 bg-white p-6 md:p-7 shadow-md shadow-slate-200/60 transition hover:-translate-y-1 hover:shadow-xl"
-      variants={cardVariants}
-      initial="hidden"
-      whileInView="visible"
-      viewport={{ once: true, amount: 0.2 }}
-      transition={{ delay: index * 0.08, duration: 0.55, ease: "easeOut" }}
-      whileHover={{ y: -4 }}
-    >
-      <div className="mb-4 h-12 w-12 flex items-center justify-center rounded-2xl bg-emerald-50">
-        {feature.icon}
-      </div>
+          {features.map((feature, index) => (
+            <motion.div
+              key={index}
+              className="flex flex-col items-center rounded-2xl border border-slate-200 bg-white p-6 md:p-7 shadow-md shadow-slate-200/60 transition md:hover:-translate-y-1 md:hover:shadow-xl"
+              variants={cardVariants}
+              initial="hidden"
+              whileInView="visible"
+              viewport={{ once: true, amount: 0.2 }}
+              transition={{ delay: index * 0.08, duration: 0.55, ease: "easeOut" }}
+            >
+              <div className="mb-4 h-12 w-12 flex items-center justify-center rounded-2xl bg-emerald-50">
+                {feature.icon}
+              </div>
 
-      <h3 className="text-lg md:text-xl font-semibold text-gray-900 mb-2 text-center">
-        {feature.title}
-      </h3>
+              <h3 className="text-lg md:text-xl font-semibold text-gray-900 mb-2 text-center">
+                {feature.title}
+              </h3>
 
-      <p className="text-gray-600 leading-relaxed text-sm md:text-base text-center">
-        {feature.description}
-      </p>
-    </motion.div>
-  ))}
-</div>
+              <p className="text-gray-600 leading-relaxed text-sm md:text-base text-center">
+                {feature.description}
+              </p>
+            </motion.div>
+          ))}
+        </div>
       </div>
     </motion.section>
   );

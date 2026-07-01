@@ -110,10 +110,12 @@ export default function Login() {
               ) : "Sign In to Panel"}
             </button>
 
-            <div className="mt-4 p-4 bg-amber-50 border border-amber-100 rounded-xl text-center">
-              <p className="text-xs font-bold text-amber-700 uppercase tracking-tighter">Demo Credentials</p>
-              <p className="text-sm text-amber-600 mt-1">admin@travel.com / admin123</p>
-            </div>
+            {import.meta.env.DEV && (
+              <div className="mt-4 p-4 bg-amber-50 border border-amber-100 rounded-xl text-center">
+                <p className="text-xs font-bold text-amber-700 uppercase tracking-tighter">Demo Credentials</p>
+                <p className="text-sm text-amber-600 mt-1">admin@travel.com / admin123</p>
+              </div>
+            )}
           </form>
         </div>
       </div>

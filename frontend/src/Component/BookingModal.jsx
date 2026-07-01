@@ -105,7 +105,6 @@ export default function BookingModal({ trip, open, onClose }) {
     }));
   };
 
-  // ==================== SUBMIT LOGIC ====================
   const createBooking = async () => {
     setError("");
 
@@ -134,8 +133,6 @@ export default function BookingModal({ trip, open, onClose }) {
         packagePrice: selectedPackage.price,
       };
 
-      // Interceptor on the axios instance automatically attaches Authorization header.
-      // Do NOT pass manual config — it can conflict with the interceptor.
       const { data } = await axios.post("/bookings", payload);
       const bookingId = data._id;
 
@@ -148,9 +145,6 @@ export default function BookingModal({ trip, open, onClose }) {
         const fd = new FormData();
         fd.append("slip", bankSlip);
 
-        // Do NOT manually set Content-Type for FormData.
-        // The browser must set it (with the multipart boundary) automatically.
-        // The interceptor handles Authorization.
         await axios.post(`/bookings/${bookingId}/slip`, fd);
 
         toast.success("Booking submitted!");
@@ -171,46 +165,51 @@ export default function BookingModal({ trip, open, onClose }) {
 
   return (
     <div className="fixed inset-0 bg-black/70 z-[9999] overflow-y-auto">
-      <div className="min-h-screen flex justify-center p-4 py-10">
-        <div className="bg-white max-w-6xl w-full rounded-3xl overflow-hidden shadow-2xl">
-          {/* Header */}
-          <div className="bg-black text-white px-8 py-6 flex justify-between items-center">
+      <div className="min-h-screen flex justify-center p-0 sm:p-4 sm:py-10">
+        <div className="bg-white w-full sm:max-w-3xl lg:max-w-6xl rounded-none sm:rounded-3xl overflow-hidden shadow-2xl">
+          <div className="bg-black text-white px-5 sm:px-8 py-4 sm:py-6 flex justify-between items-center sticky top-0 z-10">
             <div>
-              <h2 className="text-3xl font-bold">Book Expedition</h2>
-              <p className="text-gray-400 text-sm mt-1">
+              <h2 className="text-xl sm:text-2xl lg:text-3xl font-bold">
+                Book Expedition
+              </h2>
+              <p className="text-gray-400 text-xs sm:text-sm mt-1">
                 Complete your secure booking
               </p>
             </div>
             <button
               onClick={onClose}
-              className="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center hover:bg-white/20 transition-colors"
+              className="w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-white/10 flex items-center justify-center hover:bg-white/20 transition-colors shrink-0"
             >
-              <X size={20} />
+              <X size={18} className="sm:hidden" />
+              <X size={20} className="hidden sm:block" />
             </button>
           </div>
 
           <div className="grid lg:grid-cols-3">
-            <div className="lg:col-span-2 p-8 space-y-8">
-              {/* Packages */}
+            <div className="lg:col-span-2 p-5 sm:p-6 lg:p-8 space-y-6 sm:space-y-8">
               <div>
-                <h3 className="text-xl font-bold mb-4">Select Package</h3>
-                <div className="grid md:grid-cols-2 gap-4">
+                <h3 className="text-lg sm:text-xl font-bold mb-3 sm:mb-4">
+                  Select Package
+                </h3>
+                <div className="grid sm:grid-cols-2 gap-3 sm:gap-4">
                   {trip.packages?.map((pkg, i) => (
                     <button
                       key={i}
                       type="button"
                       onClick={() => setSelectedPackage(pkg)}
-                      className={`border rounded-2xl p-5 text-left transition-all ${
+                      className={`border rounded-2xl p-4 sm:p-5 text-left transition-all ${
                         selectedPackage?.name === pkg.name
                           ? "border-emerald-500 bg-emerald-50/70 shadow-sm"
                           : "hover:bg-gray-50 border-gray-200"
                       }`}
                     >
-                      <h4 className="font-bold text-slate-900">{pkg.name}</h4>
-                      <p className="text-sm text-gray-500 mt-1 line-clamp-2">
+                      <h4 className="font-bold text-slate-900 text-sm sm:text-base">
+                        {pkg.name}
+                      </h4>
+                      <p className="text-xs sm:text-sm text-gray-500 mt-1 line-clamp-2">
                         {pkg.description}
                       </p>
-                      <p className="text-xl font-black mt-3 text-slate-900">
+                      <p className="text-lg sm:text-xl font-black mt-2 sm:mt-3 text-slate-900">
                         USD {pkg.price}
                       </p>
                     </button>
@@ -218,21 +217,22 @@ export default function BookingModal({ trip, open, onClose }) {
                 </div>
               </div>
 
-              {/* Buyer Info */}
               <div>
-                <h3 className="text-xl font-bold mb-4">Buyer Information</h3>
-                <div className="grid md:grid-cols-2 gap-4">
+                <h3 className="text-lg sm:text-xl font-bold mb-3 sm:mb-4">
+                  Buyer Information
+                </h3>
+                <div className="grid sm:grid-cols-2 gap-3 sm:gap-4">
                   <input
                     placeholder="First Name"
                     value={form.buyer.firstName}
                     onChange={(e) => updateBuyer("firstName", e.target.value)}
-                    className="border border-gray-200 rounded-xl px-4 py-3 outline-none focus:border-amber-500 transition-colors"
+                    className="border border-gray-200 rounded-xl px-4 py-3 outline-none focus:border-amber-500 transition-colors text-sm sm:text-base"
                   />
                   <input
                     placeholder="Last Name"
                     value={form.buyer.lastName}
                     onChange={(e) => updateBuyer("lastName", e.target.value)}
-                    className="border border-gray-200 rounded-xl px-4 py-3 outline-none focus:border-amber-500 transition-colors"
+                    className="border border-gray-200 rounded-xl px-4 py-3 outline-none focus:border-amber-500 transition-colors text-sm sm:text-base"
                   />
                 </div>
                 <input
@@ -240,20 +240,19 @@ export default function BookingModal({ trip, open, onClose }) {
                   type="email"
                   value={form.buyer.email}
                   onChange={(e) => updateBuyer("email", e.target.value)}
-                  className="border border-gray-200 rounded-xl px-4 py-3 mt-4 w-full outline-none focus:border-amber-500 transition-colors"
+                  className="border border-gray-200 rounded-xl px-4 py-3 mt-3 sm:mt-4 w-full outline-none focus:border-amber-500 transition-colors text-sm sm:text-base"
                 />
               </div>
 
-              {/* Participants */}
-              <div className="space-y-6">
-                <div className="flex justify-between items-center border-b border-gray-100 pb-3">
-                  <h3 className="text-xl font-bold">
+              <div className="space-y-5 sm:space-y-6">
+                <div className="flex flex-wrap justify-between items-center gap-3 border-b border-gray-100 pb-3">
+                  <h3 className="text-lg sm:text-xl font-bold">
                     Travelers / Participants
                   </h3>
                   <button
                     type="button"
                     onClick={addParticipant}
-                    className="flex items-center gap-1 text-sm font-bold bg-emerald-500 text-white px-4 py-2 rounded-xl hover:bg-emerald-600 transition"
+                    className="flex items-center gap-1 text-xs sm:text-sm font-bold bg-emerald-500 text-white px-3 sm:px-4 py-2 rounded-xl hover:bg-emerald-600 transition"
                   >
                     <Plus size={16} /> Add Traveler
                   </button>
@@ -262,7 +261,7 @@ export default function BookingModal({ trip, open, onClose }) {
                 {form.participants.map((participant, index) => (
                   <div
                     key={index}
-                    className="border border-gray-200 p-5 rounded-2xl bg-gray-50/50 space-y-4 relative"
+                    className="border border-gray-200 p-4 sm:p-5 rounded-2xl bg-gray-50/50 space-y-3 sm:space-y-4 relative"
                   >
                     <div className="flex justify-between items-center">
                       <span className="text-xs font-bold text-gray-400 uppercase tracking-wider">
@@ -279,14 +278,14 @@ export default function BookingModal({ trip, open, onClose }) {
                       )}
                     </div>
 
-                    <div className="grid md:grid-cols-2 gap-4">
+                    <div className="grid sm:grid-cols-2 gap-3 sm:gap-4">
                       <input
                         placeholder="First Name"
                         value={participant.firstName}
                         onChange={(e) =>
                           updateParticipant(index, "firstName", e.target.value)
                         }
-                        className="border border-gray-200 bg-white rounded-xl px-4 py-2.5 outline-none focus:border-emerald-500 transition-colors"
+                        className="border border-gray-200 bg-white rounded-xl px-4 py-2.5 outline-none focus:border-emerald-500 transition-colors text-sm sm:text-base"
                       />
                       <input
                         placeholder="Last Name"
@@ -294,7 +293,7 @@ export default function BookingModal({ trip, open, onClose }) {
                         onChange={(e) =>
                           updateParticipant(index, "lastName", e.target.value)
                         }
-                        className="border border-gray-200 bg-white rounded-xl px-4 py-2.5 outline-none focus:border-emerald-500 transition-colors"
+                        className="border border-gray-200 bg-white rounded-xl px-4 py-2.5 outline-none focus:border-emerald-500 transition-colors text-sm sm:text-base"
                       />
                       <input
                         placeholder="Email"
@@ -303,7 +302,7 @@ export default function BookingModal({ trip, open, onClose }) {
                         onChange={(e) =>
                           updateParticipant(index, "email", e.target.value)
                         }
-                        className="border border-gray-200 bg-white rounded-xl px-4 py-2.5 outline-none focus:border-emerald-500 transition-colors"
+                        className="border border-gray-200 bg-white rounded-xl px-4 py-2.5 outline-none focus:border-emerald-500 transition-colors text-sm sm:text-base"
                       />
                       <input
                         placeholder="Phone Number"
@@ -311,17 +310,17 @@ export default function BookingModal({ trip, open, onClose }) {
                         onChange={(e) =>
                           updateParticipant(index, "phone", e.target.value)
                         }
-                        className="border border-gray-200 bg-white rounded-xl px-4 py-2.5 outline-none focus:border-emerald-500 transition-colors"
+                        className="border border-gray-200 bg-white rounded-xl px-4 py-2.5 outline-none focus:border-emerald-500 transition-colors text-sm sm:text-base"
                       />
                     </div>
 
-                    <div className="grid md:grid-cols-3 gap-4">
+                    <div className="grid sm:grid-cols-3 gap-3 sm:gap-4">
                       <select
                         value={participant.gender}
                         onChange={(e) =>
                           updateParticipant(index, "gender", e.target.value)
                         }
-                        className="border border-gray-200 bg-white rounded-xl px-4 py-2.5 outline-none focus:border-emerald-500 text-gray-600 transition-colors"
+                        className="border border-gray-200 bg-white rounded-xl px-4 py-2.5 outline-none focus:border-emerald-500 text-gray-600 transition-colors text-sm sm:text-base"
                       >
                         <option value="">Select Gender</option>
                         <option value="male">Male</option>
@@ -334,7 +333,7 @@ export default function BookingModal({ trip, open, onClose }) {
                         onChange={(e) =>
                           updateParticipant(index, "dob", e.target.value)
                         }
-                        className="border border-gray-200 bg-white rounded-xl px-4 py-2.5 w-full outline-none focus:border-emerald-500 text-gray-600 transition-colors"
+                        className="border border-gray-200 bg-white rounded-xl px-4 py-2.5 w-full outline-none focus:border-emerald-500 text-gray-600 transition-colors text-sm sm:text-base"
                       />
                       <input
                         placeholder="Nationality"
@@ -346,7 +345,7 @@ export default function BookingModal({ trip, open, onClose }) {
                             e.target.value,
                           )
                         }
-                        className="border border-gray-200 bg-white rounded-xl px-4 py-2.5 outline-none focus:border-emerald-500 transition-colors"
+                        className="border border-gray-200 bg-white rounded-xl px-4 py-2.5 outline-none focus:border-emerald-500 transition-colors text-sm sm:text-base sm:col-span-1 col-span-1"
                       />
                     </div>
                     <input
@@ -359,16 +358,17 @@ export default function BookingModal({ trip, open, onClose }) {
                           e.target.value,
                         )
                       }
-                      className="border border-gray-200 bg-white rounded-xl px-4 py-2.5 w-full outline-none focus:border-emerald-500 transition-colors"
+                      className="border border-gray-200 bg-white rounded-xl px-4 py-2.5 w-full outline-none focus:border-emerald-500 transition-colors text-sm sm:text-base"
                     />
                   </div>
                 ))}
               </div>
 
-              {/* Travel Dates */}
               <div>
-                <h3 className="text-xl font-bold mb-4">Select Date</h3>
-                <div className="grid md:grid-cols-2 gap-4">
+                <h3 className="text-lg sm:text-xl font-bold mb-3 sm:mb-4">
+                  Select Date
+                </h3>
+                <div className="grid sm:grid-cols-2 gap-3 sm:gap-4">
                   {trip.availableDates?.map((d, i) => {
                     const seatsLeft = d.totalSeats - (d.bookedSeats || 0);
                     const isFull = seatsLeft <= 0 || d.status === "full";
@@ -390,7 +390,7 @@ export default function BookingModal({ trip, open, onClose }) {
                               : "hover:bg-gray-50 border-gray-200"
                         }`}
                       >
-                        <p className="font-bold text-slate-800">
+                        <p className="font-bold text-slate-800 text-sm sm:text-base">
                           {formatDate(d.date)}
                         </p>
                         <p
@@ -414,16 +414,17 @@ export default function BookingModal({ trip, open, onClose }) {
                 </div>
               </div>
 
-              {/* Payment Section */}
               <div>
-                <h3 className="text-xl font-bold mb-4">Payment Method</h3>
+                <h3 className="text-lg sm:text-xl font-bold mb-3 sm:mb-4">
+                  Payment Method
+                </h3>
                 <PaymentMethodCard
                   paymentMethod={paymentMethod}
                   setPaymentMethod={setPaymentMethod}
                 />
 
                 {paymentMethod === "card" && (
-                  <div className="mt-4 border border-emerald-200 bg-emerald-50/40 rounded-xl p-5 text-sm text-emerald-900 flex flex-col gap-1.5">
+                  <div className="mt-4 border border-emerald-200 bg-emerald-50/40 rounded-xl p-4 sm:p-5 text-sm text-emerald-900 flex flex-col gap-1.5">
                     <p className="font-semibold">
                       ✓ Online Gateway Checkout Selected
                     </p>
@@ -437,29 +438,28 @@ export default function BookingModal({ trip, open, onClose }) {
 
                 {paymentMethod === "swift_bank_transfer" && (
                   <div className="mt-4 space-y-4">
-                    {/* Bank Details Card */}
-                    <div className="border border-emerald-200 bg-emerald-50/40 rounded-xl p-5">
-                      <h4 className="font-bold text-emerald-900 mb-3">
+                    <div className="border border-emerald-200 bg-emerald-50/40 rounded-xl p-4 sm:p-5">
+                      <h4 className="font-bold text-emerald-900 mb-3 text-sm sm:text-base">
                         Bank Transfer Details
                       </h4>
-                      <div className="text-sm text-gray-700 space-y-2">
-                        <p>
+                      <div className="text-xs sm:text-sm text-gray-700 space-y-2">
+                        <p className="break-words">
                           <span className="font-semibold">Bank Name:</span>{" "}
                           {BANK_DETAILS.bankName}
                         </p>
-                        <p>
+                        <p className="break-words">
                           <span className="font-semibold">Account Name:</span>{" "}
                           {BANK_DETAILS.accountName}
                         </p>
-                        <p>
+                        <p className="break-words">
                           <span className="font-semibold">Account Number:</span>{" "}
                           {BANK_DETAILS.accountNumber}
                         </p>
-                        <p>
+                        <p className="break-words">
                           <span className="font-semibold">SWIFT Code:</span>{" "}
                           {BANK_DETAILS.swiftCode}
                         </p>
-                        <p>
+                        <p className="break-words">
                           <span className="font-semibold">Branch:</span>{" "}
                           {BANK_DETAILS.branch}
                         </p>
@@ -470,8 +470,7 @@ export default function BookingModal({ trip, open, onClose }) {
                       </p>
                     </div>
 
-                    {/* Upload Slip */}
-                    <div className="border border-dashed border-gray-300 rounded-xl p-5 bg-gray-50/50">
+                    <div className="border border-dashed border-gray-300 rounded-xl p-4 sm:p-5 bg-gray-50/50">
                       <label className="block text-sm font-semibold text-gray-700 mb-2">
                         Upload Bank Transfer Slip / Receipt
                       </label>
@@ -481,10 +480,10 @@ export default function BookingModal({ trip, open, onClose }) {
                         onChange={(e) =>
                           setBankSlip(e.target.files?.[0] || null)
                         }
-                        className="w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-bold file:bg-emerald-100 file:text-emerald-800 hover:file:bg-emerald-200 cursor-pointer"
+                        className="w-full text-xs sm:text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-bold file:bg-emerald-100 file:text-emerald-800 hover:file:bg-emerald-200 cursor-pointer"
                       />
                       {bankSlip ? (
-                        <p className="text-xs text-emerald-600 mt-2 font-medium">
+                        <p className="text-xs text-emerald-600 mt-2 font-medium break-words">
                           ✓ Selected: {bankSlip.name}
                         </p>
                       ) : (
@@ -498,36 +497,37 @@ export default function BookingModal({ trip, open, onClose }) {
               </div>
             </div>
 
-            {/* Sidebar Summary */}
-            <div className="bg-gray-50/50 p-8 lg:border-l border-gray-200">
-              <div className="bg-white p-6 rounded-3xl border border-gray-200 shadow-sm sticky top-6">
-                <h3 className="text-2xl font-bold mb-6">Summary</h3>
-                <div className="space-y-4 text-gray-500 pb-5 border-b border-gray-100 text-sm">
-                  <div className="flex justify-between">
+            <div className="bg-gray-50/50 p-5 sm:p-6 lg:p-8 lg:border-l border-gray-200">
+              <div className="bg-white p-5 sm:p-6 rounded-3xl border border-gray-200 shadow-sm lg:sticky lg:top-6">
+                <h3 className="text-xl sm:text-2xl font-bold mb-5 sm:mb-6">
+                  Summary
+                </h3>
+                <div className="space-y-3 sm:space-y-4 text-gray-500 pb-5 border-b border-gray-100 text-sm">
+                  <div className="flex justify-between gap-3">
                     <span>Package:</span>
-                    <span className="font-bold text-slate-900">
+                    <span className="font-bold text-slate-900 text-right">
                       {selectedPackage?.name || "-"}
                     </span>
                   </div>
-                  <div className="flex justify-between">
+                  <div className="flex justify-between gap-3">
                     <span>Travelers:</span>
                     <span className="font-bold text-slate-900">
                       {form.participants.length}
                     </span>
                   </div>
-                  <div className="flex justify-between">
+                  <div className="flex justify-between gap-3">
                     <span>Departure:</span>
-                    <span className="font-bold text-slate-900">
+                    <span className="font-bold text-slate-900 text-right">
                       {formatDate(form.travelDate) || "-"}
                     </span>
                   </div>
                 </div>
 
-                <div className="flex justify-between items-center mt-5">
+                <div className="flex flex-wrap justify-between items-center gap-2 mt-5">
                   <span className="text-gray-400 text-sm font-medium">
                     Total Price
                   </span>
-                  <h2 className="text-3xl font-black text-slate-900">
+                  <h2 className="text-2xl sm:text-3xl font-black text-slate-900">
                     USD {totalPrice.toLocaleString()}
                   </h2>
                 </div>
@@ -541,7 +541,7 @@ export default function BookingModal({ trip, open, onClose }) {
                 <button
                   onClick={createBooking}
                   disabled={loading}
-                  className="w-full bg-emerald-500 hover:bg-emerald-600 disabled:bg-slate-200 disabled:text-slate-400 transition-all py-3.5 mt-6 rounded-xl font-bold text-white shadow-sm flex items-center justify-center gap-2"
+                  className="w-full bg-emerald-500 hover:bg-emerald-600 disabled:bg-slate-200 disabled:text-slate-400 transition-all py-3 sm:py-3.5 mt-6 rounded-xl font-bold text-white shadow-sm flex items-center justify-center gap-2 text-sm sm:text-base"
                 >
                   {loading ? "Processing transaction..." : "Confirm & Book Now"}
                 </button>

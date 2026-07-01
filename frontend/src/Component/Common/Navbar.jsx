@@ -109,17 +109,21 @@ const styles = `
     justify-content: space-between;
     align-items: center;
     font-family: var(--wtt-font);
+    flex-wrap: wrap;
+    row-gap: 4px;
   }
   .wtt-topbar-left {
     font-size: 11px;
     color: var(--wtt-muted);
     letter-spacing: 0.06em;
+    white-space: nowrap;
   }
   .wtt-topbar-left strong { color: var(--wtt-green); font-weight: 600; }
   .wtt-topbar-right {
     display: flex;
     gap: 20px;
     align-items: center;
+    flex-wrap: wrap;
   }
   .wtt-topbar-link {
     font-size: 10.5px;
@@ -132,9 +136,15 @@ const styles = `
     background: none;
     border: none;
     font-family: var(--wtt-font);
+    white-space: nowrap;
   }
   .wtt-topbar-link:hover { color: var(--wtt-cream); }
   .wtt-topbar-sep { color: rgba(255,255,255,0.15); font-size: 11px; }
+
+  @media (max-width: 900px) {
+    .wtt-topbar { padding: 6px 20px; gap: 6px; }
+    .wtt-topbar-right { gap: 12px; }
+  }
 
   @media (max-width: 767px) {
     .wtt-topbar { display: none; }
@@ -152,18 +162,26 @@ const styles = `
     height: 68px;
     position: relative;
     z-index: 100;
+    gap: 12px;
   }
   @media (max-width: 767px) {
     .wtt-navbar { padding: 0 16px; height: 60px; }
   }
 
   /* ---- brand ---- */
+  .wtt-brand-group {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-shrink: 1;
+    min-width: 0;
+  }
   .wtt-brand {
     display: flex;
     align-items: center;
     gap: 10px;
     text-decoration: none;
-    flex-shrink: 0;
+    min-width: 0;
   }
   .wtt-brand-name {
     font-family: var(--wtt-serif);
@@ -172,6 +190,9 @@ const styles = `
     font-weight: 700;
     letter-spacing: 0.04em;
     line-height: 1.1;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
   .wtt-brand-sub {
     display: block;
@@ -182,6 +203,16 @@ const styles = `
     color: var(--wtt-muted);
     text-transform: uppercase;
     margin-top: 3px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  @media (max-width: 420px) {
+    .wtt-brand-name { font-size: 15px; }
+    .wtt-brand-sub { font-size: 8.5px; letter-spacing: 0.14em; }
+  }
+  @media (max-width: 360px) {
+    .wtt-brand-sub { display: none; }
   }
 
   /* ---- desktop nav links ---- */
@@ -191,6 +222,7 @@ const styles = `
     gap: 2px;
     flex: 1;
     margin: 0 16px;
+    min-width: 0;
   }
   @media (max-width: 1023px) { .wtt-nav-links { display: none; } }
 
@@ -247,6 +279,7 @@ const styles = `
     border: 1px solid var(--wtt-green-dim);
     border-top: 2px solid var(--wtt-green-d);
     min-width: 420px;
+    max-width: calc(100vw - 32px);
     padding: 20px;
     z-index: 200;
     box-shadow: var(--wtt-shadow);
@@ -289,6 +322,7 @@ const styles = `
     border: 1px solid var(--wtt-green-dim);
     border-top: 2px solid var(--wtt-green-d);
     width: 520px;
+    max-width: calc(100vw - 32px);
     padding: 28px 32px;
     z-index: 200;
     display: grid;
@@ -327,9 +361,12 @@ const styles = `
     display: flex;
     align-items: center;
     gap: 18px;
+    flex-shrink: 0;
+  }
+  @media (max-width: 1180px) {
+    .wtt-nav-right .wtt-phone-wrap { display: none; }
   }
   @media (max-width: 1023px) {
-    .wtt-nav-right .wtt-phone-wrap { display: none; }
     .wtt-nav-right .wtt-loc-wrap   { display: none; }
   }
   @media (max-width: 767px) {
@@ -394,6 +431,7 @@ const styles = `
   .wtt-phone-num {
     font-size: 14px; font-weight: 700; color: var(--wtt-cream);
     letter-spacing: 0.04em; display: flex; align-items: center; gap: 7px; font-family: var(--wtt-font);
+    white-space: nowrap;
   }
   .wtt-phone-icon {
     width: 16px; height: 16px; background: var(--wtt-green-d); border-radius: 50%;
@@ -412,6 +450,7 @@ const styles = `
     transition: background var(--wtt-transition);
     align-items: center;
     justify-content: center;
+    flex-shrink: 0;
   }
   .wtt-burger:hover { background: rgba(255,255,255,0.07); }
   @media (max-width: 1023px) { .wtt-burger { display: flex; } }
@@ -452,14 +491,15 @@ const styles = `
     background: var(--wtt-bg);
     flex-shrink: 0;
   }
-  .wtt-drawer-logo { display: flex; align-items: center; gap: 10px; text-decoration: none; }
+  .wtt-drawer-logo { display: flex; align-items: center; gap: 10px; text-decoration: none; min-width: 0; }
   .wtt-drawer-title {
     font-family: var(--wtt-serif); color: var(--wtt-cream); font-size: 16px; font-weight: 700;
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
   }
   .wtt-drawer-close {
     background: none; border: none; color: var(--wtt-muted); cursor: pointer;
     padding: 6px; border-radius: 4px; transition: color var(--wtt-transition);
-    display: flex; align-items: center;
+    display: flex; align-items: center; flex-shrink: 0;
   }
   .wtt-drawer-close:hover { color: var(--wtt-cream); }
 
@@ -692,10 +732,10 @@ const Navbar = () => {
         {/* ── Main Navbar ── */}
         <nav className="wtt-navbar">
           {/* Brand */}
-          <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-            <img src={newlogo} alt="Company Logo" style={{ height: 46, width: "auto" }} />
+          <div className="wtt-brand-group">
+            <img src={newlogo} alt="Company Logo" style={{ height: 46, width: "auto", flexShrink: 0 }} />
             <Link to="/" className="wtt-brand">
-              <div>
+              <div style={{ minWidth: 0 }}>
                 <div className="wtt-brand-name">Wales Trek &amp; Travel</div>
                 <span className="wtt-brand-sub">Himalayan Specialists</span>
               </div>
@@ -814,7 +854,7 @@ const Navbar = () => {
         {/* Header */}
         <div className="wtt-drawer-header">
           <Link to="/" className="wtt-drawer-logo" onClick={closeDrawer}>
-            <img src={newlogo} alt="Logo" style={{ height: 34, width: "auto" }} />
+            <img src={newlogo} alt="Logo" style={{ height: 34, width: "auto", flexShrink: 0 }} />
             <span className="wtt-drawer-title">Wales Trek</span>
           </Link>
           <button className="wtt-drawer-close" onClick={closeDrawer} aria-label="Close menu">

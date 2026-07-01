@@ -1,5 +1,5 @@
 import React from "react";
-import photo4 from "../../assets/photo4.jpg"
+import photo4 from "../../assets/photo4.webp"
 
 const CorporateSocialInitiative = () => {
   const socialProjects = [
@@ -36,7 +36,7 @@ const CorporateSocialInitiative = () => {
   return (
     <div className="font-sans text-gray-900 bg-white">
 
-      {/* ── HERO ─────────────────────────────────────────────────── */}
+     
       <div className="relative w-full h-[420px] sm:h-[520px] overflow-hidden">
         <img
           src={photo4}
@@ -54,7 +54,7 @@ const CorporateSocialInitiative = () => {
         </div>
       </div>
 
-      {/* ── BODY ─────────────────────────────────────────────────── */}
+     
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-10 py-12 sm:py-20">
 
         <nav className="text-sm text-blue-600 mb-10 flex items-center gap-2">

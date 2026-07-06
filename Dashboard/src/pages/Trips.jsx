@@ -303,7 +303,7 @@ export default function Trips() {
   );
 }
 
-// ─── DEPARTURE MATRIX MODAL ────────────────────────────────────────────────
+
 function DepartureMatrixModal({ trip, onClose, onSave, isUpdating }) {
   const [localDates, setLocalDates] = useState(() =>
     Array.isArray(trip.availableDates)
@@ -425,7 +425,7 @@ function DepartureMatrixModal({ trip, onClose, onSave, isUpdating }) {
           </button>
         </div>
 
-        {/* Footer */}
+   
         <div className="p-3 sm:p-4 border-t border-slate-100 bg-slate-50 flex items-center justify-end gap-2 shrink-0">
           <button
             type="button"

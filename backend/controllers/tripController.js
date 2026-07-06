@@ -3,9 +3,6 @@ import slugify from "slugify";
 import cloudinary from "../config/cloudinary.js";
 import streamifier from "streamifier";
 
-/* =========================
-   Cloudinary Upload Helper
-========================= */
 const uploadBuffer = (buffer, options = {}) => {
   return new Promise((resolve, reject) => {
     const stream = cloudinary.uploader.upload_stream(
@@ -19,9 +16,6 @@ const uploadBuffer = (buffer, options = {}) => {
   });
 };
 
-/* =========================
-   Safe JSON Parse
-========================= */
 const safeParse = (val) => {
   try {
     return typeof val === "string" ? JSON.parse(val) : val || [];
@@ -29,7 +23,6 @@ const safeParse = (val) => {
     return [];
   }
 };
-
 
 export const createTrip = async (req, res) => {
   try {
@@ -40,23 +33,23 @@ export const createTrip = async (req, res) => {
       strict: true,
     });
 
- 
     let heroImage = null;
     if (req.files?.featuredImage?.[0]) {
       const result = await uploadBuffer(req.files.featuredImage[0].buffer);
       heroImage = { url: result.secure_url, public_id: result.public_id };
     }
 
-   
     let galleryImages = [];
     if (req.files?.gallery?.length) {
       for (let file of req.files.gallery) {
         const result = await uploadBuffer(file.buffer);
-        galleryImages.push({ url: result.secure_url, public_id: result.public_id });
+        galleryImages.push({
+          url: result.secure_url,
+          public_id: result.public_id,
+        });
       }
     }
 
-    // ✅ NEW: BROCHURE PDF
     let brochure = null;
     if (req.files?.brochure?.[0]) {
       const result = await uploadBuffer(req.files.brochure[0].buffer, {
@@ -66,7 +59,6 @@ export const createTrip = async (req, res) => {
       brochure = { url: result.secure_url, public_id: result.public_id };
     }
 
-    // ✅ NEW: ITINERARY PDF
     let itineraryPdf = null;
     if (req.files?.itineraryPdf?.[0]) {
       const result = await uploadBuffer(req.files.itineraryPdf[0].buffer, {
@@ -76,7 +68,6 @@ export const createTrip = async (req, res) => {
       itineraryPdf = { url: result.secure_url, public_id: result.public_id };
     }
 
-    // ✅ NEW: GUIDE PHOTO
     let guidePhoto = null;
     if (req.files?.guidePhoto?.[0]) {
       const result = await uploadBuffer(req.files.guidePhoto[0].buffer, {
@@ -85,24 +76,19 @@ export const createTrip = async (req, res) => {
       guidePhoto = { url: result.secure_url, public_id: result.public_id };
     }
 
-    // ✅ MAP IMAGE
-let mapImage = null;
+    let mapImage = null;
 
-if (req.files?.mapImage?.[0]) {
-  const result = await uploadBuffer(
-    req.files.mapImage[0].buffer,
-    {
-      folder: "trips/maps",
+    if (req.files?.mapImage?.[0]) {
+      const result = await uploadBuffer(req.files.mapImage[0].buffer, {
+        folder: "trips/maps",
+      });
+
+      mapImage = {
+        url: result.secure_url,
+        public_id: result.public_id,
+      };
     }
-  );
 
-  mapImage = {
-    url: result.secure_url,
-    public_id: result.public_id,
-  };
-}
-
-    // ✅ NEW: Parse guideInfo from body
     const rawGuideInfo = safeParse(data.guideInfo);
     const guideInfo = {
       name: rawGuideInfo.name || data.guideName || "",
@@ -133,10 +119,11 @@ if (req.files?.mapImage?.[0]) {
       heroImage,
       galleryImages,
 
-      categoryType: data.categoryType ? data.categoryType.toLowerCase() : "standard",
+      categoryType: data.categoryType
+        ? data.categoryType.toLowerCase()
+        : "standard",
       badge: data.badge === "true" || data.badge === true,
 
-      // ✅ FIXED: Strings "true"/"false" converted to actual booleans
       isBestSeller2026: data.isBestSeller2026 === "true",
       isLuxuryVIP: data.isLuxuryVIP === "true",
       isPeakClimbing: data.isPeakClimbing === "true",
@@ -144,11 +131,19 @@ if (req.files?.mapImage?.[0]) {
       isBhutanTour: data.isBhutanTour === "true",
       isTibetTour: data.isTibetTour === "true",
 
-      // ✅ NEW FIELDS
       mapImage,
       brochure,
       itineraryPdf,
       guideInfo,
+
+      note: data.note,
+      luklaFlightInfo: data.luklaFlightInfo,
+      relatedInformation: data.relatedInformation,
+      bestTime: data.bestTime,
+      whyChoose: data.whyChoose,
+
+      otherEssentials: safeParse(data.otherEssentials),
+      optionalItems: safeParse(data.optionalItems),
 
       availableDates: safeParse(data.availableDates),
       includes: safeParse(data.includes),
@@ -172,9 +167,6 @@ if (req.files?.mapImage?.[0]) {
   }
 };
 
-/* =========================
-   GET ALL TRIPS
-========================= */
 export const getTrips = async (req, res) => {
   try {
     const { category, format, type } = req.query;
@@ -183,12 +175,13 @@ export const getTrips = async (req, res) => {
     if (type) {
       if (type === "popular") {
         filterQuery = { $or: [{ isBestSeller2026: true }, { badge: true }] };
-      } else if (["standard", "comfort", "luxury"].includes(type.toLowerCase())) {
+      } else if (
+        ["standard", "comfort", "luxury"].includes(type.toLowerCase())
+      ) {
         filterQuery.categoryType = type.toLowerCase();
       }
     }
 
-    // Frontend category filter mapping
     if (category === "best-sellers") filterQuery.isBestSeller2026 = true;
     if (category === "luxury") filterQuery.isLuxuryVIP = true;
     if (category === "peak-climbing") filterQuery.isPeakClimbing = true;
@@ -198,7 +191,6 @@ export const getTrips = async (req, res) => {
 
     const trips = await Trip.find(filterQuery).sort({ createdAt: -1 });
 
-    // If frontend requests grouped format (for tab-based components)
     if (format === "grouped") {
       const groupedPackages = {
         "best-sellers": trips.filter((t) => t.isBestSeller2026),
@@ -217,7 +209,6 @@ export const getTrips = async (req, res) => {
   }
 };
 
-
 export const getTripById = async (req, res) => {
   try {
     const trip = await Trip.findById(req.params.id);
@@ -228,34 +219,48 @@ export const getTripById = async (req, res) => {
   }
 };
 
-/* =========================
-   UPDATE TRIP
-========================= */
 export const updateTrip = async (req, res) => {
   try {
     const trip = await Trip.findById(req.params.id);
     if (!trip) return res.status(404).json({ message: "Trip not found" });
 
-    /* ================= TEXT FIELDS ================= */
     const textFields = [
-      "title", "country", "overview", "difficulty", "activity",
-      "maxAltitude", "bestSeason", "startPoint", "endPoint",
-      "meals", "accommodation", "categoryType",
-       // ✅ NEW
+      "title",
+      "country",
+      "overview",
+      "difficulty",
+      "activity",
+      "maxAltitude",
+      "bestSeason",
+      "startPoint",
+      "endPoint",
+      "meals",
+      "accommodation",
+      "categoryType",
+
+      "note",
+      "luklaFlightInfo",
+      "relatedInformation",
+      "bestTime",
+      "whyChoose",
     ];
+
     textFields.forEach((f) => {
       if (req.body[f] !== undefined) trip[f] = req.body[f];
     });
 
-    /* ================= NUMBER FIELDS ================= */
     ["duration", "price", "oldPrice"].forEach((f) => {
       if (req.body[f] !== undefined) trip[f] = Number(req.body[f]) || 0;
     });
 
-    /* ================= BOOLEAN FIELDS ================= */
     const boolFields = [
-      "isBestSeller2026", "isLuxuryVIP", "isPeakClimbing",
-      "isShortTrek", "isBhutanTour", "isTibetTour", "badge",
+      "isBestSeller2026",
+      "isLuxuryVIP",
+      "isPeakClimbing",
+      "isShortTrek",
+      "isBhutanTour",
+      "isTibetTour",
+      "badge",
     ];
     boolFields.forEach((f) => {
       if (req.body[f] !== undefined) {
@@ -263,45 +268,58 @@ export const updateTrip = async (req, res) => {
       }
     });
 
-    /* ================= ARRAY FIELDS ================= */
-    const parse = (val) => {
-      try {
-        return typeof val === "string" ? JSON.parse(val) : val || [];
-      } catch {
-        return [];
-      }
-    };
+   const parse = (val, defaultValue = {}) => {
+  try {
+    return typeof val === "string"
+      ? JSON.parse(val)
+      : val ?? defaultValue;
+  } catch {
+    return defaultValue;
+  }
+};
 
     [
-      "includes", "excludes", "highlights", "itinerary",
-      "faqs", "packages", "packingList", "availableDates",
+      "includes",
+      "excludes",
+      "highlights",
+      "itinerary",
+      "faqs",
+      "packages",
+      "packingList",
+      "availableDates",
+
+      "otherEssentials",
+      "optionalItems",
     ].forEach((f) => {
       if (req.body[f] !== undefined) trip[f] = parse(req.body[f]);
     });
 
-    /* ================= SLUG ================= */
+    if (req.body.packingList !== undefined) {
+  trip.packingList = parse(req.body.packingList, {});
+}
+
     if (req.body.title) {
       trip.slug = slugify(req.body.title, { lower: true, strict: true });
     }
 
-    /* ================= HERO IMAGE ================= */
     if (req.files?.featuredImage?.[0]) {
       const result = await uploadBuffer(req.files.featuredImage[0].buffer);
       trip.heroImage = { url: result.secure_url, public_id: result.public_id };
     }
 
-    /* ================= GALLERY IMAGES ================= */
     if (req.files?.gallery?.length) {
       const uploadedGallery = [];
       for (let file of req.files.gallery) {
         const result = await uploadBuffer(file.buffer);
-        uploadedGallery.push({ url: result.secure_url, public_id: result.public_id });
+        uploadedGallery.push({
+          url: result.secure_url,
+          public_id: result.public_id,
+        });
       }
-      // Keep old + new images
+
       trip.galleryImages = [...(trip.galleryImages || []), ...uploadedGallery];
     }
 
-    /* ================= NEW: BROCHURE PDF ================= */
     if (req.files?.brochure?.[0]) {
       const result = await uploadBuffer(req.files.brochure[0].buffer, {
         folder: "trips/brochures",
@@ -310,16 +328,17 @@ export const updateTrip = async (req, res) => {
       trip.brochure = { url: result.secure_url, public_id: result.public_id };
     }
 
-    /* ================= NEW: ITINERARY PDF ================= */
     if (req.files?.itineraryPdf?.[0]) {
       const result = await uploadBuffer(req.files.itineraryPdf[0].buffer, {
         folder: "trips/itineraries",
         resource_type: "raw",
       });
-      trip.itineraryPdf = { url: result.secure_url, public_id: result.public_id };
+      trip.itineraryPdf = {
+        url: result.secure_url,
+        public_id: result.public_id,
+      };
     }
 
-    /* ================= NEW: GUIDE PHOTO ================= */
     if (req.files?.guidePhoto?.[0]) {
       const result = await uploadBuffer(req.files.guidePhoto[0].buffer, {
         folder: "trips/guides",
@@ -330,22 +349,17 @@ export const updateTrip = async (req, res) => {
       };
     }
 
-    /* ================= MAP IMAGE ================= */
-if (req.files?.mapImage?.[0]) {
-  const result = await uploadBuffer(
-    req.files.mapImage[0].buffer,
-    {
-      folder: "trips/maps",
+    if (req.files?.mapImage?.[0]) {
+      const result = await uploadBuffer(req.files.mapImage[0].buffer, {
+        folder: "trips/maps",
+      });
+
+      trip.mapImage = {
+        url: result.secure_url,
+        public_id: result.public_id,
+      };
     }
-  );
 
-  trip.mapImage = {
-    url: result.secure_url,
-    public_id: result.public_id,
-  };
-}
-
-    /* ================= NEW: GUIDE INFO TEXT FIELDS ================= */
     if (req.body.guideInfo) {
       const parsedGuide = parse(req.body.guideInfo);
       trip.guideInfo = {
@@ -356,7 +370,6 @@ if (req.files?.mapImage?.[0]) {
         languages: parsedGuide.languages ?? trip.guideInfo?.languages ?? "",
       };
     } else {
-      // Also support flat fields: guideName, guideBio, etc.
       const flatGuideFields = {
         guideName: "name",
         guideBio: "bio",
@@ -376,27 +389,25 @@ if (req.files?.mapImage?.[0]) {
     await trip.save();
     return res.status(200).json(trip);
   } catch (err) {
-    return res.status(500).json({ message: "Update failed", error: err.message });
+    return res
+      .status(500)
+      .json({ message: "Update failed", error: err.message });
   }
 };
 
-/* =========================
-   DELETE TRIP
-========================= */
 export const deleteTrip = async (req, res) => {
   try {
     const trip = await Trip.findById(req.params.id);
     if (!trip) return res.status(404).json({ message: "Trip not found" });
     await trip.deleteOne();
-    return res.status(200).json({ success: true, message: "Trip deleted successfully" });
+    return res
+      .status(200)
+      .json({ success: true, message: "Trip deleted successfully" });
   } catch (err) {
     return res.status(500).json({ message: err.message });
   }
 };
 
-/* =========================
-   ADD TRIP DATE
-========================= */
 export const addTripDate = async (req, res) => {
   try {
     const { tripId, date, totalSeats, price, status } = req.body;
@@ -408,7 +419,8 @@ export const addTripDate = async (req, res) => {
     }
 
     const trip = await Trip.findById(tripId);
-    if (!trip) return res.status(404).json({ message: "Target trip not found" });
+    if (!trip)
+      return res.status(404).json({ message: "Target trip not found" });
 
     const newDateVariant = {
       date: new Date(date),
@@ -429,13 +441,12 @@ export const addTripDate = async (req, res) => {
     });
   } catch (err) {
     console.error("❌ ADD TRIP DATE ERROR:", err);
-    return res.status(500).json({ message: "Failed to add date", error: err.message });
+    return res
+      .status(500)
+      .json({ message: "Failed to add date", error: err.message });
   }
 };
 
-/* =========================
-   GET BY SLUG
-========================= */
 export const getTrip = async (req, res) => {
   try {
     const trip = await Trip.findOne({ slug: req.params.slug });

@@ -1,18 +1,19 @@
 import { useEffect, useState } from "react";
 import axios from "../api/axios";
 import { useParams, useNavigate } from "react-router-dom";
-import { 
-  X, 
-  Save, 
-  MapPin, 
-  Image as ImageIcon, 
+import {
+  X,
+  Save,
+  MapPin,
+  Image as ImageIcon,
   ArrowLeft,
-  Eye
+  Eye,
 } from "lucide-react";
 import Sidebar from "../components/Sidebar";
 import ItineraryBuilder from "../components/ItineraryForm";
 import PackageBuilder from "../components/PackageBuilder";
 import ListBuilder from "../components/ListBuilder";
+import PackingCategory from "../components/PackingCategory";
 
 export default function EditTrip() {
   const { id } = useParams();
@@ -22,7 +23,7 @@ export default function EditTrip() {
     title: "",
     country: "Nepal",
     category: "",
-    categoryType: "standard", 
+    categoryType: "standard",
     duration: "",
     price: "",
     oldPrice: "",
@@ -35,34 +36,42 @@ export default function EditTrip() {
     endPoint: "",
     meals: "",
     accommodation: "",
-    
+
     // Operational categories state matrix variables
     isBestSeller2026: false,
     isLuxuryVIP: false,
     isPeakClimbing: false,
     isShortTrek: false,
     isBhutanTour: false,
-    isTibetTour: false, 
+    isTibetTour: false,
   });
 
-  // Track raw file state for new uploads
   const [featuredImage, setFeaturedImage] = useState(null);
   const [gallery, setGallery] = useState([]);
 
-  // Track current image references from the DB to display placeholders/previews
   const [existingHero, setExistingHero] = useState("");
   const [existingGallery, setExistingGallery] = useState([]);
-  
-  // Track schema dates so edits don't inadvertently blow away logistics
+
   const [availableDates, setAvailableDates] = useState([]);
 
-  // Dynamic state arrays
   const [itinerary, setItinerary] = useState([]);
   const [packages, setPackages] = useState([]);
   const [includes, setIncludes] = useState([]);
   const [excludes, setExcludes] = useState([]);
   const [highlights, setHighlights] = useState([]);
   const [faqs, setFaqs] = useState([]);
+
+  const [packingList, setPackingList] = useState({
+    general: [""],
+    upperBody: [""],
+    torso: [""],
+    lowerBody: [""],
+    hands: [""],
+    feet: [""],
+    undergarments: [""],
+    otherEssentials: [""],
+    optionalItems: [""],
+  });
 
   useEffect(() => {
     const fetchTrip = async () => {
@@ -72,7 +81,7 @@ export default function EditTrip() {
           title: data.title || "",
           country: data.country || "Nepal",
           category: data.category || "",
-          categoryType: data.categoryType || "standard", 
+          categoryType: data.categoryType || "standard",
           duration: data.duration || "",
           price: data.price || "",
           oldPrice: data.oldPrice || "",
@@ -90,7 +99,7 @@ export default function EditTrip() {
           isPeakClimbing: data.isPeakClimbing || false,
           isShortTrek: data.isShortTrek || false,
           isBhutanTour: data.isBhutanTour || false,
-          isTibetTour: data.isTibetTour || false, 
+          isTibetTour: data.isTibetTour || false,
         });
 
         setItinerary(data.itinerary || []);
@@ -98,10 +107,29 @@ export default function EditTrip() {
         setIncludes(data.includes || []);
         setExcludes(data.excludes || []);
         setHighlights(data.highlights || []);
+
+        setPackingList(
+          data.packingList || {
+            general: [""],
+            upperBody: [""],
+            torso: [""],
+            lowerBody: [""],
+            hands: [""],
+            feet: [""],
+            undergarments: [""],
+            otherEssentials: [""],
+            optionalItems: [""],
+          },
+        );
         setFaqs(data.faqs || []);
         setAvailableDates(data.availableDates || []);
 
-        setExistingHero(data.featuredImage?.url || data.featuredImage || data.heroImage?.url || "");
+        setExistingHero(
+          data.featuredImage?.url ||
+            data.featuredImage ||
+            data.heroImage?.url ||
+            "",
+        );
         setExistingGallery(data.gallery || data.galleryImages || []);
       } catch (err) {
         console.error("Fetch error:", err);
@@ -110,7 +138,6 @@ export default function EditTrip() {
     fetchTrip();
   }, [id]);
 
-  // Clean up object URLs to prevent browser memory leaks
   useEffect(() => {
     return () => {
       if (featuredImage?.preview) URL.revokeObjectURL(featuredImage.preview);
@@ -125,7 +152,7 @@ export default function EditTrip() {
      ========================================================================== */
   const handleInputChange = (e) => {
     const { name, value, type, checked } = e.target;
-    
+
     setForm((prev) => {
       let updatedForm = {
         ...prev,
@@ -161,28 +188,53 @@ export default function EditTrip() {
     const file = e.target.files[0];
     if (file) {
       if (featuredImage?.preview) URL.revokeObjectURL(featuredImage.preview);
-      setFeaturedImage(Object.assign(file, { preview: URL.createObjectURL(file) }));
+      setFeaturedImage(
+        Object.assign(file, { preview: URL.createObjectURL(file) }),
+      );
     }
   };
 
   const handleGalleryChange = (e) => {
     const files = Array.from(e.target.files);
     const filesWithPreview = files.map((file) =>
-      Object.assign(file, { preview: URL.createObjectURL(file) })
+      Object.assign(file, { preview: URL.createObjectURL(file) }),
     );
     setGallery((prev) => [...prev, ...filesWithPreview]);
+  };
+
+  const addPackingItem = (category) => {
+    setPackingList((prev) => ({
+      ...prev,
+      [category]: [...prev[category], ""],
+    }));
+  };
+
+  const removePackingItem = (category, index) => {
+    setPackingList((prev) => ({
+      ...prev,
+      [category]: prev[category].filter((_, i) => i !== index),
+    }));
+  };
+
+  const updatePackingItem = (category, index, value) => {
+    setPackingList((prev) => ({
+      ...prev,
+      [category]: prev[category].map((item, i) => (i === index ? value : item)),
+    }));
   };
 
   const handleFaqChange = (index, field, value) => {
     setFaqs((prevFaqs) =>
       prevFaqs.map((faq, i) =>
-        i === index ? { ...faq, [field]: value } : faq
-      )
+        i === index ? { ...faq, [field]: value } : faq,
+      ),
     );
   };
 
   const handleRemoveExistingGalleryItem = (indexToRemove) => {
-    setExistingGallery((prev) => prev.filter((_, idx) => idx !== indexToRemove));
+    setExistingGallery((prev) =>
+      prev.filter((_, idx) => idx !== indexToRemove),
+    );
   };
 
   const handleRemoveStagedGalleryItem = (indexToRemove) => {
@@ -193,14 +245,11 @@ export default function EditTrip() {
     });
   };
 
-  /* ==========================================================================
-      API DISPATCH WITH STATE NORMALIZATION
-     ========================================================================== */
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
       const fd = new FormData();
-      
+
       const finalizedForm = { ...form };
       if (finalizedForm.country === "Bhutan") {
         finalizedForm.isBhutanTour = true;
@@ -226,6 +275,7 @@ export default function EditTrip() {
       fd.append("highlights", JSON.stringify(highlights));
       fd.append("faqs", JSON.stringify(faqs));
       fd.append("availableDates", JSON.stringify(availableDates));
+      fd.append("packingList", JSON.stringify(packingList));
       fd.append("existingGallery", JSON.stringify(existingGallery));
 
       if (featuredImage) {
@@ -243,7 +293,9 @@ export default function EditTrip() {
       navigate("/trips");
     } catch (err) {
       console.error("Submission failed:", err.response?.data || err.message);
-      alert(`Update failed: ${err.response?.data?.message || "Internal Server Error"}`);
+      alert(
+        `Update failed: ${err.response?.data?.message || "Internal Server Error"}`,
+      );
     }
   };
 
@@ -253,7 +305,7 @@ export default function EditTrip() {
     "bg-white p-6 lg:p-8 rounded-2xl border border-slate-100 shadow-sm space-y-6";
   const labelClass =
     "block text-[11px] font-extrabold text-slate-400 uppercase tracking-wider mb-2 flex items-center gap-1.5";
-  const checkboxLabelClass = 
+  const checkboxLabelClass =
     "flex items-center gap-3 p-3 bg-slate-50 border border-slate-100 rounded-xl cursor-pointer hover:bg-slate-100/70 transition-all text-xs font-bold text-slate-700 uppercase tracking-wide";
 
   return (
@@ -263,7 +315,7 @@ export default function EditTrip() {
       <main className="flex-1 ml-64 p-8 lg:p-12 max-w-5xl">
         <header className="mb-10 pb-6 border-b border-slate-200 flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div>
-            <button 
+            <button
               type="button"
               onClick={() => navigate("/trips")}
               className="inline-flex items-center gap-2 text-xs font-bold text-slate-400 hover:text-indigo-600 transition-colors uppercase tracking-wider mb-3"
@@ -279,12 +331,16 @@ export default function EditTrip() {
           </div>
         </header>
 
-        <form onSubmit={handleSubmit} className="space-y-8" encType="multipart/form-data">
-          
+        <form
+          onSubmit={handleSubmit}
+          className="space-y-8"
+          encType="multipart/form-data"
+        >
           {/* MAP CONFIGS SECTION */}
           <section className={sectionClass}>
             <h2 className="text-lg font-bold text-slate-800 flex items-center gap-2 border-b border-slate-100 pb-4">
-              <MapPin size={18} className="text-indigo-500" /> Core Logistical Profiles
+              <MapPin size={18} className="text-indigo-500" /> Core Logistical
+              Profiles
             </h2>
 
             <div className="space-y-4">
@@ -407,7 +463,9 @@ export default function EditTrip() {
                   />
                 </div>
                 <div>
-                  <label className={labelClass}>Optimized Climbing Season</label>
+                  <label className={labelClass}>
+                    Optimized Climbing Season
+                  </label>
                   <input
                     name="bestSeason"
                     className={inputClass}
@@ -420,9 +478,10 @@ export default function EditTrip() {
 
               {/* DYNAMIC CONDITIONAL PROMOTIONAL CATEGORIES */}
               <div className="pt-2">
-                <label className={labelClass}>Promotional Categories & Tab Visibility</label>
+                <label className={labelClass}>
+                  Promotional Categories & Tab Visibility
+                </label>
                 <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
-                  
                   {form.country === "Nepal" && (
                     <>
                       <label className={checkboxLabelClass}>
@@ -480,7 +539,8 @@ export default function EditTrip() {
                         disabled
                         className="w-4 h-4 rounded text-emerald-600 border-slate-300 cursor-not-allowed"
                       />
-                      🇧🇹 Bhutan Exclusive Active (स्वतः भूटान ट्याब फिल्टरमा देखा पर्नेछ)
+                      🇧🇹 Bhutan Exclusive Active (स्वतः भूटान ट्याब फिल्टरमा
+                      देखा पर्नेछ)
                     </label>
                   )}
 
@@ -493,14 +553,17 @@ export default function EditTrip() {
                         disabled
                         className="w-4 h-4 rounded text-blue-600 border-slate-300 cursor-not-allowed"
                       />
-                      🇨🇳 Tibet Exclusive Active (स्वतः तिब्बत ट्याब फिल्टरमा देखा पर्नेछ)
+                      🇨🇳 Tibet Exclusive Active (स्वतः तिब्बत ट्याब फिल्टरमा
+                      देखा पर्नेछ)
                     </label>
                   )}
                 </div>
               </div>
 
               <div>
-                <label className={labelClass}>Operational Summary / Overview</label>
+                <label className={labelClass}>
+                  Operational Summary / Overview
+                </label>
                 <textarea
                   name="overview"
                   className={`${inputClass} min-h-[140px] p-4 resize-none leading-relaxed`}
@@ -515,18 +578,18 @@ export default function EditTrip() {
           {/* DIGITAL ASSET MANAGEMENT */}
           <section className={sectionClass}>
             <h2 className="text-lg font-bold text-slate-800 flex items-center gap-2 border-b border-slate-100 pb-4">
-              <ImageIcon size={18} className="text-emerald-500" /> Digital Asset Management
+              <ImageIcon size={18} className="text-emerald-500" /> Digital Asset
+              Management
             </h2>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-              
               <div className="p-5 border border-slate-100 bg-slate-50/50 rounded-2xl space-y-4">
                 <label className={labelClass}>Hero Banner Image</label>
                 {(featuredImage?.preview || existingHero) && (
                   <div className="h-40 w-full relative rounded-xl overflow-hidden bg-slate-900 border border-slate-100 group shadow-inner">
-                    <img 
-                      src={featuredImage?.preview || existingHero} 
-                      alt="Hero preview" 
-                      className="w-full h-full object-cover transition-transform group-hover:scale-105 duration-300" 
+                    <img
+                      src={featuredImage?.preview || existingHero}
+                      alt="Hero preview"
+                      className="w-full h-full object-cover transition-transform group-hover:scale-105 duration-300"
                     />
                     <div className="absolute inset-0 bg-gradient-to-t from-slate-950/40 to-transparent flex items-end p-3">
                       <span className="text-[10px] bg-slate-900/80 text-slate-200 font-bold px-2 py-0.5 rounded backdrop-blur-xs uppercase tracking-wide inline-flex items-center gap-1">
@@ -545,13 +608,20 @@ export default function EditTrip() {
 
               <div className="p-5 border border-slate-100 bg-slate-50/50 rounded-2xl space-y-4">
                 <label className={labelClass}>Gallery Collection Updates</label>
-                
+
                 <div className="grid grid-cols-4 gap-2 max-h-40 overflow-y-auto p-2 bg-white border border-slate-100 rounded-xl shadow-inner">
                   {existingGallery.map((img, idx) => {
                     const srcUrl = img.url || img;
                     return (
-                      <div key={`exist-${idx}`} className="relative h-14 rounded-lg overflow-hidden border border-slate-200 group bg-slate-100">
-                        <img src={srcUrl} className="w-full h-full object-cover" alt="Remote DB asset" />
+                      <div
+                        key={`exist-${idx}`}
+                        className="relative h-14 rounded-lg overflow-hidden border border-slate-200 group bg-slate-100"
+                      >
+                        <img
+                          src={srcUrl}
+                          className="w-full h-full object-cover"
+                          alt="Remote DB asset"
+                        />
                         <button
                           type="button"
                           onClick={() => handleRemoveExistingGalleryItem(idx)}
@@ -564,8 +634,15 @@ export default function EditTrip() {
                   })}
 
                   {gallery.map((img, idx) => (
-                    <div key={`staged-${idx}`} className="relative h-14 rounded-lg overflow-hidden border border-emerald-300 group bg-slate-100 ring-2 ring-emerald-500/20">
-                      <img src={img.preview} className="w-full h-full object-cover" alt="Local staged blob" />
+                    <div
+                      key={`staged-${idx}`}
+                      className="relative h-14 rounded-lg overflow-hidden border border-emerald-300 group bg-slate-100 ring-2 ring-emerald-500/20"
+                    >
+                      <img
+                        src={img.preview}
+                        className="w-full h-full object-cover"
+                        alt="Local staged blob"
+                      />
                       <button
                         type="button"
                         onClick={() => handleRemoveStagedGalleryItem(idx)}
@@ -585,7 +662,6 @@ export default function EditTrip() {
                   onChange={handleGalleryChange}
                 />
               </div>
-
             </div>
           </section>
 
@@ -595,7 +671,10 @@ export default function EditTrip() {
               📅 Itinerary Planner
             </h2>
             {/* ✅ FIXED: Props updated to match the expected signature in ItineraryForm.jsx */}
-            <ItineraryBuilder itinerary={itinerary} setItinerary={setItinerary} />
+            <ItineraryBuilder
+              itinerary={itinerary}
+              setItinerary={setItinerary}
+            />
           </section>
 
           <section className={sectionClass}>
@@ -608,20 +687,53 @@ export default function EditTrip() {
           {/* LIST BUILDERS GRID */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             <div className={sectionClass}>
-              <h2 className="text-lg font-bold text-slate-800">⭐ Highlights</h2>
-              <ListBuilder title="Highlight" data={highlights} setData={setHighlights} />
+              <h2 className="text-lg font-bold text-slate-800">
+                ⭐ Highlights
+              </h2>
+              <ListBuilder
+                title="Highlight"
+                data={highlights}
+                setData={setHighlights}
+              />
             </div>
-            
+
             <div className={sectionClass}>
               <h2 className="text-lg font-bold text-slate-800">📌 Includes</h2>
-              <ListBuilder title="Include" data={includes} setData={setIncludes} />
+              <ListBuilder
+                title="Include"
+                data={includes}
+                setData={setIncludes}
+              />
             </div>
 
             <div className={sectionClass}>
               <h2 className="text-lg font-bold text-slate-800">❌ Excludes</h2>
-              <ListBuilder title="Exclude" data={excludes} setData={setExcludes} />
+              <ListBuilder
+                title="Exclude"
+                data={excludes}
+                setData={setExcludes}
+              />
             </div>
           </div>
+
+          <section className={sectionClass}>
+            <h2 className="text-lg font-bold text-slate-800">
+              🎒 Packing List
+            </h2>
+
+            {Object.keys(packingList).map((category) => (
+              <PackingCategory
+                key={category}
+                title={category}
+                items={packingList[category]}
+                onAdd={() => addPackingItem(category)}
+                onRemove={(index) => removePackingItem(category, index)}
+                onChange={(index, value) =>
+                  updatePackingItem(category, index, value)
+                }
+              />
+            ))}
+          </section>
 
           {/* FREQUENTLY ASKED QUESTIONS */}
           <section className={sectionClass}>
@@ -638,13 +750,17 @@ export default function EditTrip() {
                     placeholder="The Question..."
                     className={`${inputClass} font-semibold`}
                     value={f.question}
-                    onChange={(e) => handleFaqChange(i, "question", e.target.value)}
+                    onChange={(e) =>
+                      handleFaqChange(i, "question", e.target.value)
+                    }
                   />
                   <textarea
                     placeholder="The Answer..."
                     className={`${inputClass} text-sm`}
                     value={f.answer}
-                    onChange={(e) => handleFaqChange(i, "answer", e.target.value)}
+                    onChange={(e) =>
+                      handleFaqChange(i, "answer", e.target.value)
+                    }
                   />
                   <button
                     type="button"

@@ -104,12 +104,11 @@ const tripSchema = new mongoose.Schema(
       default: false,
     },
 
-    
-   // Map Image
-mapImage: {
-  url: String,
-  public_id: String,
-},
+    // Map Image
+    mapImage: {
+      url: String,
+      public_id: String,
+    },
 
     // ✅ NEW: Downloadable brochure PDF (Cloudinary URL)
     brochure: {
@@ -117,13 +116,11 @@ mapImage: {
       public_id: String,
     },
 
-    // ✅ NEW: Downloadable itinerary PDF (Cloudinary URL)
     itineraryPdf: {
       url: String,
       public_id: String,
     },
 
-    // ✅ NEW: Lead guide information
     guideInfo: {
       name: { type: String, default: "" },
       bio: { type: String, default: "" },
@@ -135,9 +132,49 @@ mapImage: {
       },
     },
 
-    availableDates: [availableDateSchema],
+    // ===================== Extra Trek Information =====================
 
-    packingList: [String],
+    note: {
+      type: String,
+      default: "",
+    },
+
+    luklaFlightInfo: {
+      type: String,
+      default: "",
+    },
+
+    relatedInformation: {
+      type: String,
+      default: "",
+    },
+
+    bestTime: {
+      type: String,
+      default: "",
+    },
+
+    whyChoose: {
+      type: String,
+      default: "",
+    },
+
+    otherEssentials: [String],
+
+    optionalItems: [String],
+
+    availableDates: [availableDateSchema],
+    packingList: {
+      general: [String],
+      upperBody: [String],
+      torso: [String],
+      lowerBody: [String],
+      hands: [String],
+      feet: [String],
+      undergarments: [String],
+      otherEssentials: [String],
+      optionalItems: [String],
+    },
 
     highlights: [String],
     includes: [String],
